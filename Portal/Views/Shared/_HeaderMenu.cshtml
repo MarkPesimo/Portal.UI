@@ -1,0 +1,70 @@
+﻿@using APWModel.ViewModel.Global
+
+
+<nav class="navbar fixed-top navbar-expand-lg" data-bs-theme="dark" id="nav-main">
+    @*APW-navbar-main ">*@
+    <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.asiapeopleworks.com.ph"><img src="~/Content/images/apw.png" alt=""> <strong>APW Portal</strong></a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+
+
+            <div class="offcanvas-body align-items-center">
+                <ul class="navbar-nav navbar-nav-left justify-content-start flex-grow-1 pe-lg-3 ps-lg-2 mb-3 mb-lg-0 pb-3 pb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="nav-dashboard" aria-current="page" href="@Url.Action("Dashboard", "Home")">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav-joborder" href="@Url.Action("Index", "JobOrder")">Payroll</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav-candidate" href="@Url.Action("Index", "Candidate")">Documents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav-client" href="@Url.Action("Index", "Client")">Helpdesk</a>
+                    </li>
+                    
+                </ul>
+
+                <ul class="navbar-nav justify-content-end flex-grow-1">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle dropdown-no-caret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="icon-box me-1 me-lg-0">
+                                <i class="fa-regular fa-bell"></i>
+                            </span>
+                            <span class="d-inline d-lg-none">Notifications</span>
+                            <i class="nav-link-bubble"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Notification 1</a></li>
+                            <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                            <li><a class="dropdown-item" href="#">Notification 3</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown ms-lg-2">
+   
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="change-password-menu">Update Password</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("UserSettings", "User", new { _appmoduleid = 1 })">User Settings</a></li>
+                            <li><a class="dropdown-item" href="#" id="logout-menu">Sign Out</a></li>
+                        </ul>
+
+
+                    </li>
+                </ul>
+            </div>
+
+
+        </div>
+    </div>
+</nav> 
