@@ -48,7 +48,8 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.1.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\packages\AdvancedStringBuilder.0.1.1\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="APWModel">
+    <Reference Include="APWModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APW_API\APWapi\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
@@ -88,11 +89,11 @@
     <Reference Include="DocumentFormat.OpenXml.Framework, Version=3.0.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.Framework.3.0.1\lib\net46\DocumentFormat.OpenXml.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\..\Isearch_Web\iSearch\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\..\..\Isearch_Web\iSearch\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="ExcelNumberFormat, Version=1.1.0.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
@@ -106,14 +107,14 @@
     <Reference Include="Microsoft.ApplicationInsights">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\Microsoft.ApplicationInsights.2.0.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Core">
-      <HintPath>..\..\..\Isearch_Web\iSearch\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
-      <HintPath>..\..\..\Isearch_Web\iSearch\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Owin">
-      <HintPath>..\..\..\Isearch_Web\iSearch\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
@@ -382,18 +383,29 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AttendanceController.cs" />
     <Compile Include="Controllers\DocumentController.cs" />
     <Compile Include="Controllers\HelpdeskController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LeaveController.cs" />
     <Compile Include="Controllers\PayrollController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Filtering_model.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ReturnedMessageModel.cs" />
     <Compile Include="PortalConstant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\Account\AccountRepository.cs" />
-    <Compile Include="Repository\Global\GlobalRepository.cs" />
+    <Compile Include="Repository\AccountRepository.cs" />
+    <Compile Include="Repository\DocumentRepository.cs" />
+    <Compile Include="Repository\GlobalRepository.cs" />
+    <Compile Include="Repository\HelpdeskRepository.cs" />
+    <Compile Include="Repository\PayrollRepository.cs" />
+    <Compile Include="Repository\ProfileRepository.cs" />
+    <Compile Include="Repository\SettingsRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -423,7 +435,20 @@
     <Content Include="Content\Site.css" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Content Include="Scripts\Account\Account.js" />
+    <Content Include="Scripts\Account\Password.js" />
+    <Content Include="Scripts\Document\COE.js" />
+    <Content Include="Scripts\Helpdesk\Comment.js" />
+    <Content Include="Scripts\Helpdesk\Helpdesk.js" />
+    <Content Include="Scripts\Profile\Profile.js" />
+    <Content Include="Scripts\Settings\Settings.js" />
+    <Content Include="Scripts\Settings\Account.js" />
+    <Content Include="Scripts\Document\Document.js" />
+    <Content Include="Scripts\Global\core.min.js" />
     <Content Include="Scripts\Global\Global.js" />
+    <Content Include="Scripts\Global\Home.js" />
+    <Content Include="Scripts\Payroll\Loan.js" />
+    <Content Include="Scripts\Payroll\Payroll.js" />
+    <Content Include="Scripts\Payroll\Payslip.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -445,11 +470,18 @@
     <Folder Include="App_Data\" />
     <Folder Include="CandidateFiles\" />
     <Folder Include="CandidateImages\" />
+    <Folder Include="GeneratedReports\" />
+    <Folder Include="Report\Document\" />
+    <Folder Include="Report\Payroll\" />
     <Folder Include="Views\Account\modal\" />
     <Folder Include="Views\Account\partial\" />
-    <Folder Include="Views\Document\" />
-    <Folder Include="Views\Helpdesk\" />
-    <Folder Include="Views\Payroll\" />
+    <Folder Include="Views\Attendance\" />
+    <Folder Include="Views\Document\modal\" />
+    <Folder Include="Views\Document\partial\" />
+    <Folder Include="Views\Leave\" />
+    <Folder Include="Views\Payroll\partial\" />
+    <Folder Include="Views\Settings\modal\" />
+    <Folder Include="Views\Settings\partial\" />
     <Folder Include="Views\Shared\Popup\" />
     <Folder Include="Views\Shared\Search\" />
     <Folder Include="Views\Shared\Security\" />
@@ -462,6 +494,46 @@
     <None Include="packages.config" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\Layouts\_BlankLayout.cshtml" />
+    <Content Include="Views\Payroll\Payroll_index.cshtml" />
+    <Content Include="Views\Payroll\modal\_payroll_filter_modal.cshtml" />
+    <Content Include="Views\Payroll\Payslip.cshtml" />
+    <Content Include="Views\Document\Document_index.cshtml" />
+    <Content Include="Views\Payroll\Loan.cshtml" />
+    <Content Include="Views\Profile\Profile_index.cshtml" />
+    <Content Include="Views\Payroll\modal\_loan_filter_modal.cshtml" />
+    <Content Include="Views\Payroll\modal\_LoanPaymentTransaction_modal.cshtml" />
+    <Content Include="Views\Document\COE.cshtml" />
+    <Content Include="Views\Settings\Settings_index.cshtml" />
+    <Content Include="Views\Settings\AccountSetup.cshtml" />
+    <Content Include="Views\Settings\ChangePassword.cshtml" />
+    <Content Include="Views\Account\Success.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\Confirmation.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Profile\partial\_Profile_InitialInfo.cshtml" />
+    <Content Include="Views\Profile\partial\_Profile_Personal.cshtml" />
+    <Content Include="Views\Profile\partial\_Profile_Contact.cshtml" />
+    <Content Include="Views\Profile\partial\_Profile_Government.cshtml" />
+    <Content Include="Views\Profile\modal\_Attach_Image_modal.cshtml" />
+    <Content Include="Views\Helpdesk\Helpdesk_index.cshtml" />
+    <Content Include="Views\Helpdesk\modal\_helpdesk_filter_modal.cshtml" />
+    <Content Include="Views\Profile\modal\_Edit_Profile_modal.cshtml" />
+    <Content Include="Views\Profile\partial\_Edit_Profile_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Add_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Edit_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\concern\_Concern_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Post_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\concern\_Post_detail.cshtml" />
+    <Content Include="Views\Helpdesk\partial\concern\_Unpost_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Unpost_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\concern\_Cancel_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Cancel_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\concern\_Delete_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\concern\_Delete_Concern_modal.cshtml" />
+    <Content Include="Views\Helpdesk\modal\comment\_Comment_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\comment\_Add_Comment_detail.cshtml" />
+    <Content Include="Views\Helpdesk\modal\comment\_add_comment_modal.cshtml" />
+    <Content Include="Views\Helpdesk\partial\comment\_comments.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

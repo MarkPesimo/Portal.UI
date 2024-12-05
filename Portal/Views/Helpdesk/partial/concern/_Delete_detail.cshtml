@@ -1,0 +1,22 @@
+﻿@model APWModel.ViewModel.Portal.Helpdesk_model.ConcernModel
+
+
+
+@using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", name = "delete-concern-Form", id = "delete-concern-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.ConcernTypeId)
+    @Html.HiddenFor(m => m.Description)
+    @Html.HiddenFor(m => m.DateCreated)
+
+    
+    <div class="row">
+        <div class="col mb-3">
+            <label for="" class="form-label">Are you sure you want to <strong class="text-danger">Delete</strong> Concern no. <strong class="text-primary">@Model.Id</strong>? </label>
+        </div>
+    </div>
+
+}
+
+

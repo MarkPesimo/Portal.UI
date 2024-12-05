@@ -1,5 +1,63 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Home Page";
 }
 
- 
+@section Scripts
+{
+    <script src="@Url.Content("~/Scripts/Global/Home.js")"></script>
+}
+
+<section class="main">
+    <div class="main-title py-3">
+        <div class="container-fluid" id="industry-header-div">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                    <h1 class="h4 mt-2 mb-lg-0">APW Portal</h1>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content py-3">
+        <div class="container-fluid">
+            <div class="widget">
+                <div class="row justify-content-center align-items-center">
+
+                    <div class="col-11 mt-3 text-center d-sm-none">
+                        <span class="tt" data-bs-placement="bottom" title="APW logo">
+                            <img class="img-fluid" src="~/Content/images/logos/APW-Logo-02.png" alt="APW logo" />
+                        </span>
+                    </div>
+
+                    <div class="col-lg-6 col-12">
+                        <div class="display-2">
+                            <h1><strong>APW Portal</strong></h1>
+                        </div>
+
+                        <p>
+                            A one-stop service for Asia Peopleworks, Inc. employees that provides centralized information, 24/7 payslip access, and helpdesk support for employees’ query.
+                            You can access this through your desktop computer, laptop, tablet, or smartphone.
+                        </p>
+                    </div>
+
+                    <div class="col-4 text-center d-none d-md-block">
+                        <span class="tt" data-bs-placement="bottom" title="APW logo">
+                            <img class="img-fluid" src="~/content/Images/logos/APW-Logo-02.png" alt="APW logo" width="400" height="300" />
+                        </span>
+                    </div>
+
+
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+</section>

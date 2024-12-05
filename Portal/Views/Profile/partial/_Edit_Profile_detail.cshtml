@@ -1,0 +1,88 @@
+﻿@model APWModel.ViewModel.Portal.PortalPersonalinfo_model
+
+
+@using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", name = "edit-profile-Form", id = "edit-profile-Form" }))
+{
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.CandidateId)
+    @Html.HiddenFor(m => m.EmpNo)
+    @Html.HiddenFor(m => m.RequestId)
+
+
+    <div class="row" id="div-with-pending-request">
+        <div class="col-lg-6 mb-3">
+            <p class="text-danger">@ViewBag._WithPendingRequest_edit</p>
+        </div>
+    </div>
+
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-4 mb-3">
+            <label for="" class="form-label">First Name</label>
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @placeholder = "Firstname" })
+        </div>
+
+        <div class="col-lg-4 mb-3">
+            <label for="" class="form-label">Middle Name</label>
+            @Html.TextBoxFor(m => m.MiddleName, new { @class = "form-control", @placeholder = "Middlename" })
+        </div>
+
+        <div class="col-lg-4 mb-3">
+            <label for="" class="form-label">Last Name</label>
+            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @placeholder = "Lastname" })
+        </div>
+
+        <div class="col-12 mb-3">
+            <label for="" class="form-label">Position</label>
+            @Html.TextBoxFor(m => m.Position, new { @class = "form-control", @placeholder = "Position" })
+        </div>
+
+        <div class="col-lg-3  col-6 mb-3">
+            <label for="" class="form-label">Civil Status</label>
+            @Html.DropDownListFor(m => m.CivilStatus, (IEnumerable<SelectListItem>)ViewBag._CivilStatus, "Please Select", new { @class = "form-select", @placeholder = "Civil Status", @id = "CivilStatus" })
+        </div>
+
+        <div class="col-lg-3 col-6 mb-3">
+            <label for="" class="form-label">Gender</label>
+            @Html.DropDownListFor(m => m.Gender, (IEnumerable<SelectListItem>)ViewBag._Gender, "Please Select", new { @class = "form-select", @placeholder = "Gender", @id = "Gender" })
+        </div>
+
+        <div class="col-lg-3  col-6 mb-3">
+            <label for="" class="form-label">Birthday</label>
+            @Html.TextBoxFor(m => m.BirthDay, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.BirthDay.ToString("yyyy-MM-dd") })
+        </div>
+
+        <div class="col-lg-3 col-6 mb-3">
+            <label for="" class="form-label">Date Hired</label>
+            @Html.TextBoxFor(m => m.DateHired, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateHired.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-3">
+            <label for="" class="form-label">Address</label>
+            @Html.TextAreaFor(m => m.Address, 2, 40, new { @class = "form-control", @placeholder = "Current Location" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Contact no.</label>
+            @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control", @placeholder = "Contact no" })
+        </div>
+
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Email Address</label>
+            @Html.TextBoxFor(m => m.EmailAddress, new { @class = "form-control", @placeholder = "Email Address" })
+        </div>
+    </div>
+}
+
+

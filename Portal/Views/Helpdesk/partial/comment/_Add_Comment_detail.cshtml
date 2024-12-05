@@ -1,0 +1,25 @@
+﻿@model APWModel.ViewModel.Portal.Helpdesk_model.Comment_model.CommentModel
+
+
+@using (Html.BeginForm("AddComment", "Helpdesk", FormMethod.Post, new { enctype = "multipart/form-data", name = "comment-Form", id = "comment-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.DateCreated)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+        
+
+    <div class="row">
+        <div class="col">
+            <label for="" class="form-label">Comment</label>
+            @Html.TextAreaFor(m => m.Comment, 4, 40, new { @class = "form-control", @placeholder = "Enter Comments" })
+        </div>
+    </div>
+}
+
+

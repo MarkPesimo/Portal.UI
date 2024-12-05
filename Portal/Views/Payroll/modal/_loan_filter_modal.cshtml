@@ -1,0 +1,29 @@
+﻿<div class="modal fade" id="filter_loan_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header Zips-modal-header">
+                <h1 class="modal-title fs-5" id="jobOrderLabel">Filter Loan</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mt-2" id="loan-filter">
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="">Loan Status</label>
+                            @Html.DropDownList("_loanstatus", (IEnumerable<SelectListItem>)ViewBag.LoanStatus, "All", new { @class = "form-select", @id = "_loanstatus"})
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="filter_loan_btn">
+                    <i class="fa-regular fa-circle-check"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

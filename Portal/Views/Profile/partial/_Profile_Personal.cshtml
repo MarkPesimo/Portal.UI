@@ -1,0 +1,57 @@
+﻿@model APWModel.ViewModel.Portal.PortalPersonalinfo_model
+       
+<div class="row justify-content-center justify-content-sm-between">
+    <div class="col-auto">
+        <h4 class="text-primary">Personal Information</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Employee Number</small></p>
+        <p><strong>@Model.EmpNo</strong></p>
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Last Name</small></p>
+        <p><strong>@Model.LastName</strong></p>
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>First Name</small></p>
+        <p><strong>@Model.FirstName</strong></p>
+    </div>
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Middle Name</small></p>
+        <p><strong>@Model.MiddleName</strong></p>
+    </div>
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Position</small></p>
+        <p><strong>@Model.Position</strong></p>
+    </div>
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Civil Status</small></p>
+        <p><strong>@Model.CivilStatus</strong></p>
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Gender</small></p>
+        <p><strong>@Model.Gender</strong></p>
+    </div>
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Birthdate</small></p>
+        <p><strong>@Model.BirthDay.ToString("d")</strong></p>
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+        <p class="text-muted mb-0"><small>Date Hired</small></p>
+        <p><strong>@Model.DateHired.ToString("d")</strong></p>
+    </div>
+
+</div>
+
+ 

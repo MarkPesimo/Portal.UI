@@ -1,0 +1,34 @@
+﻿@model APWModel.ViewModel.Portal.Helpdesk_model.ConcernModel
+    
+
+@using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", name = "concern-Form", id = "concern-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.DateCreated)
+        
+    
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Concern Type</label>
+            @Html.DropDownListFor(m => m.ConcernTypeId, (IEnumerable<SelectListItem>)ViewBag._concernTypes, "Please Select", new { @class = "form-select", @placeholder = "Concern Type" })
+        </div>
+
+        
+    </div>    
+
+    <div class="row">
+        <div class="col">
+            <label for="" class="form-label">Description</label>
+            @Html.TextAreaFor(m => m.Description, 4, 40, new { @class = "form-control", @placeholder = "Description" })
+        </div>
+    </div>
+}
+
+

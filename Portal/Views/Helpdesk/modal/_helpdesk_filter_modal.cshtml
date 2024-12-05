@@ -1,0 +1,52 @@
+﻿@model APWModel.ViewModel.Portal.Helpdesk_model.Monitoring_model.Filter_model
+
+<div class="modal fade " id="filter_helpdesk_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header Zips-modal-header">
+                <h1 class="modal-title fs-5" id="jobOrderLabel">Filter Concern</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" id="helpdesk-filter">
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="">Start date</label>
+                            @Html.TextBoxFor(m => m.From, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.From.ToString("yyyy-MM-dd") })
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="">End date</label>
+                            @Html.TextBoxFor(m => m.To, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.To.ToString("yyyy-MM-dd") })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="">Concern Type</label>
+                            @Html.DropDownListFor(m => m.ConcernType, (IEnumerable<SelectListItem>)ViewBag._concernTypes, "All", new { @class = "form-select", @placeholder = "Concern Type"  })
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="">Status</label>
+                            @Html.DropDownListFor(m => m.Status, (IEnumerable<SelectListItem>)ViewBag._concernStatus, "All", new { @class = "form-select", @placeholder = "Status" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="filter_concern">
+                    <i class="fa-regular fa-circle-check"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

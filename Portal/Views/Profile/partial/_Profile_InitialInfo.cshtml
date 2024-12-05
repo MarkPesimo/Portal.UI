@@ -1,0 +1,25 @@
+﻿@model APWModel.ViewModel.Portal.PortalInitialInfo_model
+    
+<div class="widget p-0 mb-4">   
+    @*<img src="\CandidateImages\228.JPEG" id="employee-initial-image" alt="Profile Picture" class="mb-1 img-fluid w-100">*@
+    <img src="\CandidateImages\@(Model.CandidateId).JPEG" id="candidate-initial-image" alt="Profile Picture" class="mb-1 img-fluid w-100">
+    <div class="p-4 text-center text-lg-start border-bottom " style="border-bottom-color: #ebf0f7;">
+        <h4 class="text-primary">@Model.EmployeeName</h4>
+
+        <div class="mb-2">
+            <p class="mb-0 text-muted"><small>Position</small></p>
+            <p><strong>@Model.Position</strong></p>
+        </div>
+
+        <div class="mb-2">
+            <p class="mb-0 text-muted"><small>Current Location</small></p>
+            <p><strong>@Model.CurrentLocation</strong></p>
+        </div>
+
+    </div>
+
+    <div class="p-3 d-grid">
+        <button class="btn  btn-sm btn-primary edit-social-btn" id="0">Add/Update Photo</button>
+    </div>
+
+</div>

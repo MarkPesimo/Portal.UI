@@ -1,5 +1,5 @@
 ﻿@model APWModel.ViewModel.Global.LoginModel
-
+    
 @{ 
     ViewBag.Title = "User Authentication";
     Layout = "~/Views/Shared/Layouts/_BlankLayout.cshtml";
@@ -51,9 +51,13 @@
                         </div>
                     </div>
 
-                    <div class="text-end">
-                        <a href="#" class="mb-3 d-inline-block">Forgot Password</a>
+                    <div class="text-end mt-1 mb-4">
+                        @Html.ActionLink("Forgot Password?", "ForgotPassword") 
                     </div>
+
+                    @*<div class="text-end">
+                        <a href="#" class="mb-3 d-inline-block">Forgot Password</a>
+                    </div>*@
 
                     <button type="button" class="btn w-100 btn-primary" id="login-btn">Login</button>
                 }

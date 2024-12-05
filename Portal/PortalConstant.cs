@@ -14,7 +14,7 @@ namespace Portal
 
         public static string ServerName = ConfigurationManager.AppSettings["_ServerName"].ToString();
         public static string DatabaseName = ConfigurationManager.AppSettings["_DatabaseName"].ToString();
-
+        public static string dbpassword = ConfigurationManager.AppSettings["_Password"].ToString();
         public static string Username = ConfigurationManager.AppSettings["_Username"].ToString();
 
     }
