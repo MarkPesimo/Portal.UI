@@ -75,6 +75,44 @@ namespace Portal.Repository
             catch (Exception) { throw; }
         }
 
+        public string GetConcernStatus(int _id)
+        {
+            string _result = "";
+            try
+            {
+                
+                string _endpoint = "Helpdesk/GetConcernStatus/" + _id.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _result = JsonConvert.DeserializeObject<string>(_value);
+                }
+
+                return _result;
+            }
+            catch (Exception) { throw; }
+        }
+
+        public int GetTopConcern(int _concernid)
+        {
+            int _result = 0;
+            try
+            {
+
+                string _endpoint = "Helpdesk/GetTopComment/" + _concernid.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _result = JsonConvert.DeserializeObject<int>(_value);
+                }
+
+                return _result;
+            }
+            catch (Exception) { throw; }
+        }
+
         public int ManageConcern(ConcernModel _model, int _mode)
         {
             int _id = 0;
@@ -142,6 +180,54 @@ namespace Portal.Repository
                 {"Comment",                 _model.Comment.ToString() },
                 {"UserId",                  _model.UserId.ToString()},
                 {"DateCreated",             _model.DateCreated.ToString() },
+            };
+
+            string _body_content = JsonConvert.SerializeObject(_content_prop);
+            HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                _id = int.Parse(_value);
+            }
+
+            return _id;
+        }
+
+        public AttachmentModel GetAttachment(int _Id)
+        {
+            try
+            {
+                AttachmentModel _obj = new AttachmentModel();
+
+                string _endpoint = "Helpdesk/GetAttachment/" + _Id.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<AttachmentModel>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
+
+        public int UploadCommentAttachment(AttachmentModel _model)
+        {
+            int _id = 0;
+            string _endpoint = "Helpdesk/UploadCommentAttachment";
+
+            var _content_prop = new Dictionary<string, string>
+            {
+                {"Id",                      _model.Id.ToString() },
+                {"Location",                _model.Location.ToString() },
+                {"FileName",                _model.FileName.ToString() },
+                {"ContentType",             _model.ContentType.ToString() },
+                {"UserId",                  _model.UserId.ToString()},
+                {"DateUploaded",            _model.DateUploaded.ToString() },
             };
 
             string _body_content = JsonConvert.SerializeObject(_content_prop);

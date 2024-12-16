@@ -4,3 +4,20 @@
     background-color: forestgreen;
     color: black;
 }
+
+.tr-unposted {
+    background-color: red;
+
+}
+
+.tr-posted {
+    background-color: blue;
+}
+
+.tr-approved {
+    background-color: green;
+}
+
+.tr-cancelled {
+    background-color: red;
+}

@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewBag.Title = "Attendance";
+}
+
+@section Scripts{
+    <script src="~/Scripts/Attendance/Attendance.js"></script>
+}
+
+    <section class="main">
+        <div class="main-title py-3">
+            <div class="container-fluid">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                        <h1 class="h4 mt-2 mb-lg-0">Attendance</h1>
+
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Attendance</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="main-content py-3">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <div class="col-lg-4 mb-3">
+                        <a href="@Url.Action("ClockInOut", "Attendance")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-regular fa-clock"></i>
+                            </span>
+                            <h3 class="text-primary">Clock In & Out</h3>
+                            <p class="text-muted mb-0">View Clock in & out list</p>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-4 mb-3">
+                        <a href="@Url.Action("Correction", "Attendance")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </span>
+                            <h3 class="text-primary">Correction</h3>
+                            <p class="text-muted mb-0">File Clock in & Out Correction</p>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-4 mb-3">
+                        <a href="@Url.Action("DTR", "Attendance")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </span>
+                            <h3 class="text-primary">Daily Time Record</h3>
+                            <p class="text-muted mb-0">Submit cut-off attendance to your superior</p>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+

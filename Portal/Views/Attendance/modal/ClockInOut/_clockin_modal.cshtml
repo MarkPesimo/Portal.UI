@@ -1,0 +1,54 @@
+﻿
+<div class="modal fade" id="clockin_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header Zips-modal-header">
+                <h1 class="modal-title fs-5" id="jobOrderLabel">Previous Clock in record</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row" id="div-label-no-clockin-today" style="visibility:hidden">
+                    <p class="text-primary" id="label-no-clockin-today"><strong>The system detects that you don't have any existing clock-ins for today.</strong></p>
+                </div>
+
+                <div class="row" id="div-label-with-previous-clockin" style="visibility:hidden">
+                    <p class="text-primary" id="label-with-previous-clockin"><strong>The system detects that you have no existing clock-ins for today. Would you like to update yesterday's clock out?</strong></p>
+                </div>
+                
+                <hr />
+
+                <div class="row" id="div-with-previous-clockin" style="visibility:hidden">
+                    
+                    <div class="col-16 mb-3">
+                        <label id="label-date-log"  for="" class="form-label">Date log : </label>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label id="label-shift-description" for="" class="form-label">Shift Description : </label>
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <label id="label-clock-in" for="" class="form-label">Clock In : </label>
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <label id="label-clock-out" for="" class="form-label">Clock Out : </label>
+                    </div>
+
+                    <div class="col-12 mt-3 mb-3">
+                        <button type="button" attendance_id="0" shift_id="0" class="btn btn-primary" id="clock-out-previous-button">
+                            <i class="fa-regular fa-clock"></i> Update Clock Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+

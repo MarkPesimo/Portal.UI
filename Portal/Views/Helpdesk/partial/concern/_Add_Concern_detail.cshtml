@@ -1,7 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Helpdesk_model.ConcernModel
     
 
-@using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", name = "concern-Form", id = "concern-Form" }))
+@using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", name = "add-concern-Form", id = "add-concern-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.UserId)

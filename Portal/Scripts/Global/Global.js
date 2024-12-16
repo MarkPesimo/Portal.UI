@@ -1,4 +1,164 @@
 ﻿$(function () {
+    $(document).ready(function () {
+        GetClockInClockOut();         
+    });
+
+    function GetClockInClockOut() {
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Attendance/GetClockInClockOut",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                ShowLoading('HIDE');
+                //console.log(response);
+                document.getElementById('my-shift').innerHTML = '<i class="fa-solid fa-business-time"></i> Shift Schedule : ' + response.ShiftDescription;
+                //get the current date, store it on the current-date attribute of my-shift button, this will be used as a validation
+                //in clocking out to check
+
+
+                document.getElementById('clock-in-button').setAttribute('attendance_id', response.Id)
+                document.getElementById('clock-in-button').setAttribute('shift_id', response.ShiftId)
+                document.getElementById('clock-out-button').setAttribute('attendance_id', response.Id)
+                document.getElementById('clock-out-button').setAttribute('shift_id', response.ShiftId)
+
+                if (response.ClockIn == '') { document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock In'; }
+                else {
+                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockIn;                   
+                }
+
+                if (response.ClockOut == '') { document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock Out';                 }
+                else {
+                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockOut;                  
+                }
+
+            },
+            failure: function (response) { console.log(response); },
+            error: function (response) { console.log(response); }
+        });
+    };
+
+    $('#nav-header').on('click', '#clock-in-button', function () {
+        var AttendanceId = $(this).attr("attendance_id");
+        var ShiftId = $(this).attr("shift_id");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Attendance/ClockIn',
+            type: "POST",
+            data:
+            {
+                '_id': AttendanceId,
+                '_shiftid': ShiftId
+            },
+            dataType: 'json',
+            success: function (result) {
+                ShowLoading('HIDE');
+                if (result.Status == "SUCCESS") {
+                    GetClockInClockOut();
+                    ShowSuccessMessage('You have successfully Clock-In.')                    
+                }
+                else { alert(result.msg); }
+            }
+        });
+    });
+
+    $('#clockin_modal').on('click', '#clock-out-previous-button', function () {
+        var AttendanceId = $(this).attr("attendance_id");
+        var ShiftId = $(this).attr("shift_id");
+
+        $.ajax({
+            url: '/Attendance/ClockOut',
+            type: "POST",
+            data:
+            {
+                '_id': AttendanceId,
+                '_shiftid': ShiftId
+            },
+            dataType: 'json',
+            success: function (result) {
+                ShowLoading('HIDE');
+                if (result.Status == "SUCCESS") {
+                    $("#clockin_modal").modal('hide');
+                    GetClockInClockOut();
+                    ShowSuccessMessage('You have successfully Clock-Out.')
+                }
+                else { alert(result.msg); }
+            }
+        });
+    });
+
+    $('#nav-header').on('click', '#clock-out-button', function () {
+        var AttendanceId = $(this).attr("attendance_id");
+        var ShiftId = $(this).attr("shift_id");
+
+        ShowLoading('SHOW');
+        if (AttendanceId == 0)          //get clock-in pf the previous day
+        {
+            $.ajax({
+                type: "GET",
+                url: '/Attendance/GetPreviousClockIn',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    ShowLoading('HIDE');
+                    console.log(response);
+                    if (response.Status == "SUCCESS") {
+                        document.getElementById("div-label-no-clockin-today").style.visibility = "hidden";
+                        document.getElementById("div-label-with-previous-clockin").style.visibility = "hidden";
+                        
+
+                        if (response.WithPrevious == true) {                            
+                            document.getElementById("div-with-previous-clockin").style.visibility = "visible";
+                            document.getElementById("div-label-with-previous-clockin").style.visibility = "visible";
+
+                            document.getElementById('label-date-log').innerHTML = 'Date log : <Strong class="text-primary"> ' + response.result.DateLog + '</strong>';                            
+                            document.getElementById('label-shift-description').innerHTML = 'Shift Description : <Strong class="text-primary">' + response.result.ShiftDescription + '</strong>';
+                            document.getElementById('label-clock-in').innerHTML = 'Clock In : <Strong class="text-primary">' + response.result.ClockIn + '</strong>';
+                            document.getElementById('label-clock-out').innerHTML = 'Clock Out: <Strong class="text-primary">' + response.result.ClockOut + '</strong>';
+
+                            document.getElementById('clock-out-previous-button').setAttribute('attendance_id', response.result.Id);
+                            document.getElementById('clock-out-previous-button').setAttribute('shift_id', response.result.ShiftId);
+                        }
+                        else {
+                            document.getElementById("div-with-previous-clockin").style.visibility = "hidden";
+                            document.getElementById("div-label-no-clockin-today").style.visibility = "visible";
+                        }
+
+                        $("#clockin_modal").modal('show');
+                    }
+                    
+                    
+                },
+                failure: function (response) { LogError(response); },
+                error: function (response) { LogError(response); }
+            });
+        }
+        else {
+            $.ajax({
+                url: '/Attendance/ClockOut',
+                type: "POST",
+                data:
+                {
+                    '_id': AttendanceId,
+                    '_shiftid': ShiftId
+                },
+                dataType: 'json',
+                success: function (result) {
+                    ShowLoading('HIDE');
+                    if (result.Status == "SUCCESS") {
+                        GetClockInClockOut();
+                        ShowSuccessMessage('You have successfully Clock-Out.')
+                    }
+                    else { alert(result.msg); }
+                }
+            });
+        }
+        
+    });
+
+
     //=================================BEGIN TOASTER====================================
     const toasterSuccessBtn = document.getElementById("toasterSuccessBtn");
     const toasterSuccess = document.getElementById("toasterSuccess");
@@ -88,4 +248,13 @@
         ShowLoading('HIDE');
         return;
     }
+
+    function ShowSuccessMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterSuccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterSuccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
 });

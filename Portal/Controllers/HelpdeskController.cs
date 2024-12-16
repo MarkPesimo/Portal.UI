@@ -40,7 +40,7 @@ namespace Portal.Controllers
         public ActionResult Index()
         {
             DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, 1, 1);
-            DateTime currentdate = DateTime.Now;
+            DateTime currentdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); 
             DateTime lastDayOfMonth = currentdate.AddMonths(1).AddDays(-1);
 
             Filter_model _filter = new Filter_model
@@ -103,7 +103,7 @@ namespace Portal.Controllers
             ConcernModel _model = new ConcernModel();
             ViewBag._concernTypes = _globalrepository.GetConcernTypes().Select(t => new SelectListItem { Text = t.ConcernType, Value = t.Id.ToString() }).ToList();
             _model.UserId = _loginuserid;
-            return PartialView("~/Views/Helpdesk/Partial/concern/_Concern_detail.cshtml", _model); 
+            return PartialView("~/Views/Helpdesk/Partial/concern/_add_Concern_detail.cshtml", _model); 
         }
 
         [HttpPost]
@@ -133,7 +133,7 @@ namespace Portal.Controllers
             ViewBag._concernTypes = _globalrepository.GetConcernTypes().Select(t => new SelectListItem { Text = t.ConcernType, Value = t.Id.ToString() }).ToList();
             _model.UserId = _loginuserid;
 
-            return PartialView("~/Views/Helpdesk/Partial/concern/_Concern_detail.cshtml", _model);
+            return PartialView("~/Views/Helpdesk/Partial/concern/_Edit_Concern_detail.cshtml", _model);
         }
 
         [HttpPost]
@@ -271,17 +271,21 @@ namespace Portal.Controllers
         {
             try
             {
+                //get concern status
+                string _status = _helpdeskrepository.GetConcernStatus(_concernid);
+
                 List<CommentMonitoring_model> _obj = _helpdeskrepository.Comments(_concernid);
-                return Json(_obj, JsonRequestBehavior.AllowGet);
+                return Json( new { result = _obj, status= _status }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex) { throw; }
         }
 
         [HttpGet]
-        public ActionResult _AddComment()
+        public ActionResult _AddComment(int _concernid)
         {
             CommentModel _model = new CommentModel
             {
+                ConcernId = _concernid,
                 UserId = _loginuserid,
                 DateCreated = DateTime.Now
             };
@@ -289,14 +293,24 @@ namespace Portal.Controllers
         }
 
         [HttpPost]
-        public ActionResult _AddComment(CommentModel _model)
+        public ActionResult _AddComment(int _concernid, string _comment, HttpPostedFileBase Comment_Attachment)
         {
+            CommentModel _model = new CommentModel();
+            
             try
             {
+                _model.Id = 0;
+                _model.ConcernId = _concernid;
+                _model.Comment = _comment;
+                _model.UserId = _loginuserid;
+                _model.DateCreated = DateTime.Now;
+
                 if (ModelState.IsValid)
                 {
                     int _id = _helpdeskrepository.ManageComment(_model);
-                    return Json(new { Result = "Success" });
+                    //int _commentid = _helpdeskrepository.GetTopConcern(_id);
+                    if (AttachFile(_concernid, _id, Comment_Attachment)) { return Json(new { Result = "Success", ConcernId = _concernid }); }
+                    else { return Json(new { Result = "Error", ConcernId = _concernid }); }                    
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -306,6 +320,98 @@ namespace Portal.Controllers
             {
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
+        }
+
+        public bool AttachFile(int _concernid, int _commentid, HttpPostedFileBase Comment_Attachment)
+        {
+            try
+            {
+                if (Comment_Attachment.ContentLength > 0)
+                {
+                    AttachmentModel attach = new AttachmentModel();
+                    string _contenttype = _globalrepository.GetExtension(Comment_Attachment);
+
+                    //if location is not yet exist, create it
+                    string _check_foloder = Path.Combine(Server.MapPath("~/Attachments/" + _concernid.ToString() + "/"), "");
+                    if (Directory.Exists(_check_foloder) == false) { Directory.CreateDirectory(_check_foloder); }
+
+                    var path = Path.Combine(Server.MapPath("~/Attachments/" + _concernid.ToString() + "/"), _commentid.ToString() + _contenttype);
+                    if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
+
+                    attach.Id = _commentid;
+                    attach.UserId = _loginuserid;
+                    attach.DateUploaded = DateTime.Now;
+
+                    attach.Location = path;
+                    attach.FileName = Comment_Attachment.FileName;
+                    attach.DateUploaded = DateTime.Now;
+                    attach.ContentType = _contenttype;
+
+                    _helpdeskrepository.UploadCommentAttachment(attach);
+
+                    Comment_Attachment.SaveAs(path);
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        [HttpPost]
+        public ActionResult _Attach(int _concernid, int _commentid, HttpPostedFileBase Comment_Attachment)
+        {
+            try
+            {
+                if (AttachFile(_concernid, _commentid, Comment_Attachment)) { return Json(new { Result = "Success", ConcernId = _concernid }); }
+                else { return Json(new { Result = "Error", ConcernId = _concernid }); }                                
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error", ConcernId = 0 });
+            }
+        }
+
+        public void ViewAttachment(int ConcernId, int Id)
+        {
+            AttachmentModel _obj = _helpdeskrepository.GetAttachment(Id);
+            if (_obj != null)
+            {
+                if (_obj.ContentType != null)
+                {
+                    Response.ContentType = _obj.ContentType;
+                    Response.AddHeader("Content-Disposition", @"filename=" + _obj.FileName + "");
+
+
+                    var path = Path.Combine(Path.Combine(Server.MapPath("~/Attachments/" + ConcernId.ToString() + ""), _obj.Id.ToString() + _obj.ContentType));
+
+                    if (System.IO.File.Exists(path))
+                    {
+                        Response.TransmitFile(Path.Combine(Server.MapPath("~/Attachments/" + ConcernId.ToString() + ""), _obj.Id.ToString() + _obj.ContentType));
+                    }
+                    else { Response.Write("<h2>Attachment not found or missing.</h2>"); }
+
+                }
+                else { Response.Write("<h2>Attachment not found or missing.</h2>"); }
+            }
+            else
+            { Response.Write("<h2>Attachment not found or missing.</h2>"); }
+
+
+            //var _attachment = ifile.GetAttatchment(Id);
+            //if (_attachment != null)
+            //{
+            //    Response.ContentType = _attachment.ContentType;
+            //    Response.AddHeader("Content-Disposition", @"filename=" + _attachment.Filename + "");
+            //    //Response.TransmitFile(Path.Combine(Server.MapPath("~/App_Data/AttachmentFiles"), _attachment.Filename));
+            //    Response.TransmitFile(Path.Combine(Server.MapPath("~/Documents"), _attachment.Filename));
+            //}
+            //Response.Write("<h2>No attachment found or missing.</h2>");
+
         }
         //=============================END COMMENT================================================
     }

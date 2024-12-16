@@ -1,0 +1,29 @@
+﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
+
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "cancel-leave-Form", id = "cancel-leave-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.LeaveTypeId)
+    @Html.HiddenFor(m => m.LeaveFrom)
+    @Html.HiddenFor(m => m.LeaveFromAMPM)
+    @Html.HiddenFor(m => m.LeaveTo)
+    @Html.HiddenFor(m => m.LeaveToAMPM)
+    @Html.HiddenFor(m => m.LeaveDays)
+    @Html.HiddenFor(m => m.IsHalfday)
+    @Html.HiddenFor(m => m.FirstHalf)
+    @Html.HiddenFor(m => m.SecondHalf)
+    @Html.HiddenFor(m => m.FirstDay_SecondHalf)
+    @Html.HiddenFor(m => m.LastDay_FirstHalf)
+    @Html.HiddenFor(m => m.Reason)
+    @Html.HiddenFor(m => m.Remarks)
+    @Html.HiddenFor(m => m.Mode)
+}
+
+
+
+Are you sure you want to mark this leave request as <strong><span class="text-danger">Cancelled</span></strong>?
+
+
+
+

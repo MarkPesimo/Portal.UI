@@ -1,7 +1,8 @@
 ﻿$(function () {
     $(document).ready(function () {
         $(".navbar-nav").find(".active").removeClass("active");
-        $("#nav-payroll").addClass("active");
+        $("#nav-Payroll").addClass("active");
+        $("#nav-Payroll").addClass("bg-primary");
 
         document.getElementById("_loanstatus").selectedIndex = "1";
 

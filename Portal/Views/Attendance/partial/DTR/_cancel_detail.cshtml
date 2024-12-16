@@ -1,0 +1,17 @@
+﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
+    
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "cancel-dtr-Form", id = "cancel-dtr-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.Description)
+    @Html.HiddenFor(m => m.DateFrom)
+    @Html.HiddenFor(m => m.Dateto)
+    @Html.HiddenFor(m => m.Mode)
+}
+
+Are you sure you want to mark this DTR as <strong><span class="text-danger">Cancelled</span></strong>?
+
+
+

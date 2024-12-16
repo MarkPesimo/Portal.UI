@@ -1,0 +1,20 @@
+﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
+
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "unpost-correction-Form", id = "unpost-correction-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.DateLog)
+    @Html.HiddenFor(m => m.ShiftId)
+    @Html.HiddenFor(m => m.TimeInTime)
+    @Html.HiddenFor(m => m.TimeInTime)
+    @Html.HiddenFor(m => m.TimeOutDate)
+    @Html.HiddenFor(m => m.TimeOutTime)
+    @Html.HiddenFor(m => m.Reason)
+}
+
+Are you sure you want to mark this Attendance Correction request as <strong><span class="text-danger">Unposted</span></strong>?
+
+
+

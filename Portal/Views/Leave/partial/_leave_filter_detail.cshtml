@@ -1,0 +1,28 @@
+﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveMonitoringFilter_model
+
+@Html.HiddenFor(m => m.EmpId)
+@Html.HiddenFor(m => m.ByLeaveType)
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">Leave Type</label>
+            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, "Please Select", new { @class = "form-select", @placeholder = "Leave type", @id = "LeaveTypeId" })
+        </div>
+    </div>
+
+
+    <div class="col-6">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">Start date</label>
+            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">End date</label>
+            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+</div>

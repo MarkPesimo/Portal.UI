@@ -3,6 +3,7 @@
 
 @using (Html.BeginForm("AddComment", "Helpdesk", FormMethod.Post, new { enctype = "multipart/form-data", name = "comment-Form", id = "comment-Form" }))
 {
+    @Html.HiddenFor(m => m.ConcernId)
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.UserId)
     @Html.HiddenFor(m => m.DateCreated)
@@ -12,12 +13,21 @@
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
         </div>
     </div>
-        
+
 
     <div class="row">
         <div class="col">
             <label for="" class="form-label">Comment</label>
             @Html.TextAreaFor(m => m.Comment, 4, 40, new { @class = "form-control", @placeholder = "Enter Comments" })
+        </div>
+    </div>
+
+    <div class="row mt-2" >
+        <div class="col">
+            <div class="mb-3">
+                <label for="" class="form-label">Attach</label>
+                <input class="form-control" type="file" name="Add_Attachment" id="Add_Attachment">
+            </div>
         </div>
     </div>
 }

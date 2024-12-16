@@ -1,0 +1,40 @@
+﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
+
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "dtr-Form", id = "dtr-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.DateCreated)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label for="" class="form-label">Description</label>
+            @Html.TextAreaFor(m => m.Description, 4, 40, new { @class = "form-control", @placeholder = "Enter a Description" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Date From</label>
+            @Html.TextBoxFor(m => m.DateFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateFrom.ToString("yyyy-MM-dd") })
+        </div>
+
+        <div class="col mb-3">
+            <label for="" class="form-label">Date To</label>
+            @Html.TextBoxFor(m => m.Dateto, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.Dateto.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+      
+}
+
+
+

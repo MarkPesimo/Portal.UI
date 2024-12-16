@@ -1,7 +1,8 @@
 ﻿$(function () {
     $(document).ready(function () {
         $(".navbar-nav").find(".active").removeClass("active");
-        $("#nav-helpdesk").addClass("active");
+        $("#nav-Helpdesk").addClass("active");
+        $("#nav-Helpdesk").addClass("bg-primary");
 
         ShowLoading('HIDE');
         BindTable();
@@ -74,7 +75,7 @@
     function DisplayConcerns(response) {
         $("#helpdesk-table").DataTable(
             {
-                autoWidth: false,
+                autoWidth: true,
                 bLengthChange: true,
                 lengthMenu: [[10, -1], [10, "All"]],
                 bFilter: true,
@@ -154,9 +155,54 @@
         ShowLoading('HIDE');
     };
 
+    //----------------------------------BEGIN ADD CONCERN--------------------------------------
+    $('#helpdesk-main-div').on('click', '#add_concern_btn', function (e) {
+        e.preventDefault();
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Helpdesk/_AddConcern',
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#add_concern_modal').find(".modal-body").html(response);
+                $("#add_concern_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#add_concern_modal').on('click', '#submit-concern-button', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Helpdesk/_AddConcern',
+            type: "POST",
+            data: $('#add-concern-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#add_concern_modal").modal('hide');
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Concern successfully created.');
+
+                    ClearTable('#helpdesk-table');
+                    BindTable();                    
+                }
+            }
+        });
+    });
+    //----------------------------------END ADD CONCERN--------------------------------------
+
+
     /////////////========================================TABLE EVENTS==============================================================
 
-     //----------------------------------BEGIN EDIT CONCERN--------------------------------------
+    
+    //----------------------------------BEGIN EDIT CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.edit-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -169,7 +215,6 @@
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
-
                 $('#edit_concern_modal').find(".modal-body").html(response);
                 $("#edit_concern_modal").modal('show');
             },
@@ -183,7 +228,7 @@
         $.ajax({
             url: '/Helpdesk/_EditConcern',
             type: "POST",
-            data: $('#concern-Form').serialize(),
+            data: $('#edit-concern-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
@@ -432,28 +477,34 @@
     //----------------------------------BEGIN VIEW CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.view-concern', function () {
         var ConcernId = $(this).attr("Concernid");
+        document.querySelector('#comment_modal').querySelector("#write_comment_button").setAttribute("concernid", ConcernId);
 
+        ClearTable('#comments-table');
+        $("#comment_modal").modal('show');
+        GetComments(ConcernId);           
+    });
+
+    function GetComments(concernid) {
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
             url: '/Helpdesk/_GetComments',
-            data: { '_concernid': ConcernId },
+            data: { '_concernid': concernid },
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-                ShowLoading('HIDE');
-                //console.log(response);
-                $("#comment_modal").modal('show');
-                ClearTable('#comments-table');
-                DisplayComments(response);
+                console.log(response);
+                document.querySelector('#comment_modal').querySelector("#write_comment_button").removeAttribute("Hidden");
+                if (response.status == "Hidden") { document.querySelector('#comment_modal').querySelector("#write_comment_button").setAttribute("Hidden", "Hidden");}
+
+                DisplayComments(response.result, concernid);
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
-    });
+    }
 
-    function DisplayComments(response) {
-        console.log(response);
+    function DisplayComments(response, concernid) {
         $("#comments-table").DataTable(
             {
                 autoWidth: false,
@@ -464,27 +515,29 @@
                 bPaginate: true,
                 data: response,
                 columns: [
+                    { 'data': 'Id' },
                     { 'data': 'DateCreated' },
                     { 'data': 'CreatedBy' },
                     { 'data': 'Comment' },
                 ],
-                //order: [[0, "desc"]],
+                order: [[0, "desc"]],
                 columnDefs: [
                     {
-                        title: 'Date Created',
+                        title: 'Id',
                         target: 0,
+                        visible: false,
+                        searchable: false                         
+                    },
+                    {
+                        title: 'Date Created',
+                        target: 1,
                         "render": function (data, type, row, meta) {
                             return ' <p>' + row.DateCreated + ' </p> '
-                        }
-                        //class: "d-none d-sm-table-cell",
-                        //"render": function (data, type, row, meta) {
-                        //    const date = new Date(row.DateCreated);
-                        //    return date.toLocaleDateString('es-pa')
-                        //}
+                        } 
                     },
                     {
                         title: 'Written by',
-                        target: 1,
+                        target: 2,
                         class: "d-none d-sm-table-cell text-center",
                         "render": function (data, type, row, meta) {
                             return ' <p>' + row.CreatedBy + ' </p> '
@@ -492,13 +545,13 @@
                     },
                     {
                         title: 'Comments',
-                        target: 2,
+                        target: 3,
                         "render": function (data, type, row, meta) {
                             return ' <p>' + row.Comment + ' </p> '
                         }
                     },
                     {
-                        target: 3,
+                        target: 4,
                         className: 'dt-body-right',
                         "render": function (data, type, row, meta) {
                             return '<div class="btn-group"> ' +
@@ -506,9 +559,9 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item comment-view-attachment"' + row.ViewVisible + ' CommentId="' + row.Id + '"> <i class="fa-regular fa-eye"></i> View</a></li> ' +
-                                ' <li> <a class="dropdown-item comment-attach"' + row.AttachVisible + ' CommentId="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Attach</a></li> ' +
-                                ' <li> <a class="dropdown-item comment-delete"' + row.DeleteVisible + ' CommentId="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Delete</a></li> ' +
+                                ' <li> <a class="dropdown-item comment-view"' + row.ViewVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-regular fa-eye"></i> View attachment</a></li> ' +
+                                ' <li> <a class="dropdown-item comment-attach"' + row.AttachVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-paperclip"></i> </i> Upload/Update Attachment</a></li> ' +
+                                ' <li> <a class="dropdown-item comment-delete"' + row.DeleteVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-trash"></i> </i> Delete</a></li> ' +
                                 
                                 '</ul>' +
                                 '</div> '
@@ -530,21 +583,23 @@
     /////////////========================================TABLE EVENTS==============================================================
 
 
-
     //----------------------------------BEGIN ADD COMMENT--------------------------------------
-    $('#helpdesk-main-div').on('click', '#add_concern_btn', function (e) {
+    $('#comment_modal').on('click', '#write_comment_button', function (e) {
         e.preventDefault();
+        var _concernid = document.querySelector('#comment_modal').querySelector("#write_comment_button").getAttribute("concernid");
+
 
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
             url: '/Helpdesk/_AddComment',
+            data: { '_concernid': _concernid },
             contentType: "application/json; charset=utf-8",
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');                
-               
-                $("#add_concern_modal").modal('show');
+                $('#add_comment_modal').find(".modal-body").html(response);
+                $("#add_comment_modal").modal('show');
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -552,26 +607,103 @@
     });
 
     $('#add_comment_modal').on('click', '#submit-comment-button', function (e) {
+        var formData = new FormData();        
+
+        var _concernid = document.querySelector('#add_comment_modal').querySelector("#ConcernId").value;
+        var _comment = document.querySelector('#add_comment_modal').querySelector("#Comment").value;
+        var Attachement = $('#Add_Attachment')[0].files[0];
+
+        formData.append('_concernid', _concernid);
+        formData.append('_comment', _comment);
+        formData.append('Comment_Attachment', Attachement);
+
+        //console.log(_concernid);
+        //console.log(_comment);
+        //console.log(Attachement);
         ShowLoading('SHOW');
         $.ajax({
-            url: '/Helpdesk/_AddConcern',
+            url: '/Helpdesk/_AddComment',
             type: "POST",
-            data: $('#concern-Form').serialize(),
-            dataType: 'json',
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
                 else {
-                    $("#add_concern_modal").modal('hide');
+                    $("#add_comment_modal").modal('hide');
 
                     ShowLoading('HIDE');
-                    ShowSuccessMessage('Concern successfully created.');
-                    ClearTable();
-                    BindTable();
+                    ShowSuccessMessage('Comment successfully created.');
+                    ClearTable('#comments-table');
+                    GetComments(result.ConcernId);
                 }
             }
         });
     });
     //----------------------------------END ADD COMMENT--------------------------------------
+
+    //----------------------------------BEGIN ATTACHMENT--------------------------------------
+    $('#comments-table').on('click', '.comment-view', function () {
+        var CommentId = $(this).attr("CommentId");
+        var ConcernId = $(this).attr("ConcernId");
+
+        var url = '/Helpdesk/ViewAttachment?ConcernId=' + ConcernId + '&Id=' + CommentId;
+        window.open(url, 'Attachment', 'top=100, status=no, toolbar=no, resizable=yes, scrollbars=yes, width=800, height=600');
+    });
+
+    $('#comments-table').on('click', '.comment-attach', function () {
+        var CommentId = $(this).attr("CommentId");
+        var ConcernId = $(this).attr("ConcernId");
+        document.querySelector('#comment_attach_modal').querySelector("#submit-attach-file-button").setAttribute("commentid", CommentId);
+        document.querySelector('#comment_attach_modal').querySelector("#submit-attach-file-button").setAttribute("concernid", ConcernId);
+
+
+        document.getElementById("Comment_Attachment").value = "";
+        $("#comment_attach_modal").modal('show');
+    });
+
+    $('#comment_attach_modal').on('click', '#submit-attach-file-button', function (e) {
+        ShowLoading('SHOW');
+        $file = $("#Comment_Attachment");
+        var $filepath = $.trim($file.val());
+
+        if ($filepath != "") {
+            var formData = new FormData();
+            var _concernid = document.querySelector('#comment_attach_modal').querySelector("#submit-attach-file-button").getAttribute("concernid");
+            var _commentid = document.querySelector('#comment_attach_modal').querySelector("#submit-attach-file-button").getAttribute("CommentId");
+            var Attachement = $('#Comment_Attachment')[0].files[0];
+
+            //console.log(_concernid);
+            //console.log(_commentid);
+            //console.log(Attachement);
+            
+            formData.append('_concernid', _concernid);
+            formData.append('_commentid', _commentid);
+            formData.append('Comment_Attachment', Attachement);
+
+            //console.log(formData);
+            $.ajax({
+                url: '/Helpdesk/_Attach',
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.Result == "ERROR") {
+                        alert('Error in attaching the file!')
+                    }
+                    else {
+                        ShowSuccessMessage('File successfully attached.')
+                        $("#comment_attach_modal").modal('hide');
+                    }
+
+                }
+            });
+         }       
+
+        ShowLoading('HIDE');
+    });
+    //----------------------------------END ATTACHMENT--------------------------------------
 
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');

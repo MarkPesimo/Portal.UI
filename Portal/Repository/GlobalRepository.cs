@@ -173,6 +173,20 @@ namespace Portal.Repository
         }
         //================================END SECURITY============================================
 
+        public string GetExtension(HttpPostedFileBase _attachment)
+        {
+            string _ext = "";
+
+
+            if (_attachment.ContentType == "image/jpeg") { _ext = ".jpg"; }
+            else if (_attachment.ContentType == "image/png") { _ext = ".png"; }
+            else if (_attachment.ContentType == "image/gif") { _ext = ".gif"; }
+            else if (_attachment.ContentType == "application/pdf") { _ext = ".pdf"; }
+            else if (_attachment.ContentType == "application/msword") { _ext = ".doc"; }
+            else if (_attachment.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") { _ext = ".docx"; }
+
+            return _ext;
+        }
 
         public IEnumerable<Filtering_model.LoanStatus> GetLoanStatuses()
         {
@@ -279,6 +293,44 @@ namespace Portal.Repository
             }
         }
 
+        public IEnumerable<FixedDropdown_model.LeaveTypeList> GetLeaveTypes()
+        {
+            try
+            {
+                List<FixedDropdown_model.LeaveTypeList> _obj = new List<FixedDropdown_model.LeaveTypeList>();
+                string _endpoint = "File/LeaveTypes";
+                HttpResponseMessage _response = GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<FixedDropdown_model.LeaveTypeList>>(_value);
+                }
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
+        public IEnumerable<FixedDropdown_model.ShiftTypeList> GetClientShift(int _clientid)
+        {
+            try
+            {
+                List<FixedDropdown_model.ShiftTypeList> _obj = new List<FixedDropdown_model.ShiftTypeList>();
+                string _endpoint = "File/ClientShift/" + _clientid.ToString();
+                HttpResponseMessage _response = GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<FixedDropdown_model.ShiftTypeList>>(_value);
+                }
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewBag.Title = "Leave & Attendance";
+}
+
+@section Scripts{
+    <script src="~/Scripts/Leave/LeaveAttendance.js"></script>
+}
+
+
+<section class="main">
+    <div class="main-title py-3">
+        <div class="container-fluid">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                    <h1 class="h4 mt-2 mb-lg-0">Leave & Attendance</h1>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Leave & Attendance</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="main-content py-3">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <a href="@Url.Action("Monitoring", "Leave")" class="d-block w-100 widget text-center">
+                        <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                            <i class="fa-solid fa-plane"></i>
+                        </span>
+                        <h3 class="text-primary">Leave</h3>
+                        <p class="text-muted mb-0">View Leave Monitoring and Balances</p>
+                    </a>
+                </div>
+
+
+
+
+                <div class="col-lg-4 mb-3">
+                    <a href="@Url.Action("Index", "Attendance")" class="d-block w-100 widget text-center">
+                        <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                            <i class="fa-solid fa-clock"></i>
+                        </span>
+                        <h3 class="text-primary">Attendance</h3>
+                        <p class="text-muted mb-0">View Attendance and DTR Submission status</p>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

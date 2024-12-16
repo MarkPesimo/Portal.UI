@@ -1,8 +1,9 @@
 ﻿$(function () {
     $(document).ready(function () {
         $(".navbar-nav").find(".active").removeClass("active");
-        $("#nav-home").addClass("active");
-               
+        $("#nav-Home").addClass("active");
+        $("#nav-Home").addClass("bg-primary");
+
         ShowLoading('HIDE');
     });
 

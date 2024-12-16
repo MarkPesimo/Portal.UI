@@ -42,6 +42,7 @@ namespace Portal
                         newUser.CandidateId = serializeModel.CandidateId;
                         newUser.Username = serializeModel.Username;
                         newUser.Usertype = serializeModel.Usertype;
+                        newUser.ClientId = serializeModel.ClientId;
 
                         HttpContext.Current.User = newUser;
                     }
