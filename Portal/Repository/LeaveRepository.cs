@@ -107,6 +107,7 @@ namespace Portal.Repository
                 {"Remarks",                 _model.Remarks.ToString() },
                 {"Mode",                    _model.Mode.ToString() },
                 {"Message",                 _model.Message.ToString() },
+                {"UserId",                 _model.UserId.ToString() },
             };
 
             string _body_content = JsonConvert.SerializeObject(_content_prop);

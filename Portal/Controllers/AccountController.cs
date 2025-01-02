@@ -2,7 +2,6 @@
 using APWModel.ViewModel.Global.Account;
 using Portal.Models;
 using Portal.Repository;
-using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;

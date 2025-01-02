@@ -95,6 +95,7 @@ namespace Portal.Controllers
             LeaveModel _model = new LeaveModel
             {
                 EmpId = _loginuserid,
+                UserId = 112,
                 Mode = 0,
             };
 
@@ -109,6 +110,7 @@ namespace Portal.Controllers
         {
             LeaveModel _obj = _leaverepository.GetLeave(_id);
             _obj.Mode = 1;
+            _obj.UserId = 112;
 
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
             return PartialView("~/Views/Leave/Partial/_leave_detail.cshtml", _obj);
@@ -121,6 +123,7 @@ namespace Portal.Controllers
         {
             LeaveModel _obj = _leaverepository.GetLeave(_id);
             _obj.Mode = 3;
+            _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_post_detail.cshtml", _obj);
         }
         //---------------------------------------END POST LEAVE---------------------------------------
@@ -131,6 +134,7 @@ namespace Portal.Controllers
         {
             LeaveModel _obj = _leaverepository.GetLeave(_id);
             _obj.Mode = 4;
+            _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_unpost_detail.cshtml", _obj);
         }
         //---------------------------------------END POST LEAVE---------------------------------------
@@ -141,6 +145,7 @@ namespace Portal.Controllers
         {
             LeaveModel _obj = _leaverepository.GetLeave(_id);
             _obj.Mode = 2;
+            _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_cancel_detail.cshtml", _obj);
         }
         //---------------------------------------END CANCEL LEAVE---------------------------------------

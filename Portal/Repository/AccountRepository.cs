@@ -70,20 +70,20 @@ namespace Portal.Repository
             return "Incorrect Username or Password";
         }
 
-        public LoginUser_model GetLoginUser()       //HttpCookie authCookie
-        {
-            var _variable = System.Web.HttpContext.Current.User;
-            LoginUser_model _obj = new LoginUser_model();
-            string _endpoint = "Account/GetByUserName/" + _variable.Identity.Name.ToString() + "/1";
-            HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
-            if (_response.IsSuccessStatusCode)
-            {
-                var _value = _response.Content.ReadAsStringAsync().Result.ToString();
-                _obj = JsonConvert.DeserializeObject<LoginUser_model>(_value);
-            }
+        //public LoginUser_model GetLoginUser()       //HttpCookie authCookie
+        //{
+        //    var _variable = System.Web.HttpContext.Current.User;
+        //    LoginUser_model _obj = new LoginUser_model();
+        //    string _endpoint = "Account/GetByUserName/" + _variable.Identity.Name.ToString() + "/1";
+        //    HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+        //    if (_response.IsSuccessStatusCode)
+        //    {
+        //        var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+        //        _obj = JsonConvert.DeserializeObject<LoginUser_model>(_value);
+        //    }
             
-            return _obj;
-        }
+        //    return _obj;
+        //}
 
         //---------------------------------BEGIN FORGOT PASSWORD-----------------------------------------------------
         public string ForgotPassowrd(Portal_ForgotPassword_model model)

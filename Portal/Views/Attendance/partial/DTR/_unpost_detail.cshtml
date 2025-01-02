@@ -1,5 +1,5 @@
 ﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
-    
+
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "unpost-dtr-Form", id = "unpost-dtr-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -9,6 +9,7 @@
     @Html.HiddenFor(m => m.DateFrom)
     @Html.HiddenFor(m => m.Dateto)
     @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.Remarks)
 }
 
 Are you sure you want to mark this DTR as <strong><span class="text-danger">Unposted</span></strong>?

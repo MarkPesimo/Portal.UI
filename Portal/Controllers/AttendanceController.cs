@@ -410,7 +410,9 @@ namespace Portal.Controllers
         public ActionResult _EditDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
-
+            _obj.EmpId = _loginuserid;
+            _obj.UserId = 112;
+            _obj.Mode = 1;
             return PartialView("~/Views/Attendance/Partial/DTR/_dtr_detail.cshtml", _obj);
         }
         //---------------------------------------END EDIT DTR---------------------------------------
@@ -420,6 +422,7 @@ namespace Portal.Controllers
         public ActionResult _PostDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
+            _obj.UserId = 112;
             _obj.Mode = 3;
             return PartialView("~/Views/Attendance/Partial/DTR/_post_detail.cshtml", _obj);
         }
@@ -430,6 +433,7 @@ namespace Portal.Controllers
         public ActionResult _UnpostDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
+            _obj.UserId = 112;
             _obj.Mode = 4;
             return PartialView("~/Views/Attendance/Partial/DTR/_unpost_detail.cshtml", _obj);
         }
@@ -440,6 +444,7 @@ namespace Portal.Controllers
         public ActionResult _CancelDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
+            _obj.UserId = 112;
             _obj.Mode = 2;
             return PartialView("~/Views/Attendance/Partial/DTR/_cancel_detail.cshtml", _obj);
         }

@@ -202,6 +202,7 @@ namespace Portal.Repository
                 {"TimeOutDate",             _model.TimeOutDate.ToString() },
                 {"TimeOutTime",             _model.TimeOutTime.ToString() },
                 {"Reason",                  _model.Reason.ToString() },
+                {"Remarks",                 _model.Remarks.ToString() },
                 {"UserId",                  _model.UserId.ToString() }
             };
 
@@ -246,6 +247,7 @@ namespace Portal.Repository
         {
             int _id = 0;
             string _endpoint = "Attendance/ManageDTR";
+            if (_model.Remarks == null) { _model.Remarks = ""; }
 
             var _content_prop = new Dictionary<string, string>
             {
