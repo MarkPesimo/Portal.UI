@@ -117,8 +117,8 @@
                         class: "d-none d-sm-table-cell",
                         "render": function (data, type, row, meta) {
                             const date = new Date(row.DateLog);
-                            return ' <p>' + row.TimeIn + ' </p> ' +
-                                ' <p>' + row.TimeOut + ' </p> '
+                            return '<small class="d-block">' + row.TimeIn + ' </small> ' +
+                                ' <small class="d-block">' + row.TimeOut + ' </small> '
                         }
                     },
                      
@@ -141,7 +141,7 @@
                         target: 6,
                         "render": function (data, type, row, meta) {
                             const date = new Date(row.DateLog);
-                            return 'Date Log : ' + row.DateLog + ' ' +
+                            return '<small class="d-block"> Date log : <strong class="text-primary"> ' + row.DateLog + '</strong> </small>  ' +
                                 '<small class="d-block">Time In : ' + row.TimeIn + '</small> ' +
                                 '<small class="d-block">Time Out : ' + row.TimeOut + '</small> ' +
                                 '<small class="d-block">Reason : ' + row.Reason + '</small> ' +
@@ -181,7 +181,7 @@
 
     function SetTableBGColor(_status) {
         var _font_color = 'white';
-        var _color = 'white';
+        var _color = '#6C757D';
         if (_status == 'Posted') { _color = '#5cb85c'; }
         else if (_status == "Approved") { _color = '#0275d8'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
@@ -210,6 +210,7 @@
 
                 var _form = '#attendance-correction-Form';
                 document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
+                
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }

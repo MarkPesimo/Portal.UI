@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Access Denied";
 }
 
 @section Scripts
@@ -14,11 +14,12 @@
         <div class="container-fluid" id="industry-header-div">
             <div class="row justify-content-between align-items-center">
                 <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">APW Candidate Portal</h1>
+                    <h1 class="h4 mt-2 mb-lg-0">APW Portal</h1>
 
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Access Denied</li>
                         </ol>
                     </nav>
                 </div>
@@ -30,8 +31,10 @@
         <div class="container-fluid">
             <div class="widget">
                 <div class="row justify-content-center align-items-center">
+                    <h4 class="text-center text-primary">Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator. </h4>
+                    <img src="~/Content/images/access-denied-new.png" style="height: 300px; width: 400px;">
 
-                    <div class="col-11 mt-3 text-center d-sm-none">
+                    @*<div class="col-11 mt-3 text-center d-sm-none">
                         <span class="tt" data-bs-placement="bottom" title="APW logo">
                             <img class="img-fluid" src="~/Content/images/logos/APW-Logo-02.png" alt="APW logo" />
                         </span>
@@ -39,7 +42,7 @@
 
                     <div class="col-lg-6 col-12">
                         <div class="display-2">
-                            <h1><strong>APW Candidate Portal</strong></h1>
+                            <h1><strong>APW Portal</strong></h1>
                         </div>
 
                         <p>
@@ -52,7 +55,7 @@
                         <span class="tt" data-bs-placement="bottom" title="APW logo">
                             <img class="img-fluid" src="~/content/Images/logos/APW-Logo-02.png" alt="APW logo" width="400" height="300" />
                         </span>
-                    </div>
+                    </div>*@
 
 
                 </div>
@@ -62,3 +65,10 @@
         </div>
     </div>
 </section>
+
+
+@*<section main="class">
+    <div>
+        <img src="~/Content/images/access-denied-new.png" />
+    </div>
+</section>*@ 

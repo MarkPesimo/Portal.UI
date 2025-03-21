@@ -171,6 +171,21 @@ namespace Portal.Repository
 
             return _obj;
         }
+
+        public bool HasClientAccess(int _clientid, string _modulename)
+        {
+            bool _result = false;
+            string _endpoint = "Client/HasModuleAccess/" + _clientid.ToString() + "/" +
+                _modulename;
+            HttpResponseMessage _response = GenerateGetRequest(_endpoint);
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                _result = JsonConvert.DeserializeObject<bool>(_value);
+            }
+
+            return _result;
+        }
         //================================END SECURITY============================================
 
         public string GetExtension(HttpPostedFileBase _attachment)

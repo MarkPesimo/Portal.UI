@@ -189,7 +189,7 @@ namespace Portal.Repository
             if (_mode == 4) { _endpoint = "Attendance/UnpostCorrection"; }
             if (_mode == 5) { _endpoint = "Attendance/ApprovCorrection"; }
             if (_mode == 6) { _endpoint = "Attendance/RejectCorrection"; }
-
+            if (_model.Remarks == null) { _model.Remarks = ""; }
 
             var _content_prop = new Dictionary<string, string>
             {
@@ -242,6 +242,26 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
+
+        public List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> GetDTRDetails(int _id)
+        {
+            try
+            {
+                List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = new List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model>();
+
+                string _endpoint = "Attendance/GetDTRDetails/" + _id.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
 
         public int ManageDTR(DTRmodel _model)
         {

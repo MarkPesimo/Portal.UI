@@ -411,6 +411,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\access-denied-new.png" />
     <Content Include="Content\images\access-denied.png" />
     <Content Include="Content\images\apw.png" />
     <Content Include="Content\images\green-check.png" />
@@ -421,6 +422,7 @@
     <Content Include="Content\images\logos\APW-Logo-05.png" />
     <Content Include="Content\images\logos\APW-Logo-06.png" />
     <Content Include="Content\images\logos\APW-Logo-07.png" />
+    <Content Include="Content\images\APWTech.png" />
     <Content Include="Content\images\question-mark-1.png" />
     <Content Include="Content\images\ui-icons_444444_256x240.png" />
     <Content Include="Content\images\ui-icons_555555_256x240.png" />
@@ -456,7 +458,9 @@
     <Content Include="Scripts\Payroll\Loan.js" />
     <Content Include="Scripts\Payroll\Payroll.js" />
     <Content Include="Scripts\Payroll\Payslip.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -479,6 +483,7 @@
     <Folder Include="CandidateFiles\" />
     <Folder Include="CandidateImages\" />
     <Folder Include="GeneratedReports\" />
+    <Folder Include="LeaveAttachments\Filing\" />
     <Folder Include="Report\Document\" />
     <Folder Include="Report\Payroll\" />
     <Folder Include="Views\Account\modal\" />
@@ -581,6 +586,8 @@
     <Content Include="Views\Leave\partial\_cancel_detail.cshtml" />
     <Content Include="Views\Leave\modal\_unpost_leave_modal.cshtml" />
     <Content Include="Views\Leave\modal\_cancel_leave_modal.cshtml" />
+    <Content Include="Views\Shared\AccessDenied.cshtml" />
+    <Content Include="Views\Attendance\partial\DTR\_post_dtr_detail.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

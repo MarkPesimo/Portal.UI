@@ -48,7 +48,7 @@
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
-            url: "/Attendance/GetDTRist",
+            url: "/Attendance/GetDTRList",
             data: {
                 '_fromdate': FromDate,
                 '_todate': ToDate,
@@ -165,7 +165,7 @@
 
     function SetTableBGColor(_status) {
         var _font_color = 'white';
-        var _color = 'white';
+        var _color = '#6C757D';
         if (_status == 'Posted') { _color = '#5cb85c'; }
         else if (_status == "Approved") { _color = '#0275d8'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
@@ -175,23 +175,7 @@
         return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
     };
 
-    //function SetTableBGColor() {      
-
-    //    var table = document.getElementById("dtr-table");
-    //    for (var i = 1, row; row = table.rows[i]; i++) {
-    //        var _color = 'white';
-    //        var _font_color = 'white';
-    //        var _status = row.cells[3].innerHTML;
-    //        console.log(_status);
-
-    //        if (_status == 'Posted') { _color = '#5cb85c'; }
-    //        else if (_status == "Approved") { _color = '#0275d8'; }
-    //        else if (_status == "Cancelled") { _color = '#d9534f'; }
-    //        else { _font_color = 'black';}
-
-    //        row.cells[3].innerHTML = '<a href="#" class="btn  " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'             
-    //    }
-    //}
+  
     //----------------------------------END TABLE----------------------------------------------
 
     //----------------------------------BEGIN ADD DTR-----------------------------------
@@ -297,6 +281,8 @@
                 ShowLoading('HIDE');
                 $('#post_dtr_modal').find(".modal-body").html(response);
                 $("#post_dtr_modal").modal('show');
+
+                DisplayDtrDetails(DTRId);
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -323,6 +309,109 @@
         //});
         ManageDTR('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.')
     });
+
+    function DisplayDtrDetails(DTRId) {      
+        $.ajax({
+            type: "GET",
+            url: "/Attendance/GetDTRDetails",
+            data: {
+                '_id': DTRId 
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                ClearTable("#dtr-details-table");
+                DisplayDTRDetails(response);
+            },
+            failure: function (response) { console.log(response); },
+            error: function (response) { console.log(response); }
+        });
+    };
+
+    function DisplayDTRDetails(response) {
+        $("#dtr-details-table").DataTable(
+            {
+                autoWidth: false,
+                bLengthChange: true,
+                lengthMenu: [[-1], ["All"]],
+                bFilter: true,
+                bSort: true,
+                bPaginate: true,
+                data: response,
+                columns: [
+                    { 'data': 'DateLog' },
+                    { 'data': 'DateName' },
+                    { 'data': 'ShiftDescription' },
+                    { 'data': 'TimeIn' },
+                    { 'data': 'TimeOut' },
+                    { 'data': 'Remarks' },
+                    { 'data': 'Remarks' },
+                ],
+                order: [[0, "asc"]],
+                columnDefs: [
+                    {
+                        title: 'Date Log',
+                        target: 0,
+                        //class: "d-none d-sm-table-cell text-center",
+                        "render": function (data, type, row, meta) {
+                            const date = new Date(row.DateLog);
+                            return ' <strong class="text-primary">' + date.toLocaleDateString('es-pa') + ' </strong> '
+                        }
+                    },
+                    {
+                        title: 'Date name',
+                        class: "d-none d-sm-table-cell",
+                        target: 1,
+                    },
+                    {
+                        title: 'Shift Schedule',
+                        target: 2,
+                        class: "d-none d-sm-table-cell", 
+                    },
+                    {
+                        title: 'Time In',
+                        target: 3,
+                        class: "d-none d-sm-table-cell text-center", 
+                        //}
+                    },
+                    {
+                        title: 'Time Out',
+                        target: 4,
+                        class: "d-none d-sm-table-cell text-center", 
+                    },
+                    {
+                        title: 'Time Out',
+                        target: 5,
+                        class: "d-none d-sm-table-cell text-center", 
+                    },
+                    {
+                        title: 'Details',
+                        target: 6,
+                        class: "d-xs-block d-sm-none d-m-none d-lg-none",
+                        "render": function (data, type, row, meta) {
+                            return '<small class="d-block">Date name : ' + row.DateName + '</small> ' +
+                                '<small class="d-block">Shift Schedule : ' + row.ShiftDescription + '</small> ' +
+                                '<small class="d-block">Time in : ' + row.TimeIn + '</small> ' +
+                                '<small class="d-block">Time out : ' + row.TimeOut + '</small> ' +
+                                '<small class="d-block">Remarks : ' + row.Remarks + '</small> '
+                        }
+                    },
+                    
+                ]
+            });
+
+        //SetTableBGColor();
+        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
+        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
+        $('.dataTables_paginate').addClass('mt-2 mb-2');
+        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
+        $('.sorting').addClass('bg-primary text-white');
+
+
+        ShowLoading('HIDE');
+
+    };
+
     //----------------------------------END POST CORRECTION--------------------------------------
 
     //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------

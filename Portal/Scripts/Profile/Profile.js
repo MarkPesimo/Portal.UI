@@ -3,6 +3,14 @@
         ShowLoading('HIDE');
     });
 
+    function isJsonString(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) { return false;
+        }
+        return true;
+    }
+
 
     $('#div-candidate-header-menu').on('click', '.edit-profile-btn', function (e) {
         e.preventDefault();
@@ -16,7 +24,13 @@
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
-                
+
+                if (isJsonString(response)) {
+                    //console.log(response);
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+
                 $('#edit_profile_modal').find(".modal-body").html(response);
                 $("#edit_profile_modal").modal('show');
             },
@@ -89,6 +103,14 @@
         var x = document.getElementById("preloader");
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
+    }
+
+    function ShowAccessDenied(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterAccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterAccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
     }
 
     function ValidationError(result) {

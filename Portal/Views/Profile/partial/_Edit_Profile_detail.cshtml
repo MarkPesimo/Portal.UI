@@ -7,6 +7,7 @@
     @Html.HiddenFor(m => m.CandidateId)
     @Html.HiddenFor(m => m.EmpNo)
     @Html.HiddenFor(m => m.RequestId)
+    @Html.HiddenFor(m => m.DateHired)
 
 
     <div class="row" id="div-with-pending-request">
@@ -44,25 +45,26 @@
             @Html.TextBoxFor(m => m.Position, new { @class = "form-control", @placeholder = "Position" })
         </div>
 
-        <div class="col-lg-3  col-6 mb-3">
+
+        <div class="col-lg-4  col-6 mb-3">
             <label for="" class="form-label">Civil Status</label>
             @Html.DropDownListFor(m => m.CivilStatus, (IEnumerable<SelectListItem>)ViewBag._CivilStatus, "Please Select", new { @class = "form-select", @placeholder = "Civil Status", @id = "CivilStatus" })
         </div>
 
-        <div class="col-lg-3 col-6 mb-3">
+        <div class="col-lg-4 col-6 mb-3">
             <label for="" class="form-label">Gender</label>
             @Html.DropDownListFor(m => m.Gender, (IEnumerable<SelectListItem>)ViewBag._Gender, "Please Select", new { @class = "form-select", @placeholder = "Gender", @id = "Gender" })
         </div>
 
-        <div class="col-lg-3  col-6 mb-3">
+        <div class="col-lg-4  col-6 mb-3">
             <label for="" class="form-label">Birthday</label>
             @Html.TextBoxFor(m => m.BirthDay, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.BirthDay.ToString("yyyy-MM-dd") })
         </div>
 
-        <div class="col-lg-3 col-6 mb-3">
+        @*<div class="col-lg-3 col-6 mb-3">
             <label for="" class="form-label">Date Hired</label>
             @Html.TextBoxFor(m => m.DateHired, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateHired.ToString("yyyy-MM-dd") })
-        </div>
+        </div>*@
     </div>
 
     <div class="row">

@@ -1,4 +1,5 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+﻿using APWModel.ViewModel.Global;
+using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using Portal.Repository;
 using System;
@@ -16,6 +17,8 @@ namespace Portal.Controllers
         private GlobalRepository _globalrepository { get; set; }
         private DocumentRepository _documentrepository { get; set; }
         private int _loginuserid = 0;
+        private int _candidate_id { get; set; }
+        private int _client_id { get; set; }    
 
         private string _Document_Index = "~/Views/Document/Document_index.cshtml";
         private string _COE_Index = "~/Views/Document/COE.cshtml";
@@ -24,20 +27,50 @@ namespace Portal.Controllers
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_documentrepository == null) {  _documentrepository = new DocumentRepository(); }
-            if (_loginuserid == 0) { _loginuserid = _globalrepository.GetLoginUser().UserId; }
+            if (_loginuserid == 0)
+            {
+                LoginUser_model _user = _globalrepository.GetLoginUser();
+                if (_user != null)
+                {
+                    _loginuserid = _user.UserId;
+                    _candidate_id = _user.CandidateId;
+                    _client_id = _user.ClientId;
+                }
+            }
         }
 
         [HttpGet]
         public ActionResult Index()
         {
-            return View(_Document_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "DOCUMENT"))
+            {
+                return View(_Document_Index);
+            }
+
+            return View("AccessDenied"); 
+        }
+
+        [HttpGet]
+        public ActionResult Requirements()
+        {
+            if (_globalrepository.HasClientAccess(_client_id, "REQUIREMENTS"))
+            {
+                return View(_Document_Index);
+            }
+
+            return View("AccessDenied");
         }
 
         [HttpGet]
         public ActionResult COE()
         {
-            ViewBag._Reasons = _globalrepository.GetCOEReasons().Select(s => new SelectListItem { Text = s.Description, Value = s.Value }).ToList();
-            return View(_COE_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "GENERATE COE"))
+            {
+                ViewBag._Reasons = _globalrepository.GetCOEReasons().Select(s => new SelectListItem { Text = s.Description, Value = s.Value }).ToList();
+                return View(_COE_Index);
+            }
+
+            return View("AccessDenied");
         }
 
         ReportDocument _rptfile;
@@ -81,8 +114,8 @@ namespace Portal.Controllers
                 string localFileName = localPath + @"\" + _guid.ToString() + ".pdf"; 
                 _rptfile.ExportToDisk(ExportFormatType.PortableDocFormat, localFileName);
                 
-                bool isStored = _documentrepository.SaveCOEGeneration(_reason, _guid.ToString() + ".pdf" );
-                bool isEmail = _documentrepository.NotifyCOEGeneration( _guid.ToString() + ".pdf");
+                bool isStored = _documentrepository.SaveCOEGeneration(_reason, _guid.ToString() + ".pdf" );             //insert logs in the database
+                bool isEmail = _documentrepository.NotifyCOEGeneration( _guid.ToString() + ".pdf");                     //send email notif
 
                 _rptfile.ExportToHttpResponse(ExportFormatType.PortableDocFormat, System.Web.HttpContext.Current.Response, false, "COE");
 

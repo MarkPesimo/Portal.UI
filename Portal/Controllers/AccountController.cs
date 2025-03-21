@@ -32,6 +32,16 @@ namespace Portal.Controllers
             return View("Login", model);
         }
 
+        [HttpGet]
+        public ActionResult CompanyLogin(string _company)
+        {
+            LoginModel model = new LoginModel
+            {
+                AppModuleId = 12
+            };
+            return View("Login", model);
+        }
+
         [HttpPost]
         public ActionResult Login(LoginModel model, string returnUrl)
         {

@@ -14,7 +14,7 @@
     @Html.HiddenFor(m => m.Message)
 
     <div class="row" id="div-validation" style="display: none;">
-        <div class="col-lg-6 mb-3">
+        <div class="col mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
         </div>
     </div>
@@ -86,7 +86,7 @@
     <div class="row mt-4">
         <div class="col-3 mb-3">
             <label for="" class="form-label">No. of Days</label>
-            @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "No. of Days" })
+            @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "No. of Days", @readonly = "true" })
         </div>
     </div>
 
@@ -94,6 +94,12 @@
         <div class="col">
             <label for="" class="form-label">Reason</label>
             @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <input class="form-control" type="file" name="Leave_Attachment" id="Leave_Attachment">
         </div>
     </div>
 }

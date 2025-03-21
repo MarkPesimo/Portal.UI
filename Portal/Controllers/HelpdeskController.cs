@@ -19,6 +19,7 @@ namespace Portal.Controllers
         private HelpdeskRepository _helpdeskrepository { get; set; }
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
+        private int _client_id { get; set; }
 
         private string _Helpdesk_Index = "~/Views/Helpdesk/Helpdesk_Index.cshtml";
 
@@ -33,35 +34,42 @@ namespace Portal.Controllers
                 {
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
+                    _client_id = _user.ClientId;
                 }
             }
         }
         // GET: Helpdesk
         public ActionResult Index()
         {
-            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, 1, 1);
-            DateTime currentdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); 
-            DateTime lastDayOfMonth = currentdate.AddMonths(1).AddDays(-1);
-
-            Filter_model _filter = new Filter_model
+            if (_globalrepository.HasClientAccess(_client_id, "HELPDESK"))
             {
-                UserId = _loginuserid,
-                UserType = "User",
-                ByConcerntype = false,
-                ConcernType = 0,
-                ByStatus = false,
-                Status = "All",
-                ByDate = true,
-                From = firstDayOfMonth,
-                To = lastDayOfMonth,
-                Keyword = "",
-                ByClient = false,
-                ClientId = 0
-            };
+                DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, 1, 1);
+                DateTime currentdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime lastDayOfMonth = currentdate.AddMonths(1).AddDays(-1);
 
-            ViewBag._concernTypes = _globalrepository.GetConcernTypes().Select(t => new SelectListItem { Text = t.ConcernType, Value = t.Id.ToString() }).ToList();
-            ViewBag._concernStatus = _globalrepository.GetConcernStatus().Select(t => new SelectListItem { Text = t.Description, Value = t.Value }).ToList();
-            return View(_Helpdesk_Index, _filter);
+                Filter_model _filter = new Filter_model
+                {
+                    UserId = _loginuserid,
+                    UserType = "User",
+                    ByConcerntype = false,
+                    ConcernType = 0,
+                    ByStatus = false,
+                    Status = "All",
+                    ByDate = true,
+                    From = firstDayOfMonth,
+                    To = lastDayOfMonth,
+                    Keyword = "",
+                    ByClient = false,
+                    ClientId = 0
+                };
+
+                ViewBag._concernTypes = _globalrepository.GetConcernTypes().Select(t => new SelectListItem { Text = t.ConcernType, Value = t.Id.ToString() }).ToList();
+                ViewBag._concernStatus = _globalrepository.GetConcernStatus().Select(t => new SelectListItem { Text = t.Description, Value = t.Value }).ToList();
+                return View(_Helpdesk_Index, _filter);
+            }
+
+            return View("AccessDenied");
+            
         }
 
         public void HowToUse()

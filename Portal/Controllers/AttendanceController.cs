@@ -44,25 +44,29 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "ATTENDANCE")) { return View("AccessDenied"); }
             return View(_Attendance_Index);
         }
 
         [HttpGet]
         public ActionResult ClockInOut()
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "CLOCK IN AND OUT")) { return View("AccessDenied"); }
             return View(_ClockInOut);
         }
 
         [HttpGet]
         public ActionResult Correction()
         {
-            return View(_Correction);
+            if (!_globalrepository.HasClientAccess(_client_id, "ATTENDANCE CORRECTION")) { return View("AccessDenied"); }                    
+            return View(_Correction); 
         }
 
         [HttpGet]
         public ActionResult DTR()
         {
-            return View(_DTR);
+            if (!_globalrepository.HasClientAccess(_client_id, "DTR SUBMISSION")) { return View("AccessDenied"); }
+            return View(_DTR); 
         }
 
 
@@ -85,14 +89,20 @@ namespace Portal.Controllers
             bool WithPrevious = false;
             try
             {
+                if (!_globalrepository.HasClientAccess(_client_id, "CLOCK OUT"))
+                {
+                    return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
+                }
+
+                
                 AttendanceToday_model _obj = _attendancerepository.GetPortalPreviousClockIn();
                 if (_obj != null) { WithPrevious = true; }
 
-                return Json(new { Status = "SUCCESS", result = _obj, WithPrevious = WithPrevious }, JsonRequestBehavior.AllowGet);
+                return Json(new { Status = "SUCCESS", result = _obj, WithPrevious = WithPrevious }, JsonRequestBehavior.AllowGet);                
             }
             catch (Exception ex)
             {
-                throw;
+                return Json(new { Status = "FAILED", result = false, msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -100,6 +110,11 @@ namespace Portal.Controllers
         {
             try
             {
+                if (!_globalrepository.HasClientAccess(_client_id, "CLOCK IN"))
+                {
+                    return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
+                }
+                
                 ClockInClockOut_model _obj = new ClockInClockOut_model
                 {
                     Id = _id,
@@ -109,7 +124,7 @@ namespace Portal.Controllers
                 };
 
                 bool _result = _attendancerepository.ClockInClockOut(_obj);
-                return Json(new { Status = "SUCCESS", result = _result }, JsonRequestBehavior.AllowGet);
+                return Json(new { Status = "SUCCESS", result = _result }, JsonRequestBehavior.AllowGet);                                                   
             }
             catch (Exception ex)
             {
@@ -121,6 +136,11 @@ namespace Portal.Controllers
         {
             try
             {
+                if (!_globalrepository.HasClientAccess(_client_id, "CLOCK OUT"))
+                {
+                    return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
+                }
+
                 ClockInClockOut_model _obj = new ClockInClockOut_model
                 {
                     Id = _id,
@@ -353,7 +373,7 @@ namespace Portal.Controllers
 
         //=======================================BEGIN DTR==============================
         [HttpGet]
-        public ActionResult GetDTRist(DateTime _fromdate, DateTime _todate, string _status)
+        public ActionResult GetDTRList(DateTime _fromdate, DateTime _todate, string _status)
         {
             try
             {
@@ -372,6 +392,27 @@ namespace Portal.Controllers
             try
             {
                 DTRmodel _obj = _attendancerepository.GetDTR(_id);
+                return Json(_obj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        //[HttpGet]
+        //public ActionResult GetDTRDetails(int _id)
+        //{
+        //    List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = _attendancerepository.GetDTRDetails(_id);
+        //    return PartialView("~/Views/Attendance/Partial/DTR/_post_dtr_detail.cshtml", _obj);
+        //}
+
+        [HttpGet]
+        public ActionResult GetDTRDetails(int _id)
+        {
+            try
+            {
+                List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = _attendancerepository.GetDTRDetails(_id);
                 return Json(_obj, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -470,8 +511,6 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        
- 
         //=======================================END DTR==============================
     }
 }

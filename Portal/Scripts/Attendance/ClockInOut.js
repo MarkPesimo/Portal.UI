@@ -50,6 +50,10 @@
                 $('#add_correction_modal').find(".modal-body").innerHTML = '';
                 $('#add_correction_modal').find(".modal-body").html(response);
                 $('#add_correction_modal').modal('show');
+
+                var _form = '#attendance-correction-Form';
+                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
+
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -57,12 +61,20 @@
         
     });
 
+    function ChangeDateLogAdd() {        
+        var _form = '#attendance-correction-Form';
+        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
+
+        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
+
     $('#add_correction_modal').on('click', '#submit_correction', function (e) {
         ShowLoading('SHOW');
         $.ajax({
             url: '/Attendance/_AddCorrection',
             type: "POST",
-            data: $('#add-attendance-correction-Form').serialize(),
+            data: $('#attendance-correction-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }

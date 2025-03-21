@@ -18,6 +18,7 @@ namespace Portal.Controllers
         private ProfileRepository _profilerepository { get; set; }
         private int _loginuserid  { get; set; }
         private int _candidate_id { get; set; }
+        private int _client_id { get; set; }
 
         private string _Profile_Index = "~/Views/Profile/Profile_Index.cshtml";
 
@@ -31,6 +32,7 @@ namespace Portal.Controllers
                 {
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
+                    _client_id = _user.ClientId;
                 }
             }
         }
@@ -39,6 +41,8 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "PROFILE")) { return View("AccessDenied");             }
+
             Profile_model _model = _profilerepository.GetPortalProfile();
             if (_model.WithPendingRequest)
             {
@@ -86,6 +90,9 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _Edit()
         {
+            //return Json(new { Result = "Error", value = ex.ToString(), CandidateId = _candidateid, ElapsedTime = elapsedMs }, JsonRequestBehavior.AllowGet);
+            if (!_globalrepository.HasClientAccess(_client_id, "EDIT PROFILE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
+
             Profile_model _model = _profilerepository.GetPortalProfile();
             ViewBag._Gender = _globalrepository.GetGender().Select(s => new SelectListItem { Text = s.Gender_Desc, Value = s.Value }).ToList();
             ViewBag._CivilStatus = _globalrepository.GetCivilStatus().Select(s => new SelectListItem { Text = s.Decription, Value = s.Value }).ToList();

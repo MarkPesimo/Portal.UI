@@ -59,7 +59,10 @@
                     GetClockInClockOut();
                     ShowSuccessMessage('You have successfully Clock-In.')                    
                 }
-                else { alert(result.msg); }
+                else {
+                    ShowAccessDenied(result.result);
+                    //alert(result.result);
+                }
             }
         });
     });
@@ -84,7 +87,10 @@
                     GetClockInClockOut();
                     ShowSuccessMessage('You have successfully Clock-Out.')
                 }
-                else { alert(result.msg); }
+                else {
+                    
+                    alert(result.msg);
+                }
             }
         });
     });
@@ -107,13 +113,13 @@
                     if (response.Status == "SUCCESS") {
                         document.getElementById("div-label-no-clockin-today").style.visibility = "hidden";
                         document.getElementById("div-label-with-previous-clockin").style.visibility = "hidden";
-                        
 
-                        if (response.WithPrevious == true) {                            
+
+                        if (response.WithPrevious == true) {
                             document.getElementById("div-with-previous-clockin").style.visibility = "visible";
                             document.getElementById("div-label-with-previous-clockin").style.visibility = "visible";
 
-                            document.getElementById('label-date-log').innerHTML = 'Date log : <Strong class="text-primary"> ' + response.result.DateLog + '</strong>';                            
+                            document.getElementById('label-date-log').innerHTML = 'Date log : <Strong class="text-primary"> ' + response.result.DateLog + '</strong>';
                             document.getElementById('label-shift-description').innerHTML = 'Shift Description : <Strong class="text-primary">' + response.result.ShiftDescription + '</strong>';
                             document.getElementById('label-clock-in').innerHTML = 'Clock In : <Strong class="text-primary">' + response.result.ClockIn + '</strong>';
                             document.getElementById('label-clock-out').innerHTML = 'Clock Out: <Strong class="text-primary">' + response.result.ClockOut + '</strong>';
@@ -128,7 +134,7 @@
 
                         $("#clockin_modal").modal('show');
                     }
-                    
+                    else { ShowAccessDenied(response.result);}
                     
                 },
                 failure: function (response) { LogError(response); },
@@ -151,7 +157,9 @@
                         GetClockInClockOut();
                         ShowSuccessMessage('You have successfully Clock-Out.')
                     }
-                    else { alert(result.msg); }
+                    else {
+                        ShowAccessDenied(result.result);
+                    }
                 }
             });
         }
@@ -253,6 +261,14 @@
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
         const toaster = document.getElementById("toasterSuccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowAccessDenied(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterAccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterAccess");
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }

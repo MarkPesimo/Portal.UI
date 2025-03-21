@@ -14,5 +14,28 @@
 
 Are you sure you want to mark this DTR as <strong><span class="text-success">Posted</span></strong>?
 
+<div class="widget widget-table mt-2">
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover align-middle" id="dtr-details-table">
+            <thead>
+                <tr>
+                    <th class="bg-primary text-white">Date Log</th>
+                    <th class="bg-primary text-white">Date name</th>
+                    <th class="bg-primary text-white">Shift Schedule</th>
+                    <th class="bg-primary text-white">Time In</th>
+                    <th class="bg-primary text-white">Time Out</th>
+                    <th class="bg-primary text-white">Remarks</th>
+                    <th class="bg-primary text-white">Details</th>
+                </tr>
+            </thead>
+
+                                                      
+        </table>
+    </div>
+</div>
+
+@*@{
+    Html.RenderAction("GetDTRDetails", "Attendance", new { _id = Model.Id});
+}*@
 
 

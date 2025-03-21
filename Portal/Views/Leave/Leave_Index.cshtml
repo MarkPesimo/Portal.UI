@@ -48,34 +48,61 @@
             <div class="row">
                 <div class="col-lg-4 mb-3 me-2 widget ">
                     <div class="row" id="div-sick-leave">
-                        <div class="col-8">
+                        <div class="col-4">
                             <a href="#" class="d-block w-100 text-center">
                                 <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
                                     <i class="fa-solid fa-house-chimney-medical"> </i>
                                 </span>
-                                <h3 class="text-primary">Sick Leave</h3>
+                                <h4 class="text-primary">Sick Leave</h4>
                             </a>
                         </div>
                         <div class="col">
-                            <div class="row text-start"><p id="label-sl-balance" class="mb-0 text-muted"><strong class="text-primary">0</strong> Balance </p></div>
-                            <div class="row text-start"><p id="label-sl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p></div>
+                            <div class="row">
+                                <div class="col">
+                                    <p id="label-sl-entitled" class="mb-0 text-muted"><strong class="text-primary">0.00</strong> </p>
+                                    <p id="label-sl-earned" class="mb-0 text-muted"><strong class="text-primary">0</strong> Earned </p>
+                                    <p id="label-sl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p>                                    
+                                </div>
+
+                                <div class="col">
+                                    <p id="label-sl-balance" class="mb-0 text-muted"><strong class="text-primary">0</strong> Balance </p>
+                                    <p id="label-sl-valid-until" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Valid until </p>
+                                    
+                                </div>
+                            </div>    
+                            <div class="row">
+                                <p id="label-sl-earned-at" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Earned at the </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 mb-3 widget ">
                     <div class="row" id="div-vacation-leave">
-                        <div class="col-8">
+                        <div class="col-4">
                             <a href="#" class="d-block w-100 text-center">
                                 <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
                                     <i class="fa-solid fa-plane"></i>
                                 </span>
-                                <h3 class="text-primary">Vacation Leave</h3>
+                                <h4 class="text-primary">Vacation Leave</h4>
                             </a>
                         </div>
+
                         <div class="col">
-                            <div class="row text-start"><p id="label-vl-balance" class="mb-0 text-muted"><strong class="text-primary">0</strong> Balance </p></div>
-                            <div class="row text-start"><p id="label-vl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p></div>
+                            <div class="row">
+                                <div class="col">
+                                    <p id="label-vl-entitled" class="mb-0 text-muted"><strong class="text-primary">0.00</strong> Entitled </p>
+                                    <p id="label-vl-earned" class="mb-0 text-muted"><strong class="text-primary">0</strong> Earned </p>
+                                    <p id="label-vl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p>
+                                </div>
+                                <div class="col">
+                                    <p id="label-vl-balance" class="mb-0 text-muted"><strong class="text-primary">0</strong> Balance </p>
+                                    <p id="label-vl-valid-until" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Valid until </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <p id="label-vl-earned-at" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Earned at the </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,9 +119,11 @@
                                     <th class="bg-primary text-white">Leave Type</th>
                                     <th class="bg-primary text-white">From</th>
                                     <th class="bg-primary text-white">To</th>
+                                  
                                     <th class="bg-primary text-white">Day(s)</th>
                                     <th class="bg-primary text-white">Reason</th>
                                     <th class="bg-primary text-white">File Status</th>
+
                                     <th class="bg-primary text-white">Details</th>
                                     <th class="bg-primary text-white">&nbsp;</th>
                                 </tr>

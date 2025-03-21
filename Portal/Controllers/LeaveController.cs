@@ -2,6 +2,7 @@
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -16,6 +17,7 @@ namespace Portal.Controllers
         private LeaveRepository _leaverepository { get; set; }
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
+        public int _client_id { get; set; }
 
 
         private string _LeaveAttendance_Index = "~/Views/Leave/LeaveAttendance_Index.cshtml";
@@ -32,6 +34,7 @@ namespace Portal.Controllers
                 {
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
+                    _client_id = _user.ClientId;
                 }
             }
         }
@@ -39,7 +42,8 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return View(_Leave_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "LEAVE")) { return View(_Leave_Index); }
+            else { return View("AccessDenied"); }
         }
 
         [HttpGet]
@@ -173,10 +177,38 @@ namespace Portal.Controllers
                     else { _model.LeaveFromAMPM = "PM"; }
                 }
 
+                if (_model.Mode == 0 || _model.Mode == 1)
+                {
+                    if (_model.LeaveFrom.Date > _model.LeaveTo.Date)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The date of leave [from] cannot be ahead to the date of leave [to].", ElementName = "LeaveFrom" });
+                    }
+                 
+                    if (_model.LeaveDays <= 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Leave day(s) cannot be Zero or less than Zero.", ElementName = "LeaveDays" });
+                    }
+
+                    //check leave balance
+                    LeaveBalance_model _obj = _leaverepository.GetLeaveBalance(_model.LeaveTypeId);
+                    if (_obj!= null)
+                    {
+                        if (decimal.Parse( _obj.Balance) <= 0)
+                        {
+                            return Json(new { Result = "ERROR", Message = "Insufficient leave balance.", ElementName = "LeaveFrom" });
+                        }
+
+                        if (decimal.Parse(_model.LeaveDays.ToString()) > decimal.Parse(_obj.Balance))
+                        {
+                            return Json(new { Result = "ERROR", Message = "Insufficient leave balance.", ElementName = "LeaveFrom" });
+                        }
+                    }
+                }
+
                 if (ModelState.IsValid)
                 {
                     int _id = _leaverepository.ManageLeave(_model);
-                    return Json(new { Result = "Success" });
+                    return Json(new { Result = "Success", LeaveId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -187,5 +219,63 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        public ActionResult _LeaveAttachment(int _id, HttpPostedFileBase Leave_Attachment)
+        {
+            try
+            {
+                string _fileextension = _globalrepository.GetExtension(Leave_Attachment);
+                int _mode = 91;
+
+                LeaveModel _model = new LeaveModel();
+                _model.Id = _id;
+
+                _model.EmpId = _loginuserid;
+                _model.LeaveTypeId = 0;
+                _model.DateFiled = DateTime.Now;
+
+                _model.LeaveFrom = DateTime.Now;
+
+                _model.LeaveFromAMPM = _fileextension;
+
+                _model.LeaveTo = DateTime.Now;
+                _model.LeaveToAMPM = "PM";
+                _model.LeaveDays = 1;
+                _model.IsHalfday = false;
+                _model.FirstHalf = false;
+                _model.SecondHalf = false;
+                _model.FirstDay_SecondHalf = false;
+                _model.LastDay_FirstHalf = false;
+                _model.Reason = "";
+                _model.Remarks = "";
+                _model.Mode = _mode;
+                _model.Message = "";
+                _model.UserId = 112;
+
+
+                _id = _leaverepository.ManageLeave(_model);
+                //update table for the file extension 
+
+                //check if candidate id folder already exist, if not create a folder
+                //string _check_foloder = Path.Combine(Server.MapPath("~/LeaveAttachments/Filing/" + _id.ToString()), "");
+                //if (Directory.Exists(_check_foloder) == false) { Directory.CreateDirectory(_check_foloder); }
+
+
+                var path = Path.Combine(Server.MapPath("~/LeaveAttachments/Filing/" + _id.ToString() + _fileextension));
+
+                if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
+
+                Leave_Attachment.SaveAs(path);
+                //attached procedure ends here------------------------------------------------------------------------------
+
+                return Json(new { Result = "Success" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
     }
 }

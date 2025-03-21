@@ -36,13 +36,23 @@
                 ShowLoading('HIDE');
                 if (leavetypeid == 1)           //SICK LEAVE
                 {
-                    document.getElementById('label-sl-balance').innerHTML = '<strong class="text-primary">' + response.result.Balance + '</strong> Balance </p>';
-                    document.getElementById('label-sl-used').innerHTML = '<strong class="text-primary">' + response.result.Used + '</strong> Used </p>';
+                    document.getElementById('label-sl-balance').innerHTML = 'Balance : <strong class="text-primary">' + response.result.Balance + '</strong> </p>';
+                    document.getElementById('label-sl-earned').innerHTML = 'Earned : <strong class="text-primary">' + response.result.Earned + '</strong> </p>';
+                    document.getElementById('label-sl-used').innerHTML = 'Used : <strong class="text-primary">' + response.result.Used + '</strong> </p>';
+
+                    document.getElementById('label-sl-entitled').innerHTML = ' Entitled : <strong class="text-primary">' + response.result.EntitledLeave + '</strong></p>';
+                    document.getElementById('label-sl-valid-until').innerHTML = 'Valid Until : <strong class="text-primary">' + response.result.ValidUntil + '</strong> </p>';
+                    document.getElementById('label-sl-earned-at').innerHTML = 'Credits earned at : <strong class="text-primary">' + response.result.EarnedAt + '</strong> </p>';
                 }
                 else if (leavetypeid == 2)      //VACATION LEAVE
                 {
-                    document.getElementById('label-vl-balance').innerHTML = '<strong class="text-primary">' + response.result.Balance + '</strong> Balance </p>';
-                    document.getElementById('label-vl-used').innerHTML = '<strong class="text-primary">' + response.result.Used + '</strong> Used </p>';
+                    document.getElementById('label-vl-balance').innerHTML = 'Balance : <strong class="text-primary">' + response.result.Balance + '</strong> </p>';
+                    document.getElementById('label-vl-earned').innerHTML = 'Earned : <strong class="text-primary">' + response.result.Earned + '</strong> </p>';
+                    document.getElementById('label-vl-used').innerHTML = 'Used : <strong class="text-primary">' + response.result.Used + '</strong> </p>';
+
+                    document.getElementById('label-vl-entitled').innerHTML = 'Entitled : <strong class="text-primary">' + response.result.EntitledLeave + '</strong> </p>';
+                    document.getElementById('label-vl-valid-until').innerHTML = 'Valid Until : <strong class="text-primary">' + response.result.ValidUntil + '</strong> </p>';
+                    document.getElementById('label-vl-earned-at').innerHTML = 'Credits earned at : <strong class="text-primary">' + response.result.EarnedAt + '</strong> </p>';
                 }
             },
             failure: function (response) { console.log(response); },
@@ -129,6 +139,7 @@
                     { 'data': 'LeaveType' },
                     { 'data': 'DateFrom' },
                     { 'data': 'DateTo' },
+
                     { 'data': 'NoOfDays' },
                     { 'data': 'Reason' },
                     { 'data': 'Status' },
@@ -229,11 +240,13 @@
     function SetTableBGColor(_status) {
         var _font_color = 'white';
         var _color = 'white';
+
         if (_status == 'Posted') { _color = '#5cb85c'; }
-        else if (_status == "Approved") { _color = '#0275d8'; }
+        else if (_status == "Approved by Client") { _color = '#0275d8'; }
+        else if (_status == "Approved by Payroll") { _color = '#10a9e0'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
         else if (_status == "Rejected") { _color = '#c94D3B'; }
-        else { _font_color = 'black'; }
+        else { _color = '#959A97'; _font_color = 'white'; }
 
         return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
     };
@@ -451,6 +464,14 @@
                 else {
                     $("#add_leave_modal").modal('hide');
 
+                    $file = $("#Leave_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        LeaveAttachment(result.LeaveId, 'Leave successfully created.')
+                        return;
+                    }
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully created.');
 
@@ -463,6 +484,36 @@
         });
     });
     //----------------------------------END ADD LEAVE--------------------------------------
+
+    function LeaveAttachment(_id, _msg) {
+ 
+        var formData = new FormData();
+        var _Attachement = $('#Leave_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Leave_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Leave/_LeaveAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#leave-table');
+                    LoadDefault();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+    
+    }
 
     //----------------------------------BEGIN EDIT LEAVE--------------------------------------
     $('#leave-table').on('click', '.edit-leave', function () {
@@ -528,6 +579,14 @@
                 else {
                     $("#edit_leave_modal").modal('hide');
 
+                    $file = $("#Leave_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        LeaveAttachment(result.LeaveId, 'Leave successfully updated.')
+                        return;
+                    }
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully updated.');
 
@@ -554,7 +613,7 @@
                 ShowLoading('HIDE');
                 $('#post_leave_modal').find(".modal-body").innerHTML = '';
                 $('#post_leave_modal').find(".modal-body").html(response);
-                $("#post_leave_modal").modal('show');                 
+                $("#post_leave_modal").modal('show');
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -684,6 +743,7 @@
         toasterFunction.show();
     }
 
+ 
     function LogError(response) {
         ShowLoading('HIDE');
         console.log(response.responseText);
