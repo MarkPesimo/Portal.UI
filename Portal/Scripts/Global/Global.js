@@ -13,7 +13,7 @@
             success: function (response) {
                 ShowLoading('HIDE');
                 //console.log(response);
-                document.getElementById('my-shift').innerHTML = '<i class="fa-solid fa-business-time"></i> Shift Schedule : ' + response.ShiftDescription;
+                document.getElementById('my-shift').innerHTML = '<i class="fa-solid fa-business-time"></i> Shift Sched : ' + response.ShiftDescription;
                 //get the current date, store it on the current-date attribute of my-shift button, this will be used as a validation
                 //in clocking out to check
 

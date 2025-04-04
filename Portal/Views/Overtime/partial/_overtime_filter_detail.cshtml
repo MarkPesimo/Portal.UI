@@ -1,0 +1,30 @@
+﻿@model APWModel.ViewModel.Portal.Overtime_model.FiledOvertimeMonitoringFilter_model
+
+@Html.HiddenFor(m => m.EmpId)
+@Html.HiddenFor(m => m.ByStatus)
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">Status</label>
+
+            @Html.DropDownListFor(m => m.Status, (IEnumerable<SelectListItem>)ViewBag._Status, "Please Select", new { @class = "form-select", @placeholder = "Status", @id = "Status" })
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">Overtime from</label>
+            @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-group mb-3">
+            <label class="form-label" for="">Overtime to</label>
+            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+ 
+</div>

@@ -1,0 +1,27 @@
+﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
+    
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "unpost-overtime-Form", id = "unpost-overtime-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.ClientId)
+    @Html.HiddenFor(m => m.DateFiled)
+    @Html.HiddenFor(m => m.OTFrom)
+    @Html.HiddenFor(m => m.OTFromTime)
+    @Html.HiddenFor(m => m.OTTo)
+    @Html.HiddenFor(m => m.OTToTime)
+    @Html.HiddenFor(m => m.OTHours)
+
+    @Html.HiddenFor(m => m.Reason)
+    @Html.HiddenFor(m => m.Remarks)
+    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.UserId)
+}
+
+
+
+Are you sure you want to mark this Overtime request as <strong><span class="text-danger">Unposted</span></strong>?
+
+
+
+

@@ -561,6 +561,16 @@
                 document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
 
                 ComputeLeaveDays();
+
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+                var _has_attachment = document.getElementById("HasAttachement").value;
+                var _view_button = document.querySelector('#edit_leave_modal').querySelector('#view_attached_btn');
+                _view_button.style.visibility = _has_attachment;
+
+                //var _edit_button = document.querySelector('#edit_task_modal').querySelector('#edit_task_btn');
+                //if (_det_status == 'Draft') { _edit_button.style.visibility = 'none'; }
+                //else { _edit_button.style.visibility = 'hidden'; }
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -594,6 +604,33 @@
                     LoadDefault();
                 }
             }
+        });
+    });
+
+    $('#edit_leave_modal').on('click', '#view_attached_btn', function () {
+        var _fileid = document.querySelector('#leave-Form').querySelector("#Id").value;
+        var _extension = document.querySelector('#leave-Form').querySelector("#FileExtension").value;
+        //alert(_taskid);
+        //alert(_extension);
+
+        //return;
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Leave/_OpenLeaveFile",
+            data: {
+                '_fileid': _fileid,
+                '_extension': _extension,
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $("#open_leave_file_modal").find(".modal-body").html(response);
+                $("#open_leave_file_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
         });
     });
     //----------------------------------END EDIT LEAVE--------------------------------------

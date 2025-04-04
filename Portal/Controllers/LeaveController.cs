@@ -132,7 +132,7 @@ namespace Portal.Controllers
         }
         //---------------------------------------END POST LEAVE---------------------------------------
 
-        //---------------------------------------BEGIN POST LEAVE---------------------------------------
+        //---------------------------------------BEGIN UNPOST LEAVE---------------------------------------
         [HttpGet]
         public ActionResult _UnpostLeave(int _id)
         {
@@ -141,7 +141,7 @@ namespace Portal.Controllers
             _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_unpost_detail.cshtml", _obj);
         }
-        //---------------------------------------END POST LEAVE---------------------------------------
+        //---------------------------------------END UNPOST LEAVE---------------------------------------
 
         //---------------------------------------BEGIN CANCEL LEAVE---------------------------------------
         [HttpGet]
@@ -275,6 +275,18 @@ namespace Portal.Controllers
             {
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
+        }
+
+        [HttpGet]
+        public ActionResult _OpenLeaveFile(int _fileid, string _extension)
+        {
+            LeaveModel _model = new LeaveModel
+            {
+                Id = _fileid,
+                FileExtension = _extension
+            };
+
+            return PartialView("~/Views/Leave/partial/_view_attachment.cshtml", _model);
         }
 
     }

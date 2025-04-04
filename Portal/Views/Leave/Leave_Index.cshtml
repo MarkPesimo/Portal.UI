@@ -61,15 +61,15 @@
                                 <div class="col">
                                     <p id="label-sl-entitled" class="mb-0 text-muted"><strong class="text-primary">0.00</strong> </p>
                                     <p id="label-sl-earned" class="mb-0 text-muted"><strong class="text-primary">0</strong> Earned </p>
-                                    <p id="label-sl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p>                                    
+                                    <p id="label-sl-used" class="mb-0 text-muted"><strong class="text-primary">0</strong> Used </p>
                                 </div>
 
                                 <div class="col">
                                     <p id="label-sl-balance" class="mb-0 text-muted"><strong class="text-primary">0</strong> Balance </p>
                                     <p id="label-sl-valid-until" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Valid until </p>
-                                    
+
                                 </div>
-                            </div>    
+                            </div>
                             <div class="row">
                                 <p id="label-sl-earned-at" class="mb-0 text-muted"><strong class="text-primary">mm-yy</strong> Earned at the </p>
                             </div>
@@ -119,7 +119,7 @@
                                     <th class="bg-primary text-white">Leave Type</th>
                                     <th class="bg-primary text-white">From</th>
                                     <th class="bg-primary text-white">To</th>
-                                  
+
                                     <th class="bg-primary text-white">Day(s)</th>
                                     <th class="bg-primary text-white">Reason</th>
                                     <th class="bg-primary text-white">File Status</th>
@@ -138,6 +138,7 @@
 </section>
 
 @Html.Partial("~/Views/Leave/Modal/_leave_filter_modal.cshtml")
+@Html.Partial("~/Views/Leave/Modal/_open_leave_file_modal.cshtml")
 
 @Html.Partial("~/Views/Leave/Modal/_add_leave_modal.cshtml")
 @Html.Partial("~/Views/Leave/Modal/_edit_leave_modal.cshtml")

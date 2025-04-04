@@ -388,6 +388,7 @@
     <Compile Include="Controllers\HelpdeskController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LeaveController.cs" />
+    <Compile Include="Controllers\OvertimeController.cs" />
     <Compile Include="Controllers\PayrollController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -405,6 +406,7 @@
     <Compile Include="Repository\GlobalRepository.cs" />
     <Compile Include="Repository\HelpdeskRepository.cs" />
     <Compile Include="Repository\LeaveRepository.cs" />
+    <Compile Include="Repository\OvertimeRepository.cs" />
     <Compile Include="Repository\PayrollRepository.cs" />
     <Compile Include="Repository\ProfileRepository.cs" />
     <Compile Include="Repository\SettingsRepository.cs" />
@@ -448,6 +450,7 @@
     <Content Include="Scripts\Helpdesk\Comment.js" />
     <Content Include="Scripts\Helpdesk\Helpdesk.js" />
     <Content Include="Scripts\Leave\Leave.js" />
+    <Content Include="Scripts\Overtime\Overtime.js" />
     <Content Include="Scripts\Profile\Profile.js" />
     <Content Include="Scripts\Settings\Settings.js" />
     <Content Include="Scripts\Settings\Account.js" />
@@ -484,6 +487,7 @@
     <Folder Include="CandidateImages\" />
     <Folder Include="GeneratedReports\" />
     <Folder Include="LeaveAttachments\Filing\" />
+    <Folder Include="OvertimeAttachments\Filing\" />
     <Folder Include="Report\Document\" />
     <Folder Include="Report\Payroll\" />
     <Folder Include="Views\Account\modal\" />
@@ -588,6 +592,22 @@
     <Content Include="Views\Leave\modal\_cancel_leave_modal.cshtml" />
     <Content Include="Views\Shared\AccessDenied.cshtml" />
     <Content Include="Views\Attendance\partial\DTR\_post_dtr_detail.cshtml" />
+    <Content Include="Views\Overtime\Overtime_Index.cshtml" />
+    <Content Include="Views\Overtime\modal\_add_overtime_modal.cshtml" />
+    <Content Include="Views\Overtime\modal\_edit_overtime_modal.cshtml" />
+    <Content Include="Views\Overtime\modal\_overtime_filter_modal.cshtml" />
+    <Content Include="Views\Overtime\modal\_cancel_overtime_modal.cshtml" />
+    <Content Include="Views\Overtime\modal\_post_overtime_modal.cshtml" />
+    <Content Include="Views\Overtime\modal\_unpost_overtime_modal.cshtml" />
+    <Content Include="Views\Overtime\partial\_overtime_detail.cshtml" />
+    <Content Include="Views\Overtime\partial\_overtime_filter_detail.cshtml" />
+    <Content Include="Views\Overtime\partial\_post_detail.cshtml" />
+    <Content Include="Views\Overtime\partial\_unpost_detail.cshtml" />
+    <Content Include="Views\Overtime\partial\_cancel_detail.cshtml" />
+    <Content Include="Views\Overtime\modal\_open_overtime_file_modal.cshtml" />
+    <Content Include="Views\Overtime\partial\_view_attachment.cshtml" />
+    <Content Include="Views\Leave\partial\_view_attachment.cshtml" />
+    <Content Include="Views\Leave\modal\_open_leave_file_modal.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

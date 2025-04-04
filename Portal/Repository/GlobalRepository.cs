@@ -33,7 +33,7 @@ namespace Portal.Repository
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -54,7 +54,7 @@ namespace Portal.Repository
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -75,7 +75,7 @@ namespace Portal.Repository
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
         //================================END REQUEST============================================
