@@ -1,0 +1,72 @@
+﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
+
+
+@using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-overtime-Form", id = "post-overtime-Form" }))
+{
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.ClientId)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.DateFiled)
+    @Html.HiddenFor(m => m.OTHours)
+    @Html.HiddenFor(m => m.Remarks)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.Message)
+
+    @Html.HiddenFor(m => m.HasAttachement)
+    @Html.HiddenFor(m => m.FileExtension)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <label for="" class="form-label">Overtime start</label>
+        <div class="col">
+            @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col">
+            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @placeholder = "OT Start", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime" })
+        </div>
+    </div>
+
+    <div class="row">
+        <label for="" class="form-label">Overtime End</label>
+        <div class="col">
+            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col">
+            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @placeholder = "OT End", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime" })
+        </div>
+    </div>
+
+
+
+    @*<div class="row mt-4">
+            <div class="col-3 mb-3">
+                <label for="" class="form-label">Overtime Hours</label>
+                @Html.TextBoxFor(m => m.OTHours, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "Overtime Hours", @readonly = "true" })
+            </div>
+        </div>*@
+
+    <div class="row mt-2">
+        <div class="col">
+            <label for="" class="form-label">Reason</label>
+            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <input class="form-control" type="file" name="Overtime_Post_Attachment" id="Overtime_Post_Attachment">
+        </div>
+    </div>
+}
+
+
+

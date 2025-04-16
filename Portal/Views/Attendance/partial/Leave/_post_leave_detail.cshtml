@@ -1,0 +1,111 @@
+﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
+
+
+@using (Html.BeginForm("Add", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-leave-Form", id = "post-leave-Form" }))
+{
+
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.DateFiled)
+    @Html.HiddenFor(m => m.LeaveFromAMPM)
+    @Html.HiddenFor(m => m.LeaveToAMPM)
+    @Html.HiddenFor(m => m.Remarks)
+    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.Message)
+
+    @Html.HiddenFor(m => m.HasAttachement)
+    @Html.HiddenFor(m => m.FileExtension)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Leave Type</label>
+            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, "Please Select", new { @class = "form-select", @placeholder = "Leave Types" })
+        </div>
+
+
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <label for="" class="form-label">From</label>
+            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
+        </div>
+
+        <div class="col-6">
+            <label for="" class="form-label">To</label>
+            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="row mt-4" id="div-sameday-halfday">
+        <div class="col-4">
+            <div class="form-check form-switch mt-2">
+                @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input", @name = @Model.IsHalfday, @value = @Model.IsHalfday })
+                <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+            </div>
+        </div>
+
+        <div class="col-8 d-none" id="div-sameday-halfday-details">
+            <div class="row">
+                <div class="col">
+                    <div class="form-check form-switch mt-2">
+                        @Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input", @name = @Model.FirstHalf, @value = @Model.FirstHalf })
+                        <label class="form-check-label" for="flexSwitchCheckChecked">First Half</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-check form-switch mt-2">
+                        @Html.CheckBoxFor(m => m.SecondHalf, new { @class = "form-check-input", @name = @Model.SecondHalf, @value = @Model.SecondHalf })
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Second Half</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 d-none" id="div-not-sameday-halfday">
+        <div class="col-6">
+            <div class="form-check form-switch mt-2">
+                @Html.CheckBoxFor(m => m.FirstDay_SecondHalf, new { @class = "form-check-input", @name = @Model.FirstDay_SecondHalf, @value = @Model.FirstDay_SecondHalf })
+                <label class="form-check-label" for="flexSwitchCheckChecked">First day, Second half</label>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-check form-switch mt-2">
+                @Html.CheckBoxFor(m => m.LastDay_FirstHalf, new { @class = "form-check-input", @name = @Model.LastDay_FirstHalf, @value = @Model.LastDay_FirstHalf })
+                <label class="form-check-label" for="flexSwitchCheckChecked">Last day, First Half</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-3 mb-3">
+            <label for="" class="form-label">No. of Days</label>
+            @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "No. of Days", @readonly = "true" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <label for="" class="form-label">Reason</label>
+            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <input class="form-control" type="file" name="Leave_Post_Attachment" id="Leave_Post_Attachment">
+        </div>
+    </div>
+}
+
+
+

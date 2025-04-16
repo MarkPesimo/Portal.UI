@@ -202,6 +202,54 @@ namespace Portal.Controllers
             }
         }
 
+        //---------------------------------------BEGIN ADD POST ATTENDANCE CORRECTION---------------------------------------
+        [HttpGet]
+        public ActionResult _AddPostCorrection(DateTime _datelog)
+        {
+            Correction_model _model = new Correction_model
+            {
+                DateLog = _datelog,
+                EmpId = _loginuserid,
+                UserId = 112
+            };
+
+            DefaultShift _defaultshift = _attendancerepository.GetDefaultShift();
+            if (_defaultshift != null)
+            {
+                _model.ShiftId = _defaultshift.ShiftId;
+                _model.TimeInDate = _defaultshift.TimeInDate;
+                _model.TimeInTime = _defaultshift.TimeInDate;
+                _model.TimeOutDate = _defaultshift.TimeOutDate;
+                _model.TimeOutDate = _defaultshift.TimeOutDate;
+            }
+
+            ViewBag._ClientShift = _globalrepository.GetClientShift(_client_id).Select(t => new SelectListItem { Text = t.ShiftTypeDescription, Value = t.ShiftTypeId.ToString() }).ToList();
+            return PartialView("~/Views/Attendance/Partial/Correction/_post_correction_detail.cshtml", _model);
+        }
+
+        [HttpPost]
+        public ActionResult _AddPostCorrection(Correction_model _model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
+                    _model.Id = _id;
+                    _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
+                    return Json(new { Result = "Success" });
+                }
+
+                List<string> _errors = _globalrepository.GetModelErrors(ModelState);
+                return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+        //---------------------------------------END ADD POST  ATTENDANCE CORRECTION---------------------------------------
+
 
         //---------------------------------------BEGIN ADD ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]

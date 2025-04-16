@@ -31,11 +31,13 @@
                                 <i class="fa-solid fa-sliders"></i> Filter Records
                             </button>
                         </div>
-                        <div class="col-lg-auto col-6">
+                        @*
+                            <div class="col-lg-auto col-6">
                             <button type="button" class="btn btn-sm ms-lg-1 rounded btn-primary" id="add_correction_btn">
                                 <i class="fa-solid fa-plus"></i> File Correction
                             </button>
-                        </div>
+                            </div>
+                        *@
                     </div>
                 </div>
 
@@ -69,10 +71,8 @@
 
 
 @Html.Partial("~/Views/Attendance/Modal/ClockInOut/_filter_clockinout_modal.cshtml")
-@Html.Partial("~/Views/Attendance/Modal/Correction/_add_correction_modal.cshtml")
+@*@Html.Partial("~/Views/Attendance/Modal/Correction/_add_correction_modal.cshtml")*@
 
-@*
-    @Html.Partial("~/Views/File/Industry/modal/_industryedit_modal.cshtml")
-    @Html.Partial("~/Views/File/Industry/modal/_industryactivate_modal.cshtml")
-    @Html.Partial("~/Views/File/Industry/modal/_industrydeactivate_modal.cshtml")
-*@
+@Html.Partial("~/Views/Attendance/Modal/Correction/_add_post_correction_modal.cshtml")
+@Html.Partial("~/Views/Attendance/Modal/Leave/_add_post_leave_modal.cshtml")
+@Html.Partial("~/Views/Attendance/Modal/Overtime/_add_post_overtime_modal.cshtml")

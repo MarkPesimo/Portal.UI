@@ -1,0 +1,60 @@
+﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
+    
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-attendance-correction-Form", id = "post-attendance-correction-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.Remarks)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Date Log</label>
+            @Html.TextBoxFor(m => m.DateLog, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateLog.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mb-3">
+            <label for="" class="form-label">Shift</label>
+            @Html.DropDownListFor(m => m.ShiftId, (IEnumerable<SelectListItem>)ViewBag._ClientShift, "Please Select", new { @class = "form-select", @placeholder = "Shift" })
+        </div>
+    </div>
+
+    <div class="row">
+        <label for="" class="form-label">Time In</label>
+        <div class="col">
+            @Html.TextBoxFor(m => m.TimeInDate, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeInDate.ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col">
+            @Html.TextBoxFor(m => m.TimeInTime, new { @class = "form-control", @placeholder = "Time Out", @type = "time", @Value = Model.TimeInTime.ToString("HH:mm"), @id = "TimeInTime" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <label for="" class="form-label">Time Out</label>
+        <div class="col">
+            @Html.TextBoxFor(m => m.TimeOutDate, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeOutDate.ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col">
+            @Html.TextBoxFor(m => m.TimeOutTime, new { @class = "form-control", @placeholder = "Time Out", @type = "time", @Value = Model.TimeOutTime.ToString("HH:mm"), @id = "TimeOutTime" })
+        </div>
+    </div>
+
+    <div class="row mt-2 ">
+        <div class="col">
+            <label for="" class="form-label">Reason</label>
+            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter a Reason" })
+        </div>
+    </div>
+
+}
+
+
+

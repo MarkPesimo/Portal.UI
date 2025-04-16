@@ -135,14 +135,14 @@
                 bPaginate: true,
                 data: response,
                 columns: [
-                    { 'data': 'DateFiled' },
-                    { 'data': 'LeaveType' },
-                    { 'data': 'DateFrom' },
-                    { 'data': 'DateTo' },
+                    { 'data': 'DateFiled' },        //0
+                    { 'data': 'LeaveType' },        //1
+                    { 'data': 'DateFrom' },         //2
+                    { 'data': 'DateTo' },           //3
 
-                    { 'data': 'NoOfDays' },
-                    { 'data': 'Reason' },
-                    { 'data': 'Status' },
+                    { 'data': 'NoOfDays' },         //4
+                    { 'data': 'Reason' },           //5
+                    { 'data': 'Status' },           //6
                     { 'data': 'Status' },
                 ],
                 order: [[0, "desc"]],

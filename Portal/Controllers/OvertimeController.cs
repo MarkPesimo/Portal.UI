@@ -78,10 +78,73 @@ namespace Portal.Controllers
                 return Json(new { Status = "ERROR", Msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-        
-        
-        
+
+
+
         //---------------------------------------END GET---------------------------------------
+
+        //---------------------------------------BEGIN ADD POST OVERTIME---------------------------------------
+        [HttpGet]
+        public ActionResult _AddPostOvertime(DateTime _datelog)
+        {
+            OvertimeModel _model = new OvertimeModel
+            {
+                OTFrom = _datelog,
+                OTTo = _datelog,
+                EmpId = _loginuserid,
+                UserId = 112,
+                ClientId = _client_id,
+                Mode = 0,
+            };
+
+            return PartialView("~/Views/Attendance/Partial/Overtime/_post_overtime_detail.cshtml", _model);
+        }
+
+        [HttpPost]
+        public ActionResult _AddPostOvertime(OvertimeModel _model)
+        {
+            try
+            {
+                if (_model.Remarks == null) { _model.Remarks = ""; }
+                if (_model.Message == null) { _model.Message = ""; }
+
+
+
+                if (_model.Mode == 0 || _model.Mode == 1)
+                {
+                    if (_model.OTFrom.Date > _model.OTTo.Date)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
+                    }
+
+                    DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());
+                    DateTime _to = DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString());
+
+                    if (_from > _to)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
+                    }
+                }
+
+                if (ModelState.IsValid)
+                {
+                    int _id = _overtimerepository.ManageOvertime(_model);
+                    _model.Id = _id;
+                    _model.Mode = 3;
+                    _id = _overtimerepository.ManageOvertime(_model);
+
+                    return Json(new { Result = "Success", OvertimeId = _id });
+                }
+
+                List<string> _errors = _globalrepository.GetModelErrors(ModelState);
+                return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+        //---------------------------------------END ADD POST OVERTIME---------------------------------------
 
         //---------------------------------------BEGIN ADD OVERTIME---------------------------------------
         [HttpGet]

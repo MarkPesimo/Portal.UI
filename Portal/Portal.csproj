@@ -48,8 +48,9 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.1.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\packages\AdvancedStringBuilder.0.1.1\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="APWModel">
-      <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
+    <Reference Include="APWModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APW_API\APWapi\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\BundleTransformer.Core.1.10.0\lib\net40\BundleTransformer.Core.dll</HintPath>
@@ -607,6 +608,12 @@
     <Content Include="Views\Overtime\partial\_view_attachment.cshtml" />
     <Content Include="Views\Leave\partial\_view_attachment.cshtml" />
     <Content Include="Views\Leave\modal\_open_leave_file_modal.cshtml" />
+    <Content Include="Views\Attendance\modal\Correction\_add_post_correction_modal.cshtml" />
+    <Content Include="Views\Attendance\partial\Correction\_post_correction_detail.cshtml" />
+    <Content Include="Views\Attendance\modal\Leave\_add_post_leave_modal.cshtml" />
+    <Content Include="Views\Attendance\partial\Leave\_post_leave_detail.cshtml" />
+    <Content Include="Views\Attendance\modal\Overtime\_add_post_overtime_modal.cshtml" />
+    <Content Include="Views\Attendance\partial\Overtime\_post_overtime_detail.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

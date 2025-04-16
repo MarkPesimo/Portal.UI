@@ -92,6 +92,96 @@ namespace Portal.Controllers
             }
         }
 
+        //---------------------------------------BEGIN ADD POST LEAVE---------------------------------------
+        [HttpGet]
+        public ActionResult _AddPostLeave(DateTime _datelog)
+        {
+            LeaveModel _model = new LeaveModel
+            {
+                LeaveFrom = _datelog,
+                LeaveTo = _datelog,
+                EmpId = _loginuserid,
+                UserId = 112,
+                Mode = 0,
+            };
+
+            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
+            return PartialView("~/Views/Attendance/Partial/Leave/_post_leave_detail.cshtml", _model);
+        }
+
+
+        [HttpPost]
+        public ActionResult _AddPostLeave(LeaveModel _model)
+        {
+            try
+            {
+                if (_model.Remarks == null) { _model.Remarks = ""; }
+                if (_model.Message == null) { _model.Message = ""; }
+
+                if (_model.IsHalfday)
+                {
+                    if (_model.FirstHalf) { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "AM"; }
+                    else if (_model.SecondHalf) { _model.LeaveFromAMPM = "PM"; _model.LeaveToAMPM = "PM"; }
+                }
+                else
+                {
+                    if (_model.FirstDay_SecondHalf) { _model.LeaveFromAMPM = "PM"; }
+                    else { _model.LeaveFromAMPM = "AM"; }
+
+                    if (_model.LastDay_FirstHalf) { _model.LeaveFromAMPM = "AM"; }
+                    else { _model.LeaveFromAMPM = "PM"; }
+                }
+
+                if (_model.Mode == 0 || _model.Mode == 1)
+                {
+                    if (_model.LeaveFrom.Date > _model.LeaveTo.Date)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The date of leave [from] cannot be ahead to the date of leave [to].", ElementName = "LeaveFrom" });
+                    }
+
+                    if (_model.LeaveDays <= 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Leave day(s) cannot be Zero or less than Zero.", ElementName = "LeaveDays" });
+                    }
+
+                    //check leave balance
+                    LeaveBalance_model _obj = _leaverepository.GetLeaveBalance(_model.LeaveTypeId);
+                    if (_obj != null)
+                    {
+                        if (decimal.Parse(_obj.Balance) <= 0)
+                        {
+                            return Json(new { Result = "ERROR", Message = "Insufficient leave balance.", ElementName = "LeaveFrom" });
+                        }
+
+                        if (decimal.Parse(_model.LeaveDays.ToString()) > decimal.Parse(_obj.Balance))
+                        {
+                            return Json(new { Result = "ERROR", Message = "Insufficient leave balance.", ElementName = "LeaveFrom" });
+                        }
+                    }
+                }
+
+                if (ModelState.IsValid)
+                {
+                    int _id = _leaverepository.ManageLeave(_model);
+
+                    _model.Id = _id;
+                    _model.Mode = 3;
+                    _id = _leaverepository.ManageLeave(_model);
+
+                    return Json(new { Result = "Success", LeaveId = _id });
+                }
+
+                List<string> _errors = _globalrepository.GetModelErrors(ModelState);
+                return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+        //---------------------------------------END ADD LEAVE---------------------------------------
+
         //---------------------------------------BEGIN ADD LEAVE---------------------------------------
         [HttpGet]
         public ActionResult _AddLeave()
