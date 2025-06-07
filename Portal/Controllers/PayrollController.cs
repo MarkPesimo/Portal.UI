@@ -1,4 +1,5 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+﻿using APWModel.ViewModel.Global;
+using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using Portal.Repository;
 using System;
@@ -16,6 +17,8 @@ namespace Portal.Controllers
         private GlobalRepository _globalrepository { get; set; }
         private PayrollRepository _payrollrepository { get; set; }
         private int _loginuserid = 0;
+        private int _candidate_id { get; set; }
+        private int _client_id { get; set; }
 
         private string _Payroll_Index = "~/Views/Payroll/Payroll_Index.cshtml";
         private string _Payslip_Index = "~/Views/Payroll/Payslip.cshtml";
@@ -25,7 +28,15 @@ namespace Portal.Controllers
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_payrollrepository == null) { _payrollrepository = new PayrollRepository(); }
-            if (_loginuserid == 0) { _loginuserid = _globalrepository.GetLoginUser().UserId; }
+            if (_loginuserid == 0) {
+                LoginUser_model _user = _globalrepository.GetLoginUser();
+                if (_user != null)
+                {
+                    _loginuserid = _user.UserId;
+                    _candidate_id = _user.CandidateId;
+                    _client_id = _user.ClientId;
+                }
+            }
         }
 
         
@@ -33,14 +44,18 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return View(_Payroll_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "PAYROLL")) { return View(_Payroll_Index); }
+            else { return View("AccessDenied"); }
+            //return View(_Payroll_Index);
         }
 
         //----------------------------------------------BEGIN PAYSLIP---------------------------------------------------
         [HttpGet]
         public ActionResult Payslip()
         {
-            return View(_Payslip_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "PAYSLIP")) { return View(_Payslip_Index); }
+            else { return View("AccessDenied"); }
+            //return View(_Payslip_Index);
         }
 
         [HttpGet]
@@ -87,9 +102,16 @@ namespace Portal.Controllers
         //----------------------------------------------BEGIN LOAN---------------------------------------------------
         public ActionResult Loan()
         {
-            var _loan_status = _globalrepository.GetLoanStatuses().Select(t => new SelectListItem { Text = t.Description, Value = t.Value }).ToList();
-            ViewBag.LoanStatus = _loan_status;
-            return View(_Loan_Index);
+            if (_globalrepository.HasClientAccess(_client_id, "LOAN")) {
+                //return View(_Payslip_Index);
+                var _loan_status = _globalrepository.GetLoanStatuses().Select(t => new SelectListItem { Text = t.Description, Value = t.Value }).ToList();
+                ViewBag.LoanStatus = _loan_status;
+                return View(_Loan_Index);
+            }
+            else
+            {
+                return View("AccessDenied");
+            }           
         }
 
         [HttpGet]

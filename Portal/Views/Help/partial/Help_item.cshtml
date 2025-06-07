@@ -1,0 +1,34 @@
+﻿@model APWModel.ViewModel.iSearch.HelpModel
+
+
+<tr>
+    
+    <td>
+        @Model.Description
+    </td>
+    <td class="text-center text-sm-center">
+        @Model.ModuleName
+    </td>
+    <td class="text-center">
+
+        <a href="#" class="btn btn-sm btn-primary preview-button " 
+           data-toggle="tooltip" 
+           title="Preview" 
+           _modulename="@Model.ModuleName"
+           _description="@Model.Description"
+           _filename="@Model.Filename" 
+           _id="@Model.Id">  
+        <i class="fa-regular fa-circle-play"></i> Preview </a>
+    </td>
+    @*
+
+        <td class="d-none d-sm-table-cell">@Model.PositionApplied</td>
+        <td class="d-none d-sm-table-cell">@Model.Role</td>
+        <td class="d-none d-sm-table-cell text-center">@Model.YearsOfService</td>
+        <td class="d-none d-sm-table-cell">@Model.PositionAppliedTwo</td>
+        <td class="d-none d-sm-table-cell text-end">@Model.AskingSalary</td>
+        <td class="d-none d-sm-table-cell">@Model.CityName</td>
+        <td class="d-none d-sm-table-cell">@Model.DesiserWorkLocation</td>
+
+    *@
+</tr>

@@ -75,7 +75,7 @@
     function DisplayConcerns(response) {
         $("#helpdesk-table").DataTable(
             {
-                autoWidth: true,
+                autoWidth: false,
                 bLengthChange: true,
                 lengthMenu: [[10, -1], [10, "All"]],
                 bFilter: true,
@@ -87,6 +87,7 @@
                     { 'data': 'ConcernType' },
                     { 'data': 'Remarks' },
                     { 'data': 'FileStatus' },
+                    { 'data': 'ConcernStatus' },
                     { 'data': 'ConcernStatus' },
                 ],
                 order: [[0, "desc"]],
@@ -104,18 +105,23 @@
                     {
                         title: 'Type',
                         target: 1,
+                        class: "d-none d-sm-table-cell text-center",
                         "render": function (data, type, row, meta) {
                             return ' <strong class="text-primary">' + row.ConcernType + ' </strong> '
                         }
                     },                    
                     {
                         title: 'Concern',
+                        class: "d-none d-sm-table-cell text-center",
                         target: 2
                     },
                     {
                         title: 'File Status',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 3
+                        target: 3,
+                        "render": function (data, type, row, meta) {
+                            return SetTableBGColor(row.FileStatus)
+                        }
                     },
                     {
                         title: 'Concern Status',
@@ -123,7 +129,21 @@
                         target: 4
                     },
                     {
+                        title: 'Details',
+                        class: "d-xs-block d-sm-none d-m-none d-lg-none ",
                         target: 5,
+                        "render": function (data, type, row, meta) {
+                            return 'Date Filed : ' + row.ConcernDate + ' ' +
+                                '<small class="d-block">Type : ' + row.ConcernType + '</small> ' +
+                                '<small class="d-block">Concern : ' + row.Remarks + '</small> ' +
+                                '<small class="d-block">File Status : ' + SetTableBGColor(row.FileStatus) + '</small> ' +
+                                '<small class="d-block">Concern Status : ' + row.ConcernStatus + '</small> '
+                                //+
+                                //SetTableBGColor(row.Status)
+                        }
+                    },
+                    {
+                        target: 6,
                         className: 'dt-body-right',
                         "render": function (data, type, row, meta) {
                             return '<div class="btn-group"> ' +
@@ -153,6 +173,19 @@
 
 
         ShowLoading('HIDE');
+    };
+
+    function SetTableBGColor(_status) {
+        var _font_color = 'white';
+        var _color = 'white';
+
+        if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Approved") { _color = '#0275d8'; }
+        else if (_status == "Cancelled") { _color = '#d9534f'; }
+        else if (_status == "Rejected") { _color = '#c94D3B'; }
+        else { _color = '#959A97'; _font_color = 'white'; }
+
+        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
     };
 
     //----------------------------------BEGIN ADD CONCERN--------------------------------------

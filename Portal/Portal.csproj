@@ -48,9 +48,8 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.1.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\packages\AdvancedStringBuilder.0.1.1\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="APWModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APW_API\APWapi\APWModel\bin\Debug\APWModel.dll</HintPath>
+    <Reference Include="APWModel">
+      <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\BundleTransformer.Core.1.10.0\lib\net40\BundleTransformer.Core.dll</HintPath>
@@ -385,6 +384,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AttendanceController.cs" />
     <Compile Include="Controllers\DocumentController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HelpdeskController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LeaveController.cs" />
@@ -404,6 +404,7 @@
     <Compile Include="Repository\AttendanceRepository.cs" />
     <Compile Include="Repository\DocumentRepository.cs" />
     <Compile Include="Repository\GlobalRepository.cs" />
+    <Compile Include="Repository\HelpRepository.cs" />
     <Compile Include="Repository\HelpdeskRepository.cs" />
     <Compile Include="Repository\LeaveRepository.cs" />
     <Compile Include="Repository\OvertimeRepository.cs" />
@@ -448,6 +449,7 @@
     <Content Include="Scripts\Attendance\DTR.js" />
     <Content Include="Scripts\Document\COE.js" />
     <Content Include="Scripts\Helpdesk\Comment.js" />
+    <Content Include="Scripts\Helpdesk\Help.js" />
     <Content Include="Scripts\Helpdesk\Helpdesk.js" />
     <Content Include="Scripts\Leave\Leave.js" />
     <Content Include="Scripts\Overtime\Overtime.js" />
@@ -486,6 +488,7 @@
     <Folder Include="CandidateFiles\" />
     <Folder Include="CandidateImages\" />
     <Folder Include="GeneratedReports\" />
+    <Folder Include="HelpFiles\" />
     <Folder Include="LeaveAttachments\Filing\" />
     <Folder Include="OvertimeAttachments\Filing\" />
     <Folder Include="Report\Document\" />
@@ -614,6 +617,11 @@
     <Content Include="Views\Attendance\partial\Leave\_post_leave_detail.cshtml" />
     <Content Include="Views\Attendance\modal\Overtime\_add_post_overtime_modal.cshtml" />
     <Content Include="Views\Attendance\partial\Overtime\_post_overtime_detail.cshtml" />
+    <Content Include="Views\Help\Help_index.cshtml" />
+    <Content Include="Views\Help\partial\Help_item.cshtml" />
+    <Content Include="Views\Help\modal\preview_modal.cshtml" />
+    <Content Include="Views\Help\partial\Preview.cshtml" />
+    <Content Include="Views\Shared\_AccessDenied.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

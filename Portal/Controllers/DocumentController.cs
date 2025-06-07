@@ -102,7 +102,8 @@ namespace Portal.Controllers
                 _rptfile.DataDefinition.FormulaFields["Purpose"].Text = "'" + _reason + "'";
                 _rptfile.DataDefinition.FormulaFields["EmpID"].Text = "" + _loginuserid.ToString() + "";
 
-                
+
+                //string _password = _globalrepository.Dcrypt(PortalConstant.dbpassword);
                 _rptfile.SetDatabaseLogon(PortalConstant.Username, PortalConstant.dbpassword, PortalConstant.ServerName, PortalConstant.DatabaseName);
 
                 string localPath = System.Web.HttpContext.Current.Server.MapPath("~/GeneratedReports/" + _loginuserid.ToString());

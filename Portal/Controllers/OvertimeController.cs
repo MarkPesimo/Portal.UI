@@ -42,7 +42,7 @@ namespace Portal.Controllers
         // GET: Overtime
         public ActionResult Index()
         {
-            if (_globalrepository.HasClientAccess(_client_id, "LEAVE")) { return View(_Overtime_Index); }
+            if (_globalrepository.HasClientAccess(_client_id, "OVERTIME")) { return View(_Overtime_Index); }
             else { return View("AccessDenied"); }            
         }
 
