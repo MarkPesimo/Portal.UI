@@ -625,6 +625,7 @@
     <Content Include="Views\Help\partial\Preview.cshtml" />
     <Content Include="Views\Shared\_AccessDenied.cshtml" />
     <Content Include="Views\Shared\Layouts\_LoginLayout.cshtml" />
+    <None Include="Properties\PublishProfiles\APWEmployeePortal.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

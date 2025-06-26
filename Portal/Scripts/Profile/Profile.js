@@ -85,11 +85,16 @@
                     //console.log(result);
                     if (result == "ERROR") {
                         alert('Error in attaching the file!')
+
+                        
                     }
+
+                    location.reload();
                 }
             });
         }
-        location.reload();
+        
+        
  
     });
 

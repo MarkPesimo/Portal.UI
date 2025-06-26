@@ -38,7 +38,8 @@ namespace Portal.Repository
                 List<HelpModel> _obj = new List<HelpModel>();
 
                 string _endpoint = "Help/App/" +
-                    _appid.ToString();
+                    _appid.ToString() + "/" +
+                    _client_id.ToString();
                 HttpResponseMessage _response = _globalrepository.GenerateGetRequest(_endpoint);
                 if (_response.IsSuccessStatusCode)
                 {

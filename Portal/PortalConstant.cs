@@ -9,7 +9,7 @@ namespace Portal
     public class PortalConstant
     {
         public static string BaseAddress = ConfigurationManager.AppSettings["_BaseAddress"].ToString();
-        public static string ReportPath = ConfigurationManager.AppSettings["_ReportPath"].ToString();
+        public static string _ReportPath = ConfigurationManager.AppSettings["_ReportPath"].ToString();
         public static string RootPath = ConfigurationManager.AppSettings["_RootPath"].ToString();
 
         public static string ServerName = ConfigurationManager.AppSettings["_ServerName"].ToString();
