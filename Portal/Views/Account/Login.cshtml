@@ -1,15 +1,159 @@
 ﻿@model APWModel.ViewModel.Global.LoginModel
-    
-@{ 
+
+@{
     ViewBag.Title = "User Authentication";
-    Layout = "~/Views/Shared/Layouts/_BlankLayout.cshtml";
+    //Layout= "";
+    Layout = "~/Views/Shared/Layouts/_LoginLayout.cshtml";
 }
+    
 
 @section Scripts
 {
     <script src="@Url.Content("~/Scripts/Account/Account.js")"></script>
 }
 
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .logo-container {
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        max-width: 240px;
+        width: 100%;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 30px 24px;
+        box-shadow: 30px 30px 30px 30px rgba(0, 0, 0, 0.08);
+        text-align: left;
+    }
+
+    .sign-in-title {
+        color: #960808;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: border 0.3s;
+    }
+
+        input:focus {
+            border-color: #2563eb;
+        }
+
+    .forgot-link {
+        text-align: right;
+        margin-top: 8px;
+    }
+
+        .forgot-link a {
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+    .login-btn {
+        width: 100%;
+        background: #a21d1a;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .login-btn:hover {
+        background: #8b1817;
+    }
+</style>
+
+
+<div class="container">
+    <div class="logo-container">
+        <img src="~/Content/images/APWPortal.png" alt="APW Portal Logo" class="logo" />
+    </div>
+
+    <div class="login-card">
+        <h2 class="sign-in-title">Sign in</h2>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { enctype = "multipart/form-data", name = "login-Form", id = "login-Form" }))
+        {
+            @Html.HiddenFor(m => m.AppModuleId)
+            <div class="row" id="div-validation" style="display: none;">
+                <div class="col-lg-12 mb-3">
+                    <label for="html" id="error-message-label" class="form-label" style="color: red">@Model.Remarks</label><br>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Enter your username</label>
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username", @ariadescribedby = "login-email-help" })
+                @*<input type="text" id="username" placeholder="Username" />*@
+            </div>
+
+            <div class="form-group">
+                <label for="password">Enter your Password</label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
+                @*<input type="password" id="password" placeholder="Password" />*@
+                <div class="forgot-link">
+                    @Html.ActionLink("Forgot Password", "ForgotPassword")
+                    @*<a href="#">Forgot Password</a>*@
+                </div>
+            </div>
+
+            <button type="button" class="btn login-btn" id="login-btn">Login</button>
+            @*<button type="submit" class="login-btn">Login</button>*@
+        }
+
+
+    </div>
+</div>
+
+<!--
 <section class="login d-flex align-items-center" style="background-color: #282828;">
     <div class="container">
         <div class="row align-items-center justify-content-center">
@@ -50,7 +194,7 @@
                     </div>
 
                     <div class="text-end mt-1 mb-4">
-                        @Html.ActionLink("Forgot Password?", "ForgotPassword") 
+                        @Html.ActionLink("Forgot Password?", "ForgotPassword")
                     </div>
 
                     @*<div class="text-end">
@@ -68,4 +212,4 @@
 </section>
 
 
- 
+ -->

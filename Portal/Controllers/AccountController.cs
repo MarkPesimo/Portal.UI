@@ -9,13 +9,15 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
+ 
+
 namespace Portal.Controllers
 {
     public class AccountController : Controller
     {
         private GlobalRepository _globalrepository { get; set; }
         private AccountRepository _accountrepository { get; set; }
-         
+
         public AccountController()
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
@@ -30,6 +32,14 @@ namespace Portal.Controllers
                 AppModuleId = 12
             };
             return View("Login", model);
+        }
+
+
+        public void GetCurrentLocation()
+        {
+
+
+
         }
 
         [HttpGet]

@@ -39,32 +39,118 @@
         });
     };
 
-    $('#nav-header').on('click', '#clock-in-button', function () {
+    //$("#get_location").click(function (e) {
+    //    e.preventDefault();
+
+    //    if (navigator.geolocation) {
+    //        navigator.geolocation.getCurrentPosition(success, error);
+    //    } else {
+    //        alert("Geolocation is not supported by this browser.");
+    //    }
+    //});
+
+    
+
+    $('#nav-header').on('click', '#clock-in-button', async function () {
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
 
+ 
         ShowLoading('SHOW');
-        $.ajax({
-            url: '/Attendance/ClockIn',
-            type: "POST",
-            data:
-            {
-                '_id': AttendanceId,
-                '_shiftid': ShiftId
-            },
-            dataType: 'json',
-            success: function (result) {
-                ShowLoading('HIDE');
-                if (result.Status == "SUCCESS") {
-                    GetClockInClockOut();
-                    ShowSuccessMessage('You have successfully Clock-In.')                    
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    $.ajax({
+                        url: '/Attendance/ClockIn',
+                        type: "POST",
+                        data:
+                        {
+                            '_id': AttendanceId,
+                            '_shiftid': ShiftId,
+                            '_latitude': position.coords.latitude,
+                            '_longitude': position.coords.longitude
+                        },
+                        dataType: 'json',
+                        success: function (result) {
+                            ShowLoading('HIDE');
+                            if (result.Status == "SUCCESS") {
+                                GetClockInClockOut();
+                                ShowSuccessMessage('You have successfully Clock-In.')
+                            }
+                            else { ShowAccessDenied(result.result); }
+                        }
+                    });
+                },
+                function () {
+                    $.ajax({
+                        url: '/Attendance/ClockIn',
+                        type: "POST",
+                        data:
+                        {
+                            '_id': AttendanceId,
+                            '_shiftid': ShiftId,
+                            '_latitude': 0,
+                            '_longitude': 0
+                        },
+                        dataType: 'json',
+                        success: function (result) {
+                            ShowLoading('HIDE');
+                            if (result.Status == "SUCCESS") {
+                                GetClockInClockOut();
+                                ShowSuccessMessage('You have successfully Clock-In.')
+                            }
+                            else { ShowAccessDenied(result.result); }
+                        }
+                    });
+                });
+        }
+        else {
+            $.ajax({
+                url: '/Attendance/ClockIn',
+                type: "POST",
+                data:
+                {
+                    '_id': AttendanceId,
+                    '_shiftid': ShiftId,
+                    '_latitude': 0,
+                    '_longitude': 0
+                },
+                dataType: 'json',
+                success: function (result) {
+                    ShowLoading('HIDE');
+                    if (result.Status == "SUCCESS") {
+                        GetClockInClockOut();
+                        ShowSuccessMessage('You have successfully Clock-In.')
+                    }
+                    else { ShowAccessDenied(result.result); }
                 }
-                else {
-                    ShowAccessDenied(result.result);
-                    //alert(result.result);
-                }
-            }
-        });
+            });
+        }
+
+        //ShowLoading('SHOW');
+    //    $.ajax({
+    //        url: '/Attendance/ClockIn',
+    //        type: "POST",
+    //        data:
+    //        {
+    //            '_id': AttendanceId,
+    //            '_shiftid': ShiftId,    
+    //            '_latitude': _latitude,
+    //            '_longitude': _longitude
+    //        },
+    //        dataType: 'json',
+    //        success: function (result) {
+    //            ShowLoading('HIDE');
+    //            if (result.Status == "SUCCESS") {
+    //                GetClockInClockOut();
+    //                ShowSuccessMessage('You have successfully Clock-In.')                    
+    //            }
+    //            else {
+    //                ShowAccessDenied(result.result);
+    //                //alert(result.result);
+    //            }
+    //        }
+    //    });
     });
 
     $('#clockin_modal').on('click', '#clock-out-previous-button', function () {
@@ -100,7 +186,7 @@
         var ShiftId = $(this).attr("shift_id");
 
         ShowLoading('SHOW');
-        if (AttendanceId == 0)          //get clock-in pf the previous day
+        if (AttendanceId == 0)          //get clock-in of the previous day
         {
             $.ajax({
                 type: "GET",
@@ -142,26 +228,96 @@
             });
         }
         else {
-            $.ajax({
-                url: '/Attendance/ClockOut',
-                type: "POST",
-                data:
-                {
-                    '_id': AttendanceId,
-                    '_shiftid': ShiftId
-                },
-                dataType: 'json',
-                success: function (result) {
-                    ShowLoading('HIDE');
-                    if (result.Status == "SUCCESS") {
-                        GetClockInClockOut();
-                        ShowSuccessMessage('You have successfully Clock-Out.')
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        $.ajax({
+                            url: '/Attendance/ClockOut',
+                            type: "POST",
+                            data:
+                            {
+                                '_id': AttendanceId,
+                                '_shiftid': ShiftId,
+                                '_latitude': position.coords.latitude,
+                                '_longitude': position.coords.longitude
+                            },
+                            dataType: 'json',
+                            success: function (result) {
+                                ShowLoading('HIDE');
+                                if (result.Status == "SUCCESS") {
+                                    GetClockInClockOut();
+                                    ShowSuccessMessage('You have successfully Clock-Out.')
+                                }
+                                else { ShowAccessDenied(result.result); }
+                            }
+                        });
+                    },
+                    function () {
+                        $.ajax({
+                            url: '/Attendance/ClockOut',
+                            type: "POST",
+                            data:
+                            {
+                                '_id': AttendanceId,
+                                '_shiftid': ShiftId,
+                                '_latitude': 0,
+                                '_longitude': 0
+                            },
+                            dataType: 'json',
+                            success: function (result) {
+                                ShowLoading('HIDE');
+                                if (result.Status == "SUCCESS") {
+                                    GetClockInClockOut();
+                                    ShowSuccessMessage('You have successfully Clock-Out.')
+                                }
+                                else { ShowAccessDenied(result.result); }
+                            }
+                        });
+                    });
+            }
+            else {
+                $.ajax({
+                    url: '/Attendance/ClockOut',
+                    type: "POST",
+                    data:
+                    {
+                        '_id': AttendanceId,
+                        '_shiftid': ShiftId,
+                        '_latitude': 0,
+                        '_longitude': 0
+                    },
+                    dataType: 'json',
+                    success: function (result) {
+                        ShowLoading('HIDE');
+                        if (result.Status == "SUCCESS") {
+                            GetClockInClockOut();
+                            ShowSuccessMessage('You have successfully Clock-Out.')
+                        }
+                        else { ShowAccessDenied(result.result); }
                     }
-                    else {
-                        ShowAccessDenied(result.result);
-                    }
-                }
-            });
+                });
+            }
+
+            //$.ajax({
+            //    url: '/Attendance/ClockOut',
+            //    type: "POST",
+            //    data:
+            //    {
+            //        '_id': AttendanceId,
+            //        '_shiftid': ShiftId
+            //    },
+            //    dataType: 'json',
+            //    success: function (result) {
+            //        ShowLoading('HIDE');
+            //        if (result.Status == "SUCCESS") {
+            //            GetClockInClockOut();
+            //            ShowSuccessMessage('You have successfully Clock-Out.')
+            //        }
+            //        else {
+            //            ShowAccessDenied(result.result);
+            //        }
+            //    }
+            //});
         }
         
     });

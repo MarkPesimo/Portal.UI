@@ -81,7 +81,9 @@ namespace Portal.Repository
                 {"Id",                      _model.Id.ToString() },
                 {"Type",                    _model.Type.ToString() },
                 {"EmpID",                   _model.EmpID.ToString() },
-                {"ShiftId",                 _model.ShiftId.ToString()}
+                {"ShiftId",                 _model.ShiftId.ToString()},
+                {"Latitude",                 _model.Latitude.ToString()},
+                {"Longitude",                 _model.Longitude.ToString()},
             };
 
             string _body_content = JsonConvert.SerializeObject(_content_prop);

@@ -175,6 +175,10 @@ namespace Portal.Repository
         public bool HasClientAccess(int _clientid, string _modulename)
         {
             bool _result = false;
+
+            if (_modulename == " ") { return true; }
+
+
             string _endpoint = "Client/HasModuleAccess/" + _clientid.ToString() + "/" +
                 _modulename;
             HttpResponseMessage _response = GenerateGetRequest(_endpoint);

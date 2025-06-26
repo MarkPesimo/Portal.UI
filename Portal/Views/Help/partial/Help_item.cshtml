@@ -2,13 +2,16 @@
 
 
 <tr>
-    
+    <td>
+        @Model.SortNo
+    </td>
     <td>
         @Model.Description
     </td>
     <td class="text-center text-sm-center">
         @Model.ModuleName
     </td>
+
     <td class="text-center">
 
         <a href="#" class="btn btn-sm btn-primary preview-button " 
@@ -18,7 +21,7 @@
            _description="@Model.Description"
            _filename="@Model.Filename" 
            _id="@Model.Id">  
-        <i class="fa-regular fa-circle-play"></i> Preview </a>
+        <i class="fa-regular fa-circle-play"></i> Watch </a>
     </td>
     @*
 

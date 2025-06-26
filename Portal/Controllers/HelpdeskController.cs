@@ -10,6 +10,8 @@ using static APWModel.ViewModel.Portal.Helpdesk_model;
 using static APWModel.ViewModel.Portal.Helpdesk_model.Comment_model;
 using static APWModel.ViewModel.Portal.Helpdesk_model.Monitoring_model;
 
+
+
 namespace Portal.Controllers
 {
     [Authorize]
@@ -70,6 +72,11 @@ namespace Portal.Controllers
 
             return View("AccessDenied");
             
+        }
+
+        public void GetLocationProperty()
+        {
+          
         }
 
         public void HowToUse()
@@ -301,10 +308,10 @@ namespace Portal.Controllers
         }
 
         [HttpPost]
-        public ActionResult _AddComment(int _concernid, string _comment, HttpPostedFileBase Comment_Attachment)
+        public ActionResult _AddComment2(int _concernid, string _comment)
         {
             CommentModel _model = new CommentModel();
-            
+
             try
             {
                 _model.Id = 0;
@@ -316,9 +323,7 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     int _id = _helpdeskrepository.ManageComment(_model);
-                    //int _commentid = _helpdeskrepository.GetTopConcern(_id);
-                    if (AttachFile(_concernid, _id, Comment_Attachment)) { return Json(new { Result = "Success", ConcernId = _concernid }); }
-                    else { return Json(new { Result = "Error", ConcernId = _concernid }); }                    
+                    return Json(new { Result = "Success", ConcernId = _concernid, Id = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -329,6 +334,36 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        //[HttpPost]
+        //public ActionResult _AddComment2(int _concernid, string _comment, HttpPostedFileBase Comment_Attachment)
+        //{
+        //    CommentModel _model = new CommentModel();
+
+        //    try
+        //    {
+        //        _model.Id = 0;
+        //        _model.ConcernId = _concernid;
+        //        _model.Comment = _comment;
+        //        _model.UserId = _loginuserid;
+        //        _model.DateCreated = DateTime.Now;
+
+        //        if (ModelState.IsValid)
+        //        {
+        //            int _id = _helpdeskrepository.ManageComment(_model);
+        //            //int _commentid = _helpdeskrepository.GetTopConcern(_id);
+        //            if (AttachFile(_concernid, _id, Comment_Attachment)) { return Json(new { Result = "Success", ConcernId = _concernid }); }
+        //            else { return Json(new { Result = "Error", ConcernId = _concernid }); }                    
+        //        }
+
+        //        List<string> _errors = _globalrepository.GetModelErrors(ModelState);
+        //        return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { Result = "ERROR", Message = ex.Message });
+        //    }
+        //}
 
         public bool AttachFile(int _concernid, int _commentid, HttpPostedFileBase Comment_Attachment)
         {

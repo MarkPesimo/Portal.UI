@@ -6,13 +6,42 @@
 
         ShowLoading('HIDE');
 
-        $("#help-table").DataTable();
+        $("#help-table").DataTable(
+            {
+                autoWidth: false,
+                bLengthChange: true,
+                order: [[0, "asc"]],
+                //columns: [
+                //    { 'data': 'SortNo' },
+                //    { 'data': 'Description' },
+                //    { 'data': 'ModuleName' }, 
+                //],
+                //coldecolumnDefs: [
+                //    {
+                //        target: 1,
+                //        visible : false,
+                //    },
+                //    //{
+                //    //    title: 'MOD NAME',
+                //    //    target: 1,
+                //    //    //class: "d-none d-sm-table-cell text-center",
+                //    //    visible: false
+                        
+                //    //},
+                //],
+            }
+        );
+        
         $('.dataTables_length').addClass('bs-select ms-2 mt-2');
         $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
         $('.dataTables_paginate').addClass('mt-2 mb-2');
         $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
         $('.sorting').addClass('bg-primary text-white');
 
+        var dt = $('#help-table').DataTable();
+        //hide the first column
+        //dt.column(0).visible(false);
+        dt.column(2).visible(false);
     });
 
     $('#help-table').on('click', '.preview-button', function (e) {
@@ -46,9 +75,15 @@
             error: function (response) { LogError(response); }
         });
 
-
+        
         
     });
+
+    $('#preview_help_modal').on('hidden.bs.modal', function () {
+        // do something…
+        //alert('test');
+        $('#preview_help_modal').find(".modal-body").html('');
+    })
 
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');

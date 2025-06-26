@@ -44,6 +44,13 @@ namespace Portal
                         newUser.Usertype = serializeModel.Usertype;
                         newUser.ClientId = serializeModel.ClientId;
 
+                        newUser.PayrollMenuVisibility = serializeModel.PayrollMenuVisibility;
+                        newUser.DocumentMenuVisibility = serializeModel.DocumentMenuVisibility;
+                        newUser.HelpdeskMenuVisibility = serializeModel.HelpdeskMenuVisibility;
+                        newUser.OvertimeMenuVisibility = serializeModel.OvertimeMenuVisibility;
+                        newUser.LeaveMenuVisibility = serializeModel.LeaveMenuVisibility;
+                        newUser.AttendanceMenuVisibility = serializeModel.AttendanceMenuVisibility;
+
                         HttpContext.Current.User = newUser;
                     }
                 }

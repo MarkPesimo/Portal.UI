@@ -23,27 +23,30 @@
                         <a class="nav-link " active" id="nav-Home" aria-current="page" href="@Url.Action("Index", "Home")">Home</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link " id="nav-Payroll" href="@Url.Action("Index", "Payroll")">Payroll</a>
+                    
+                    <li class="nav-item" @((User as ContextLoginUser_model).PayrollMenuVisibility)>
+                        <a class="nav-link " id="nav-Payroll" href="@Url.Action("Index", "Payroll")">
+                            Payroll
+                        </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" @((User as ContextLoginUser_model).DocumentMenuVisibility)>
                         <a class="nav-link " id="nav-Document" href="@Url.Action("Index", "Document")">Documents</a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" @((User as ContextLoginUser_model).HelpdeskMenuVisibility)>
                         <a class="nav-link " id="nav-Helpdesk" href="@Url.Action("Index", "Helpdesk")">Helpdesk</a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" @((User as ContextLoginUser_model).OvertimeMenuVisibility)>
                         <a class="nav-link " id="nav-Overtime" href="@Url.Action("Index", "Overtime")">Overtime</a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" @((User as ContextLoginUser_model).LeaveMenuVisibility)>
                         <a class="nav-link " id="nav-Leave" href="@Url.Action("Index", "Leave")">Leave</a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" @((User as ContextLoginUser_model).AttendanceMenuVisibility)> 
                         <a class="nav-link " id="nav-Attendance" href="@Url.Action("Index", "Attendance")">Attendance</a>
                     </li>
 
@@ -54,7 +57,7 @@
 
 
                 <ul class="navbar-nav justify-content-end flex-grow-1">
-                    <li class="nav-item mt-1">
+                    <li class="nav-item mt-1" @((User as ContextLoginUser_model).AttendanceMenuVisibility)>
                         <div>
                             <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="my-shift" current-date="" disabled> </button>
                             <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="clock-in-button" shift_id="0" attendance_id="0" type="submit"><i class="fa-regular fa-clock"></i> </button>

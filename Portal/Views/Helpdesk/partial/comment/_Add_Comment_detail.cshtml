@@ -1,7 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Helpdesk_model.Comment_model.CommentModel
 
 
-@using (Html.BeginForm("AddComment", "Helpdesk", FormMethod.Post, new { enctype = "multipart/form-data", name = "comment-Form", id = "comment-Form" }))
+@using (Html.BeginForm("_AddComment", "Helpdesk", FormMethod.Post, new { enctype = "multipart/form-data", name = "comment-Form", id = "comment-Form" }))
 {
     @Html.HiddenFor(m => m.ConcernId)
     @Html.HiddenFor(m => m.Id)

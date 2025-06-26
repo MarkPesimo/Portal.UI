@@ -48,7 +48,8 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.1.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\packages\AdvancedStringBuilder.0.1.1\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="APWModel">
+    <Reference Include="APWModel, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
@@ -417,6 +418,7 @@
     <Content Include="Content\images\access-denied-new.png" />
     <Content Include="Content\images\access-denied.png" />
     <Content Include="Content\images\apw.png" />
+    <Content Include="Content\images\APWPortal.png" />
     <Content Include="Content\images\green-check.png" />
     <Content Include="Content\images\logos\APW-Logo-01.png" />
     <Content Include="Content\images\logos\APW-Logo-02.png" />
@@ -622,6 +624,7 @@
     <Content Include="Views\Help\modal\preview_modal.cshtml" />
     <Content Include="Views\Help\partial\Preview.cshtml" />
     <Content Include="Views\Shared\_AccessDenied.cshtml" />
+    <Content Include="Views\Shared\Layouts\_LoginLayout.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

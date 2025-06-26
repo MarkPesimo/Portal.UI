@@ -96,7 +96,12 @@ namespace Portal.Controllers
 
                 
                 AttendanceToday_model _obj = _attendancerepository.GetPortalPreviousClockIn();
-                if (_obj != null) { WithPrevious = true; }
+                if (_obj != null)
+                {
+                    if (_obj.Id == 0) { WithPrevious = false; }
+                    else { WithPrevious = true; }
+                    
+                }
 
                 return Json(new { Status = "SUCCESS", result = _obj, WithPrevious = WithPrevious }, JsonRequestBehavior.AllowGet);                
             }
@@ -106,7 +111,8 @@ namespace Portal.Controllers
             }
         }
 
-        public ActionResult ClockIn(int _id, int _shiftid)
+        [HttpPost]
+        public ActionResult ClockIn(int _id, int _shiftid, string _latitude, string _longitude)
         {
             try
             {
@@ -120,7 +126,9 @@ namespace Portal.Controllers
                     Id = _id,
                     EmpID = _loginuserid,
                     Type = "CLOCK-IN",
-                    ShiftId = _shiftid
+                    ShiftId = _shiftid,
+                    Latitude = _latitude,
+                    Longitude = _longitude
                 };
 
                 bool _result = _attendancerepository.ClockInClockOut(_obj);
@@ -132,7 +140,8 @@ namespace Portal.Controllers
             }
         }
 
-        public ActionResult ClockOut(int _id, int _shiftid)
+        [HttpPost]
+        public ActionResult ClockOut(int _id, int _shiftid, string _latitude, string _longitude)
         {
             try
             {
@@ -146,7 +155,9 @@ namespace Portal.Controllers
                     Id = _id,
                     EmpID = _loginuserid,
                     Type = "CLOCK-OUT",
-                    ShiftId = _shiftid
+                    ShiftId = _shiftid,
+                    Latitude = _latitude,
+                    Longitude = _longitude
                 };
 
                 bool _result = _attendancerepository.ClockInClockOut(_obj);
