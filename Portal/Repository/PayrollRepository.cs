@@ -32,14 +32,20 @@ namespace Portal.Repository
 
         public List<PayrollList_model> EmployeePayrolls(string _fromdate, string _todate)
         {
+            DateTime _from = DateTime.Parse(_fromdate);
+
+            DateTime _temp_to = DateTime.Parse(_todate);
+            var _x = DateTime.DaysInMonth(_temp_to.Year, _temp_to.Month);
+
+            DateTime _to = DateTime.Parse(_temp_to.Month.ToString() + "/" + _x + "/"  + _temp_to.Year.ToString());
             try
             {
                 List<PayrollList_model> _obj = new List<PayrollList_model>();
 
                 string _endpoint = "Payroll/EmployeePayrolls/" +
                     _loginuserid.ToString() + "/" +
-                    DateTime.Parse(_fromdate).ToShortDateString().Replace("/", "-") + "/" +
-                    DateTime.Parse(_todate).ToShortDateString().Replace("/", "-");
+                    _from.ToShortDateString().Replace("/", "-") + "/" +
+                    _to.ToShortDateString().Replace("/", "-");
                 HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
                 if (_response.IsSuccessStatusCode)
                 {
