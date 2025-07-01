@@ -44,7 +44,7 @@ namespace Portal.Repository
             {
                 var _value = _response.Content.ReadAsStringAsync().Result.ToString();
                 var _CustomPrincipalSerializeModel = JsonConvert.DeserializeObject<LoginUser_model>(_value);
-
+                              
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 string userData = serializer.Serialize(_CustomPrincipalSerializeModel);
