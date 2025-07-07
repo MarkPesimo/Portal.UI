@@ -44,7 +44,12 @@ namespace Portal.Repository
             {
                 var _value = _response.Content.ReadAsStringAsync().Result.ToString();
                 var _CustomPrincipalSerializeModel = JsonConvert.DeserializeObject<LoginUser_model>(_value);
-                              
+                
+                if (!_CustomPrincipalSerializeModel.Status)
+                {
+                    return "Your Account is currently Inactive. Kindly coordinate with Employment Services Team.";
+                }
+                
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 string userData = serializer.Serialize(_CustomPrincipalSerializeModel);
