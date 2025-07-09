@@ -34,6 +34,16 @@ namespace Portal.Controllers
             return View("Login", model);
         }
 
+        [HttpGet]
+        public ActionResult Logon()
+        {
+            LoginModel model = new LoginModel
+            {
+                AppModuleId = 12
+            };
+            return View("Login", model);
+        }
+
 
         public void GetCurrentLocation()
         {
