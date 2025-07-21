@@ -19,6 +19,7 @@ namespace Portal.Controllers
         private int _loginuserid = 0;
         private int _candidate_id { get; set; }
         private int _client_id { get; set; }    
+        private int _companyid { get; set; }
 
         private string _Document_Index = "~/Views/Document/Document_index.cshtml";
         private string _COE_Index = "~/Views/Document/COE.cshtml";
@@ -35,6 +36,7 @@ namespace Portal.Controllers
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
                     _client_id = _user.ClientId;
+                    _companyid = _user.Companyid;
                 }
             }
         }
@@ -96,7 +98,10 @@ namespace Portal.Controllers
 
             try
             {
-                string _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//Document//" + "COE with Compensation - Annual.rpt";
+                string _filename = "";
+
+                if (_companyid == 4) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Annual.rpt"; }
+                else if (_companyid == 10) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE - APWTECH.rpt"; }
 
                 _rptfile.Load(_filename);
                 _rptfile.DataDefinition.FormulaFields["Purpose"].Text = "'" + _reason + "'";
