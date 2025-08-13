@@ -229,6 +229,10 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _UnpostLeave(int _id)
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "UNPOST LEAVE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
+
+
+
             LeaveModel _obj = _leaverepository.GetLeave(_id);
             _obj.Mode = 4;
             _obj.UserId = 112;
