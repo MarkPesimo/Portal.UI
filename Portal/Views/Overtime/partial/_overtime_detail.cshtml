@@ -24,27 +24,25 @@
     </div>
 
 
-
     <div class="row">
         <label for="" class="form-label">Overtime start</label>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.OTFrom, new {@class = "form-control",@placeholder = "mm/dd/yyyy", @type = "date",  @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
         </div>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @placeholder = "OT Start", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime" })
+            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @placeholder = "OT Start", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime"})
         </div>
     </div>
 
     <div class="row">
         <label for="" class="form-label">Overtime End</label>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd"),@min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")})
         </div>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @placeholder = "OT End", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime" })
+            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @placeholder = "OT End", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime"})
         </div>
     </div>
-
 
 
     @*<div class="row mt-4">

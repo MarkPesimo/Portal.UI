@@ -1,12 +1,17 @@
 ﻿using APWModel.ViewModel.Global;
+using ClosedXML.Excel;
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using System.Web;
 using System.Web.Mvc;
 using static APWModel.ViewModel.Portal.Overtime_model;
+using System.Runtime.InteropServices;
+using ClosedXML.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Portal.Controllers
 {
@@ -46,7 +51,6 @@ namespace Portal.Controllers
             else { return View("AccessDenied"); }            
         }
 
-
         //---------------------------------------BEGIN FILTER---------------------------------------
         [HttpGet]
         public ActionResult _Filter()
@@ -56,7 +60,6 @@ namespace Portal.Controllers
             return PartialView("~/Views/Overtime/Partial/_overtime_filter_detail.cshtml", _model);
         }
         //---------------------------------------END FILTER---------------------------------------
-
 
         //---------------------------------------BEGIN GET---------------------------------------
         [HttpGet]
@@ -78,9 +81,6 @@ namespace Portal.Controllers
                 return Json(new { Status = "ERROR", Msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-
-
-
         //---------------------------------------END GET---------------------------------------
 
         //---------------------------------------BEGIN ADD POST OVERTIME---------------------------------------
@@ -258,12 +258,92 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    if (_model.Mode == 3) { GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
                     return Json(new { Result = "Success", OvertimeId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
                 return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult GenerateOvertimeForm(int id)
+        {
+            try
+            {
+                OvertimeModel _overtime = _overtimerepository.GetOvertime(id);
+                if (_overtime == null)
+                    return Json(new { Result = "ERROR", Message = "overtime record not found." });
+
+                string templatePath = Server.MapPath("~/OvertimeAttachments/Overtime_Form_Templace.xlsx");
+                if (!System.IO.File.Exists(templatePath))
+                    return Json(new { Result = "ERROR", Message = "Template not found." });
+
+                string baseFolder = Server.MapPath("~/OvertimeAttachments/OvertimeFormsGenerated/Posted/");
+                if (!Directory.Exists(baseFolder)) Directory.CreateDirectory(baseFolder);
+
+                string guidFolder = Path.Combine(baseFolder, _overtime.guid.ToString());
+                if (!Directory.Exists(guidFolder)) Directory.CreateDirectory(guidFolder);
+
+                string outputPdf = Path.Combine(guidFolder, _overtime.guid + ".pdf");
+
+                using (XLWorkbook wb = new XLWorkbook(templatePath))
+                {
+                    var ws = wb.Worksheet(1);
+
+                    ws.Cell("H8").Value = _overtime.DateFiled.ToString("MM/dd/yyyy");
+                    ws.Cell("E10").Value = _overtime.EmpName;
+                    ws.Cell("E11").Value = _overtime.ClientName;
+                    ws.Cell("E13").Value = _overtime.OTFrom.ToString("MM/dd/yyyy");
+                    ws.Cell("H13").Value = _overtime.OTFromTime.ToString("hh:mm tt");
+                    ws.Cell("E14").Value = _overtime.OTTo.ToString("MM/dd/yyyy");
+                    ws.Cell("H14").Value = _overtime.OTToTime.ToString("hh:mm tt");
+                    ws.Cell("E16").Value = _overtime.Reason;
+
+                    using (var ms = new MemoryStream())
+                    {
+                        wb.SaveAs(ms);
+                        ms.Position = 0;
+
+                        string tempPath = Path.GetTempFileName() + ".xlsx";
+                        System.IO.File.WriteAllBytes(tempPath, ms.ToArray());
+
+                        Excel.Application excelApp = new Excel.Application();
+                        excelApp.Visible = false;
+                        Microsoft.Office.Interop.Excel.Workbook excelWorkbook = excelApp.Workbooks.Open(tempPath);
+
+                        try
+                        {
+                            excelWorkbook.ExportAsFixedFormat(
+                                Excel.XlFixedFormatType.xlTypePDF,
+                                outputPdf
+                            );
+                        }
+                        finally
+                        {
+                            excelWorkbook.Close(false);
+                            excelApp.Quit();
+
+                            Marshal.ReleaseComObject(excelWorkbook);
+                            Marshal.ReleaseComObject(excelApp);
+
+                            if (System.IO.File.Exists(tempPath))
+                                System.IO.File.Delete(tempPath);
+                        }
+                    }
+                }
+
+                return Json(new
+                {
+                    Result = "SUCCESS",
+                    FilePath = "/OvertimeAttachments/OvertimeFormsGenerated/Posted/" + _overtime.guid + "/" + _overtime.guid + ".pdf"
+                });
             }
             catch (Exception ex)
             {

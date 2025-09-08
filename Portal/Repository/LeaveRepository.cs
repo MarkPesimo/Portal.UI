@@ -92,6 +92,7 @@ namespace Portal.Repository
                 {"Id",                      _model.Id.ToString() },
                 {"EmpId",                   _model.EmpId.ToString() },
                 {"LeaveTypeId",             _model.LeaveTypeId.ToString() },
+                {"EmergencyLeave",          _model.EmergencyLeave.ToString() },
                 {"DateFiled",               _model.DateFiled.ToString()},
                 {"LeaveFrom",               _model.LeaveFrom.ToString() },
                 {"LeaveFromAMPM",           _model.LeaveFromAMPM.ToString() },
@@ -116,8 +117,13 @@ namespace Portal.Repository
             HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
             if (_response.IsSuccessStatusCode)
             {
-                var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                var _value = _response.Content.ReadAsStringAsync().Result;
                 _id = int.Parse(_value);
+            }
+            else
+            {
+                var errorMessage = _response.Content.ReadAsStringAsync().Result;
+                throw new Exception(errorMessage); 
             }
 
             return _id;

@@ -1,18 +1,20 @@
 ﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
-    
+
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-overtime-Form", id = "post-overtime-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.EmpName)
     @Html.HiddenFor(m => m.ClientId)
+    @Html.HiddenFor(m => m.ClientName)
     @Html.HiddenFor(m => m.DateFiled)
     @Html.HiddenFor(m => m.OTFrom)
     @Html.HiddenFor(m => m.OTFromTime)
     @Html.HiddenFor(m => m.OTTo)
     @Html.HiddenFor(m => m.OTToTime)
     @Html.HiddenFor(m => m.OTHours)
-   
+
     @Html.HiddenFor(m => m.Reason)
     @Html.HiddenFor(m => m.Remarks)
     @Html.HiddenFor(m => m.Mode)

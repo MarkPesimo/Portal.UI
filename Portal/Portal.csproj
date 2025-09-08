@@ -48,7 +48,8 @@
     <Reference Include="AdvancedStringBuilder, Version=0.1.1.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
       <HintPath>..\packages\AdvancedStringBuilder.0.1.1\lib\net45\AdvancedStringBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="APWModel">
+    <Reference Include="APWModel, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ISearch-API\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
@@ -486,11 +487,15 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Attachments\" />
+    <Folder Include="AttendanceCorrectionAttachments\NewFolder1\" />
     <Folder Include="CandidateFiles\" />
     <Folder Include="CandidateImages\" />
+    <Folder Include="DTRAttachments\" />
     <Folder Include="GeneratedReports\" />
     <Folder Include="HelpFiles\" />
     <Folder Include="LeaveAttachments\Filing\" />
+    <Folder Include="LeaveAttachments\LeaveFormsGenerated\Approved\" />
+    <Folder Include="LeaveAttachments\LeaveFormsGenerated\Posted\" />
     <Folder Include="OvertimeAttachments\Filing\" />
     <Folder Include="Report\Document\" />
     <Folder Include="Report\Payroll\" />

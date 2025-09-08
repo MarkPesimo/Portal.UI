@@ -466,7 +466,6 @@
         //return _result;
     }
 
-
     $('#add_leave_modal').on('click', '#submit-leave-button', function (e) {
         ShowLoading('SHOW');
         $.ajax({
@@ -475,8 +474,10 @@
             data: $('#leave-Form').serialize(),
             dataType: 'json',
             success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
+                if (result.Result == "ERROR") {
+                    ShowWarningMessage(result.Message);
+                    return;
+                } else {
                     $("#add_leave_modal").modal('hide');
 
                     $file = $("#Leave_Attachment");
@@ -493,11 +494,16 @@
                     ClearTable('#leave-table');
                     LoadDefault();
                 }
-            } ,
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
+            },
+            failure: function (response) {
+                ShowWarningMessage(response.responseText);
+            },
+            error: function (response) {
+                ShowWarningMessage(response.responseText);
+            }
         });
     });
+
     //----------------------------------END ADD LEAVE--------------------------------------
 
     function LeaveAttachment(_id, _msg) {
@@ -578,9 +584,9 @@
                 ComputeLeaveDays();
 
                 //----------------------SHOW/HIDE VIEW BUTTON-----------------------
-                var _has_attachment = document.getElementById("HasAttachement").value;
-                var _view_button = document.querySelector('#edit_leave_modal').querySelector('#view_attached_btn');
-                _view_button.style.visibility = _has_attachment;
+                //var _has_attachment = document.getElementById("HasAttachement").value;
+                //var _view_button = document.querySelector('#edit_leave_modal').querySelector('#view_attached_btn');
+                //_view_button.style.visibility = _has_attachment;
 
                 //var _edit_button = document.querySelector('#edit_task_modal').querySelector('#edit_task_btn');
                 //if (_det_status == 'Draft') { _edit_button.style.visibility = 'none'; }
@@ -680,12 +686,20 @@
             data: $('#post-leave-Form').serialize(),
             dataType: 'json',
             success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
+                if (result.Result == "ERROR") {
+                    ValidationError(result);
+                } else {
                     $("#post_leave_modal").modal('hide');
-
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully Posted.');
+                    
+                    $.post('/Leave/GenerateOvertimeForm', { id: result.LeaveId }, function (genResult) {
+                        if (genResult.Result === "SUCCESS") {
+                            console.log("Leave form saved: " + genResult.FilePath);
+                        } else {
+                            console.error("Leave form generation failed: " + genResult.Message);
+                        }
+                    });
 
                     ClearTable('#leave-table');
                     LoadDefault();
@@ -763,11 +777,24 @@
     });
 
     $('#cancel_leave_modal').on('click', '#cancel-leave-button', function (e) {
+   
+        var leaveFromStr = $('#LeaveFrom').val();
+        var leaveFromDate = new Date(leaveFromStr);
+        var today = new Date();
+        today.setHours(0, 0, 0, 0); 
+
+        if (leaveFromDate.getFullYear() === today.getFullYear() &&
+            leaveFromDate.getMonth() === today.getMonth() &&
+            leaveFromDate.getDate() === today.getDate()) {
+            ShowInfoMessage("This leave request cannot be cancelled because it starts today.");
+            return; 
+        }
+
         ShowLoading('SHOW');
         $.ajax({
             url: '/Leave/_ManageLeave',
             type: "POST",
-            data: $('#cancel-leave-Form').serialize(),
+            data: $('#cancel-leave-Form').serialize(),  
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
@@ -783,6 +810,7 @@
             }
         });
     });
+
     //----------------------------------END CANCEL LEAVE--------------------------------------
 
 
@@ -802,7 +830,6 @@
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
-
 
     function LogError(response) {
         ShowLoading('HIDE');
@@ -826,6 +853,46 @@
         var x = document.getElementById("preloader");
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
+    }
+
+    function ShowSuccessMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterSuccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterSuccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowInfoMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterInfo-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterInfo");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowWarningMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterWarning-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterWarning");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowDangerMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterDanger-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterDanger");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowAccessDenied(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterAccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterAccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
     }
     //==================================END MISC==================================
 });

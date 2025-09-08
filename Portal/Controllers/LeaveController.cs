@@ -1,4 +1,5 @@
 ﻿using APWModel.ViewModel.Global;
+using ClosedXML.Excel;
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ClosedXML.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
+
 using static APWModel.ViewModel.Portal.Leave_model;
 
 namespace Portal.Controllers
@@ -109,7 +114,6 @@ namespace Portal.Controllers
             return PartialView("~/Views/Attendance/Partial/Leave/_post_leave_detail.cshtml", _model);
         }
 
-
         [HttpPost]
         public ActionResult _AddPostLeave(LeaveModel _model)
         {
@@ -142,6 +146,11 @@ namespace Portal.Controllers
                     if (_model.LeaveDays <= 0)
                     {
                         return Json(new { Result = "ERROR", Message = "Leave day(s) cannot be Zero or less than Zero.", ElementName = "LeaveDays" });
+                    }
+
+                    if (_model.LeaveFrom.Year > DateTime.Now.Year || _model.LeaveTo.Year > DateTime.Now.Year)
+                    {
+                        return Json(new { Result = "ERROR", Message = "You can't advance filing for next year.", ElementName = "LeaveFrom" });
                     }
 
                     //check leave balance
@@ -300,12 +309,117 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    if (_model.Mode == 3) { GenerateLeaveForm(_model.Id); }
+
                     int _id = _leaverepository.ManageLeave(_model);
                     return Json(new { Result = "Success", LeaveId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
                 return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "ERROR",
+                    Message = ex.InnerException != null ? ex.InnerException.Message : ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult GenerateLeaveForm(int id)
+        {
+            try
+            {
+                LeaveModel leave = _leaverepository.GetLeave(id);
+                if (leave == null)
+                    return Json(new { Result = "ERROR", Message = "Leave record not found." });
+
+                string templatePath = Server.MapPath("~/LeaveAttachments/Leave_Notification_Form_Template.xlsx");
+                if (!System.IO.File.Exists(templatePath))
+                    return Json(new { Result = "ERROR", Message = "Template not found." });
+
+                string baseFolder = Server.MapPath("~/LeaveAttachments/LeaveFormsGenerated/Posted/");
+                if (!Directory.Exists(baseFolder)) Directory.CreateDirectory(baseFolder);
+
+                string guidFolder = Path.Combine(baseFolder, leave.guid.ToString());
+                if (!Directory.Exists(guidFolder)) Directory.CreateDirectory(guidFolder);
+
+                string outputPdf = Path.Combine(guidFolder, leave.guid + ".pdf");
+                
+                using (XLWorkbook wb = new XLWorkbook(templatePath))
+                {
+                    var ws = wb.Worksheet(1);
+
+                    ws.Cell("G7").Value = leave.DateFiled.ToString("MM/dd/yyyy");
+                    ws.Cell("D9").Value = leave.EmpName;
+                    ws.Cell("D10").Value = leave.ClientName;
+                    switch (leave.LeaveTypeId)
+                    {
+                        case 1:
+                            ws.Cell("D12").Value = "Sick Leave";
+                            break;
+                        case 2:
+                            ws.Cell("D12").Value = leave.EmergencyLeave
+                                ? "Vacation Leave (Emergency Leave)"
+                                : "Vacation Leave";
+                            break;
+                        case 3:
+                            ws.Cell("D12").Value = "Emergency Leave";
+                            break;
+                        case 4:
+                            ws.Cell("D12").Value = "Maternity Leave";
+                            break;
+                        case 5:
+                            ws.Cell("D12").Value = "Paternity Leave";
+                            break;
+                    }
+
+                    ws.Cell("D13").Value = leave.LeaveFrom.ToString("MM/dd/yyyy");
+                    ws.Cell("D14").Value = leave.LeaveTo.ToString("MM/dd/yyyy");
+                    ws.Cell("D15").Value = leave.LeaveDays;
+                    ws.Cell("D17").Value = leave.Reason;
+
+                    using (var ms = new MemoryStream())
+                    {
+                        wb.SaveAs(ms);
+                        ms.Position = 0;
+                        
+                        string tempPath = Path.GetTempFileName() + ".xlsx";
+                        System.IO.File.WriteAllBytes(tempPath, ms.ToArray());
+
+                        Excel.Application excelApp = new Excel.Application();
+                        excelApp.Visible = false;
+                        Excel.Workbook excelWorkbook = excelApp.Workbooks.Open(tempPath);
+
+                        try
+                        {
+                            excelWorkbook.ExportAsFixedFormat(
+                                Excel.XlFixedFormatType.xlTypePDF,
+                                outputPdf
+                            );
+                        }
+                        finally
+                        {
+                            excelWorkbook.Close(false);
+                            excelApp.Quit();
+
+                            Marshal.ReleaseComObject(excelWorkbook);
+                            Marshal.ReleaseComObject(excelApp);
+                            
+                            if (System.IO.File.Exists(tempPath))
+                                System.IO.File.Delete(tempPath);
+                        }
+                    }
+                }
+
+                return Json(new
+                {
+                    Result = "SUCCESS",
+                    FilePath = "/LeaveAttachments/LeaveFormsGenerated/Posted/" + leave.guid + "/" + leave.guid + ".pdf"
+                });
             }
             catch (Exception ex)
             {

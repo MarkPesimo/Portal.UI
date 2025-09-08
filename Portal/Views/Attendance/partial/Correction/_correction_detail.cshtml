@@ -1,5 +1,6 @@
 ﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
-    
+
+
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "attendance-correction-Form", id = "attendance-correction-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -16,9 +17,27 @@
     <div class="row">
         <div class="col-6 mb-3">
             <label for="" class="form-label">Date Log</label>
-            @Html.TextBoxFor(m => m.DateLog, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateLog.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.DateLog, new {
+                @class = "form-control",
+                @placeholder = "mm/dd/yyyy",
+                @type = "date",
+                @Value = Model.DateLog.ToString("yyyy-MM-dd")
+            })
+        </div>
+
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Work Location</label>
+            @Html.DropDownListFor(m => m.WorkLocation, 
+                new List<SelectListItem> {
+                    new SelectListItem { Text = "Office", Value = "1" },
+                    new SelectListItem { Text = "Home", Value = "2" },
+                    new SelectListItem { Text = "Onsite Work", Value = "3" }
+                },
+                "Please Select",
+                new { @class = "form-select" })
         </div>
     </div>
+
 
     <div class="row">
         <div class="col mb-3">
