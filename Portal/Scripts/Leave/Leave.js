@@ -722,6 +722,12 @@
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
+
+                if (isJsonString(response)) {
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+                
                 $('#unpost_leave_modal').find(".modal-body").innerHTML = '';
                 $('#unpost_leave_modal').find(".modal-body").html(response);
                 $("#unpost_leave_modal").modal('show');

@@ -130,6 +130,7 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +
+                                ' <li> <a class="dropdown-item print-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
                                 ' <li> <a class="dropdown-item edit-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
                                 ' <li> <a class="dropdown-item post-dtr"' + row.PostVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
                                 ' <li> <a class="dropdown-item unpost-dtr"' + row.UnpostVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
