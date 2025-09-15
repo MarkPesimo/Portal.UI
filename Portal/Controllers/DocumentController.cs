@@ -1,13 +1,16 @@
 ﻿using APWModel.ViewModel.Global;
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
+using Portal.Models;
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using static Portal.Models.VW_COE;
 
 namespace Portal.Controllers
 {
@@ -82,7 +85,8 @@ namespace Portal.Controllers
         {
             try
             {
-                bool canGenerate = _documentrepository.CheckGenerateCOE(); 
+                bool canGenerate = _documentrepository.CheckGenerateCOE();
+                Guid _guid = Guid.NewGuid();
                 return Json(new { success = canGenerate, message="Success"  }, JsonRequestBehavior.AllowGet);                
             }
             catch (Exception ex)
@@ -91,17 +95,53 @@ namespace Portal.Controllers
             }
         }
 
-        public void GenerateCOE(string _reason)
+        //Guid _guid;
+
+
+        [HttpGet]
+        public ActionResult CanGenerateCOE2()
+        {
+            
+            try
+            {
+                bool canGenerate  = _documentrepository.CheckGenerateCOE();
+                return Json(new { success = canGenerate, message = "Success" }, JsonRequestBehavior.AllowGet);                
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = "ERROR", Msg = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [HttpGet]
+        public ActionResult GenerateCOE2(string _compensationtype, string _salarytype, string _reason)
         {
             _rptfile = new ReportDocument();
-            Guid _guid = Guid.NewGuid();
 
+         
             try
             {
                 string _filename = "";
 
-                if (_companyid == 4) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Annual.rpt"; }
-                else if (_companyid == 10) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE - APWTECH.rpt"; }
+                if (_compensationtype == "With Compensation")
+                {
+                    if (_companyid == 4)                        //APW
+                    {
+                        if (_salarytype == "Monthly") { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Monthly.rpt"; }
+                        else if (_salarytype == "Annual") { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Annual.rpt"; }
+                    }
+                    else if (_companyid == 10)                  //APWTECH
+                    {
+                        _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "Not Supported.rpt";
+                    }
+                }
+                else if (_compensationtype == "Without Compensation")
+                {
+                    if (_companyid == 4) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE without Compensation.rpt"; }
+                    else if (_companyid == 10) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//APWTech//" + "COE without Compensation.rpt"; }
+                }
+
 
                 _rptfile.Load(_filename);
                 _rptfile.DataDefinition.FormulaFields["Purpose"].Text = "'" + _reason + "'";
@@ -111,22 +151,106 @@ namespace Portal.Controllers
                 //string _password = _globalrepository.Dcrypt(PortalConstant.dbpassword);
                 _rptfile.SetDatabaseLogon(PortalConstant.Username, PortalConstant.dbpassword, PortalConstant.ServerName, PortalConstant.DatabaseName);
 
-                string localPath = System.Web.HttpContext.Current.Server.MapPath("~/GeneratedReports/" + _loginuserid.ToString());
+                string localPath = System.Web.HttpContext.Current.Server.MapPath("~/GeneratedReports/COE/" + _loginuserid.ToString());
                 if (!Directory.Exists(localPath))
                 {
                     Directory.CreateDirectory(localPath);
                 }
 
-                string localFileName = localPath + @"\" + _guid.ToString() + ".pdf"; 
-                _rptfile.ExportToDisk(ExportFormatType.PortableDocFormat, localFileName);
-                
-                bool isStored = _documentrepository.SaveCOEGeneration(_reason, _guid.ToString() + ".pdf" );             //insert logs in the database
-                bool isEmail = _documentrepository.NotifyCOEGeneration( _guid.ToString() + ".pdf");                     //send email notif
+                Guid _guid = Guid.NewGuid();
+                string localFileName = localPath + @"/" + _guid.ToString() + ".pdf";
 
-                _rptfile.ExportToHttpResponse(ExportFormatType.PortableDocFormat, System.Web.HttpContext.Current.Response, false, "COE");
+           
+                _rptfile.ExportToDisk(ExportFormatType.PortableDocFormat, localFileName);
+
+                 
 
                 _rptfile.Close();
                 _rptfile.Dispose();
+
+                COE_MODEL _coe = new COE_MODEL();
+                _coe.Location = _loginuserid.ToString();
+                _coe.Filename = _guid.ToString() + ".pdf";
+
+                Thread.Sleep(5000);
+
+                bool isStored = _documentrepository.SaveCOEGeneration(_reason, _guid.ToString() + ".pdf" );             //insert logs in the database
+                bool isEmail = _documentrepository.NotifyCOEGeneration( _guid.ToString() + ".pdf");                     //send email notif
+
+                return PartialView("~/Views/Document/partial/_preview_coe_detail.cshtml", _coe);
+              
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void GenerateCOE(string _compensationtype, string _salarytype, string _reason)
+        {
+            _rptfile = new ReportDocument();
+
+            Guid _guid = Guid.NewGuid();
+            try
+            {
+                string _filename = "";
+
+                if (_compensationtype == "With Compensation")
+                {
+                    if (_companyid == 4)                        //APW
+                    {
+                        if (_salarytype == "Monthly") { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Monthly.rpt"; }
+                        else if (_salarytype == "Annual") { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE with Compensation - Annual.rpt"; }                        
+                    }
+                    else if (_companyid == 10)                  //APWTECH
+                    {
+                        _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "Not Supported.rpt";
+                    }
+                }
+                else if (_compensationtype == "Without Compensation")
+                {
+                    if (_companyid == 4) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//" + "COE without Compensation.rpt"; }
+                    else if (_companyid == 10) { _filename = System.Web.HttpContext.Current.Server.MapPath("~/") + "Report//COE//APWTech//" + "COE without Compensation.rpt"; }
+                }
+                                
+
+                _rptfile.Load(_filename);
+                _rptfile.DataDefinition.FormulaFields["Purpose"].Text = "'" + _reason + "'";
+                _rptfile.DataDefinition.FormulaFields["EmpID"].Text = "" + _loginuserid.ToString() + "";
+
+
+                //string _password = _globalrepository.Dcrypt(PortalConstant.dbpassword);
+                _rptfile.SetDatabaseLogon(PortalConstant.Username, PortalConstant.dbpassword, PortalConstant.ServerName, PortalConstant.DatabaseName);
+
+                string localPath = System.Web.HttpContext.Current.Server.MapPath("~/GeneratedReports/COE/" + _loginuserid.ToString());
+                if (!Directory.Exists(localPath))
+                {
+                    Directory.CreateDirectory(localPath);
+                }
+
+                string localFileName = localPath + @"/" +_guid.ToString() + ".pdf";
+ 
+                //DirectoryInfo di = new DirectoryInfo(localPath);
+                //FileInfo[] files = di.GetFiles("*.pdf");
+                //List<FileInfo> _checker = (from d in files where d.CreationTime.Month == 9 && d.CreationTime.Year == 2025 && d.CreationTime.Day == 12 && d.CreationTime.Hour == 19 && d.CreationTime.Minute == 58 select d).ToList(); //  where d.CreationTime.Month == 9 && d.CreationTime.Year == 2025 && d.CreationTime.Day == 12 && d.CreationTime.Hour == 7 && d.CreationTime.Minute == 55 select d).ToList();
+                //if (_checker.Count == 0)
+                //{
+                    _rptfile.ExportToDisk(ExportFormatType.PortableDocFormat, localFileName);
+
+                    //bool isStored = _documentrepository.SaveCOEGeneration(_reason, _guid.ToString() + ".pdf" );             //insert logs in the database
+                    //bool isEmail = _documentrepository.NotifyCOEGeneration( _guid.ToString() + ".pdf");                     //send email notif
+
+                    //if (_guid.ToString() != "00000000-0000-0000-0000-000000000000") {
+
+                    //}
+                    _rptfile.ExportToHttpResponse(ExportFormatType.PortableDocFormat, System.Web.HttpContext.Current.Response, false, "COE");
+
+                    _rptfile.Close();
+                    _rptfile.Dispose();
+
+                ////}
+
+
             }
             catch (Exception ex)
             {

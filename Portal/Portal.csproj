@@ -398,6 +398,7 @@
     <Compile Include="Models\Filtering_model.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ReturnedMessageModel.cs" />
+    <Compile Include="Models\VW_COE.cs" />
     <Compile Include="PortalConstant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\AccountRepository.cs" />
@@ -492,13 +493,12 @@
     <Folder Include="HelpFiles\" />
     <Folder Include="LeaveAttachments\Filing\" />
     <Folder Include="OvertimeAttachments\Filing\" />
+    <Folder Include="Report\COE\" />
     <Folder Include="Report\Document\" />
     <Folder Include="Report\Payroll\" />
     <Folder Include="Views\Account\modal\" />
     <Folder Include="Views\Account\partial\" />
     <Folder Include="Views\Attendance\partial\ClockInOut\" />
-    <Folder Include="Views\Document\modal\" />
-    <Folder Include="Views\Document\partial\" />
     <Folder Include="Views\Payroll\partial\" />
     <Folder Include="Views\Settings\modal\" />
     <Folder Include="Views\Settings\partial\" />
@@ -625,6 +625,8 @@
     <Content Include="Views\Shared\_AccessDenied.cshtml" />
     <Content Include="Views\Shared\Layouts\_LoginLayout.cshtml" />
     <None Include="Properties\PublishProfiles\APWEmployeePortal.pubxml" />
+    <Content Include="Views\Document\modal\_preview_coe_modal.cshtml" />
+    <Content Include="Views\Document\partial\_preview_coe_detail.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
