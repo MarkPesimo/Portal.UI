@@ -76,7 +76,10 @@ namespace Portal.Repository
         {
             bool _result = false;
             string _endpoint = "Attendance/ClockInClockOut";
-                     
+
+            if (_model.Latitude == null) { _model.Latitude = "0"; }
+            if (_model.Longitude == null) { _model.Longitude = "0"; }
+
             var _content_prop = new Dictionary<string, string>
             {
                 {"Id",                      _model.Id.ToString() },

@@ -63,10 +63,17 @@ namespace Portal.Repository
 
         public bool NotifyCOEGeneration(string _filename)
         {
-            string _endpoint = "Employee/NotifyCOEGeneration/" +
-                _loginuserid.ToString() + "/" +
-                _filename;
-            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint);
+            string _endpoint = "Employee/NotifyCOEGeneration";
+            var _content_prop = new Dictionary<string, string>
+            {
+                {"EmpId", _loginuserid.ToString() },
+                {"Filename",  _filename }
+            };
+
+            string _body_content = JsonConvert.SerializeObject(_content_prop);
+            HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
             if (_response.IsSuccessStatusCode)
             {
                 var _value = _response.Content.ReadAsStringAsync().Result.ToString();
