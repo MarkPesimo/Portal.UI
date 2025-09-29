@@ -75,6 +75,8 @@ namespace Portal.Repository
             return "Incorrect Username or Password";
         }
 
+
+
         //public LoginUser_model GetLoginUser()       //HttpCookie authCookie
         //{
         //    var _variable = System.Web.HttpContext.Current.User;

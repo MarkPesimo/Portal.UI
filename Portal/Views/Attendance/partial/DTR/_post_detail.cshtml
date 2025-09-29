@@ -3,18 +3,16 @@
 <style>
     .uniform-table th,
     .uniform-table td {
-        width: 15%; /* base width, overridden by .reason-col */
+        width: 15%;
         text-align: center;
         vertical-align: middle;
     }
 
-    /* Reason column: wider + wraps text */
     .uniform-table .reason-col {
         width: 25% !important;
-        white-space: normal; /* allow wrapping */
-        word-break: break-word; /* break long words if needed */
-        text-align: left; /* better readability */
-    }
+        white-space: normal; 
+        word-break: break-word; 
+        text-align: left;     }
 </style>
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-dtr-Form", id = "post-dtr-Form" }))
@@ -27,7 +25,6 @@
     @Html.HiddenFor(m => m.DTR.Dateto, new { Name = "Dateto" })
     @Html.HiddenFor(m => m.DTR.Remarks, new { Name = "Remarks" })
     @Html.HiddenFor(m => m.DTR.Mode, new { Name = "Mode" })
-
 }
 
 <p>
@@ -51,7 +48,8 @@
             <thead>
                 <tr class="text-center">
                     <th class="bg-primary text-white">Date</th>
-                    <th class="bg-primary text-white">Work Schedule</th>
+                    <th class="bg-primary text-white">Date Log</th> 
+                    <th class="bg-primary text-white">Schedule</th> 
                     <th class="bg-primary text-white">Time In</th>
                     <th class="bg-primary text-white">Time Out</th>
                     <th class="bg-primary text-white">With Correction</th>
@@ -65,6 +63,7 @@
                     {
                         <tr class="text-center">
                             <td>@a.Date</td>
+                            <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
                             <td class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
                             <td>@a.TimeIn</td>
                             <td>@a.TimeOut</td>
@@ -76,7 +75,8 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center text-muted">
+                        <td colspan="7" class="text-center text-muted">
+                            @* Increased colspan from 6 to 7 *@@* Adjusted *@
                             No attendance records available
                         </td>
                     </tr>
@@ -85,7 +85,7 @@
         </table>
     </div>
 </div>
-<!-- ================= Overtime Table ================= -->
+
 <div class="widget widget-table mt-4">
     <h6 class="fw-bold mb-2">Overtime</h6>
     <div class="table-responsive">
@@ -124,7 +124,6 @@
     </div>
 </div>
 
-<!-- ================= Leave Table ================= -->
 <div class="widget widget-table mt-4">
     <h6 class="fw-bold mb-2">Leave</h6>
     <div class="table-responsive">

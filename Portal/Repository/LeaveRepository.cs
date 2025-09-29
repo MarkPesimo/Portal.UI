@@ -147,5 +147,27 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
+
+
+        public ComputeLeaveDays_model GetComputedFiledLeaveDays(DateTime d1, DateTime d2, bool isFirstDayHalf, bool isLastDayHalf)
+        {
+            try
+            {
+                ComputeLeaveDays_model _obj = new ComputeLeaveDays_model();
+
+                string _endpoint = $"Leave/GetComputedFiledLeaveDays?d1={d1:yyyy-MM-dd}&d2={d2:yyyy-MM-dd}&isFirstDayHalf={isFirstDayHalf}&isLastDayHalf={isLastDayHalf}";
+
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<ComputeLeaveDays_model>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
     }
 }

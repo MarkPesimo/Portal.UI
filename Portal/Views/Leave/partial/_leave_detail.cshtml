@@ -97,9 +97,16 @@
     <div class="row mt-4">
         <div class="col-3 mb-3">
             <label for="" class="form-label">No. of Days</label>
-            @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "No. of Days", @readonly = "true" })
+            @Html.TextBoxFor(m => m.LeaveDays, new {
+    @class = "text-center form-control text-primary font-weight-bold",
+    style = "background-color: #e9ecef;",
+    @placeholder = "No. of Days",
+    @readonly = "true"
+})
+
         </div>
     </div>
+
 
     <div class="row mt-2">
         <div class="col">
@@ -183,6 +190,6 @@
         setDateRules();
 
         $("#LeaveTypeId").on("change", setDateRules);
-        $("#checkbox").on("change", setDateRules); 
+        $("#checkbox").on("change", setDateRules);
     });
 </script>

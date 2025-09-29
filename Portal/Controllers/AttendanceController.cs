@@ -575,7 +575,6 @@ namespace Portal.Controllers
             DTRmodel _model = new DTRmodel
             {
                 EmpId = _loginuserid,
-                UserId = 112,
                 Mode = 0
             };
 
@@ -598,8 +597,8 @@ namespace Portal.Controllers
         public ActionResult _EditDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
+            _obj.Id = _id;
             _obj.EmpId = _loginuserid;
-            _obj.UserId = 112;
             _obj.Mode = 1;
             return PartialView("~/Views/Attendance/Partial/DTR/_dtr_detail.cshtml", _obj);
         }
@@ -610,7 +609,6 @@ namespace Portal.Controllers
         public ActionResult _PostDTR(int _id)
         {
             DTRmodel _dtr = _attendancerepository.GetDTR(_id);
-            _dtr.UserId = 112;
             _dtr.Mode = 3;
             
             DTRPostDetailResult _postDetails = _attendancerepository.GetPostDTR(_id);
@@ -785,8 +783,8 @@ namespace Portal.Controllers
                 return Json(new
                 {
                     success = true,
-                    dateFrom = result.DateFrom.ToString("MM/dd/yyyy"),
-                    dateTo = result.Dateto.ToString("MM/dd/yyyy")
+                    dateFrom = result.DateFrom.ToString("yyyy-MM-dd"),
+                    dateTo = result.Dateto.ToString("yyyy-MM-dd")
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -794,5 +792,6 @@ namespace Portal.Controllers
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
     }
 }

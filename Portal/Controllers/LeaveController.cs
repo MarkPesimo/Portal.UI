@@ -500,5 +500,18 @@ namespace Portal.Controllers
             return PartialView("~/Views/Leave/partial/_view_attachment.cshtml", _model);
         }
 
+        [HttpGet]
+        public JsonResult GetComputedFiledLeaveDays(DateTime d1, DateTime d2, bool isFirstDayHalf, bool isLastDayHalf)
+        {
+            try
+            {
+                var result = _leaverepository.GetComputedFiledLeaveDays(d1, d2, isFirstDayHalf, isLastDayHalf);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

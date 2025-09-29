@@ -37,7 +37,7 @@
                 new { @class = "form-select", id = "Cutoff", name = "Cutoff" })
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-6 mb-3">
             <label class="form-label">Month</label>
@@ -64,29 +64,37 @@
     </div>
     <hr />
     <div class="row">
+        <div class="col-12 mb-2">
+            <p class="text-muted fst-italic" style="font-size: 0.9rem;">
+                *You can adjust the date range if the cutoff period is shortened or different.
+            </p>
+        </div>
+
         <div class="col-6 mb-3">
             <label class="form-label">Date From</label>
-            @Html.TextBoxFor(m => m.DateFrom, "{0:MM/dd/yyyy}",
+            @Html.TextBox("DateFrom",
+                Model.DateFrom != DateTime.MinValue ? Model.DateFrom.ToString("yyyy-MM-dd") : "",
                 new {
                     @class = "form-control fw-bold",
-                    style = "background-color: #dcdcdc; color: #6c757d; cursor: not-allowed;",
-                    @readonly = "readonly",
+                    type = "date",
                     id = "DateFrom",
                     name = "DateFrom"
                 })
         </div>
+
         <div class="col-6 mb-3">
             <label class="form-label">Date To</label>
-            @Html.TextBoxFor(m => m.Dateto, "{0:MM/dd/yyyy}",
+            @Html.TextBox("Dateto",
+                Model.Dateto != DateTime.MinValue ? Model.Dateto.ToString("yyyy-MM-dd") : "",
                 new {
                     @class = "form-control fw-bold",
-                    style = "background-color: #dcdcdc; color: #6c757d; cursor: not-allowed;",
-                    @readonly = "readonly",
+                    type = "date",
                     id = "DateTo",
                     name = "DateTo"
                 })
         </div>
     </div>
+
 
 }
 
@@ -95,8 +103,7 @@
     $("#Cutoff, #Month, #Year").change(function () {
         var cutoff = $("#Cutoff").val();
         var year = $("#Year").val();
-        
-        var monthInput = $("#Month").val(); 
+        var monthInput = $("#Month").val();
         var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
 
         if (cutoff && month > 0 && year) {
@@ -112,4 +119,5 @@
                 });
         }
     });
+
 </script>

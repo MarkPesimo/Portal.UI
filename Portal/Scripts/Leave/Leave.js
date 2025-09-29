@@ -278,8 +278,6 @@
                     ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
                     return;
                 }
-
-
                 $('#add_leave_modal').find(".modal-body").innerHTML = '';
                 $('#add_leave_modal').find(".modal-body").html(response);
                 $("#add_leave_modal").modal('show');
@@ -303,7 +301,7 @@
     });
 
     function ToggleNotSameDayAdd() {     
-        ComputeLeaveDays();
+        ComputeLeaveDaysAPI();
     };
 
     function ToggleFirstHalfAdd() {
@@ -321,7 +319,7 @@
         //    document.querySelector(_form).querySelector('#SecondHalf').value = true;
         //}
 
-        ComputeLeaveDays();
+        ComputeLeaveDaysAPI();
     };
 
     function ToggleSecondHalfAdd() {
@@ -338,7 +336,7 @@
         //    document.querySelector(_form).querySelector('#FirstHalf').value = true;
         //}
 
-        ComputeLeaveDays();
+        ComputeLeaveDaysAPI();
     };
 
     function CheckIsNotHalfdayAdd() {
@@ -376,8 +374,8 @@
             div_not_sameday_halfday.classList.add('d-none');
             div_sameday_halfday.classList.add('d-none');
         }
-
-        ComputeLeaveDays();
+        ComputeLeaveDaysAPI()
+      //   ComputeLeaveDaysAPI();
     };
 
     function CheckIsHalfdayAdd() {
@@ -409,11 +407,36 @@
             document.querySelector(_form).querySelector('#SecondHalf').checked = false
             document.querySelector(_form).querySelector('#SecondHalf').value = false;
         }
-
-        ComputeLeaveDays();
+        ComputeLeaveDaysAPI();
+        //ComputeLeaveDays();
     };
 
+    function ComputeLeaveDaysAPI() {
+        var _form = '#leave-Form';
+
+        var leaveFrom = document.querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_form).querySelector("#LeaveTo").value;
+
+        var isFirstDayHalf = document.querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        var isLastDayHalf = document.querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+        
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
+
+
     function ComputeLeaveDays() {
+
         var _form = '#leave-Form';
 
         var _leavefrom = Date.parse(document.querySelector(_form).querySelector("#LeaveFrom").value);
@@ -581,7 +604,7 @@
                 document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
                 document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
 
-                ComputeLeaveDays();
+                ComputeLeaveDaysAPI();
 
                 //----------------------SHOW/HIDE VIEW BUTTON-----------------------
                 //var _has_attachment = document.getElementById("HasAttachement").value;

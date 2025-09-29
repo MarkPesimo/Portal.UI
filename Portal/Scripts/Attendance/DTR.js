@@ -6,18 +6,28 @@
 
         var date = new Date();
         var curr_date = date.getDate();
-        var curr_month = date.getMonth() + 1; //Months are zero based
+        var curr_month = date.getMonth() + 1;
         var curr_year = date.getFullYear();
 
         if (curr_month.toString().length == 1) { curr_month = "0" + curr_month; }
         if (curr_date.toString().length == 1) { curr_date = "0" + curr_date; }
 
-        document.getElementById("dtr_from").value = curr_year + "-01-01"; //  firstDay.toString( "yy-mm-dd"); "2021-01-01";  //
-        document.getElementById("dtr_to").value = curr_year + "-" + curr_month + "-" + curr_date; //lastDay;
-
+        document.getElementById("dtr_from").value = curr_year + "-01-01";
+        
+        var lastMonthDate = new Date(curr_year, date.getMonth(), 0);
+        var lastMonthYear = lastMonthDate.getFullYear();
+        var lastMonth = ("0" + (lastMonthDate.getMonth() + 1)).slice(-2);
+        var lastDayLastMonth = ("0" + lastMonthDate.getDate()).slice(-2);
+        
+        var lastDayOfYear = new Date(curr_year, 11, 31);
+        var lastYearMonth = ("0" + (lastDayOfYear.getMonth() + 1)).slice(-2);
+        var lastYearDay = ("0" + lastDayOfYear.getDate()).slice(-2);
+        document.getElementById("dtr_to").value = curr_year + "-" + lastYearMonth + "-" + lastYearDay; 
+        
         ShowLoading('HIDE');
         BindTable();
     });
+
 
     //----------------------------------BEGIN TABLE----------------------------------------------
     function ClearTable(tablename) {
@@ -544,6 +554,31 @@
         var x = document.getElementById("preloader");
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
+    }
+
+
+    function ShowInfoMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterInfo-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterInfo");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowWarningMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterWarning-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterWarning");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowAccessDenied(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterAccess-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterAccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
     }
     //==================================END MISC==================================
 });
