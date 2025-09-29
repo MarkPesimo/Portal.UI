@@ -2,20 +2,49 @@
     $(document).ready(function () {
         ShowLoading('HIDE');
     });
+    
+    function getDeviceId() {
+        const raw = navigator.userAgent
+            + navigator.language
+            + screen.width + "x" + screen.height
+            + navigator.hardwareConcurrency;
 
+        return CryptoJS.SHA256(raw).toString();
+    }
+    
+    function getDeviceDetails() {
+        return {
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            screen: screen.width + "x" + screen.height,
+            cpuCores: navigator.hardwareConcurrency || "N/A"
+        };
+    }
 
     $("#login-btn").click(function (e) {
         e.preventDefault();
-        
+
         var btn = document.getElementById("login-btn");
         btn.disabled = true;
-
-        var _id = e.target.id;
         ShowLoading('SHOW');
+        
+        var deviceId = getDeviceId();
+        var device = getDeviceDetails();
+        
+        console.log(
+            "Device Info:\n\n" +
+            "Browser/UserAgent: " + device.userAgent + "\n" +
+            "Language: " + device.language + "\n" +
+            "Screen: " + device.screen + "\n" +
+            "CPU Cores: " + device.cpuCores + "\n\n" +
+            "Device ID (hashed): " + deviceId
+        );
+        var formData = $('#login-Form').serialize() + "&deviceId=" + encodeURIComponent(deviceId);
+
         $.ajax({
             url: '/Account/Login',
             type: "POST",
-            data: $('#login-Form').serialize(),
+            data: formData,
             dataType: 'json',
             success: function (result) {
                 ShowLoading('HIDE');
@@ -24,11 +53,10 @@
                     ValidationError(result);
                 }
                 else { window.location = result.URL; }
-            }
+            },
+            error: LogError
         });
     });
-
-
 
     function ShowLoading(show) {
         var x = document.getElementById("preloader");

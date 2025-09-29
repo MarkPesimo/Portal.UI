@@ -16,6 +16,12 @@
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
+    <style>
+        .hidden {
+            display: none !important;
+        }
+    </style>
+
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
@@ -24,22 +30,24 @@
 
     <div class="row">
         <div class="col-6 mb-3">
-            <label for="" class="form-label">Leave Type</label>
-            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, "Please Select", new { @class = "form-select", @placeholder = "Leave Types" })
+            <label for="LeaveTypeId" class="form-label">Leave Type</label>
+            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, new { @class = "form-select", @placeholder = "Leave Types", @id = "LeaveTypeId" })
         </div>
-
-
+        <div class="col-6 mb-3 d-flex align-items-center" id="checkboxWrapper">
+            @Html.CheckBoxFor(m => m.EmergencyLeave, new { @class = "form-check-input me-1", id = "checkbox" })
+            <label for="checkbox" class="form-check-label">Emergency Leave</label>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-6">
             <label for="" class="form-label">From</label>
-            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @id = "LeaveFrom", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
         </div>
 
         <div class="col-6">
             <label for="" class="form-label">To</label>
-            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @id = "LeaveTo", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
         </div>
     </div>
 
@@ -109,3 +117,72 @@
 
 
 
+<script>
+    $(document).ready(function () {
+        function getWorkingDaysAgo(startDate, daysBack) {
+            var date = new Date(startDate);
+            var count = 0;
+            while (count < daysBack) {
+                date.setDate(date.getDate() - 1);
+                var day = date.getDay();
+                if (day !== 0 && day !== 6) count++;
+            }
+            return date;
+        }
+
+        function setDateRules() {
+            var leaveType = $("#LeaveTypeId").val();
+            var fromInput = $("#LeaveFrom");
+            var toInput = $("#LeaveTo");
+            var isEmergency = $("#checkbox").is(":checked");
+
+            if (leaveType == "2") {
+                $("#checkboxWrapper").removeClass("hidden");
+            } else {
+                $("#checkboxWrapper").addClass("hidden");
+                $("#checkbox").prop("checked", false);
+            }
+
+            var today = new Date();
+            var todayStr = today.toISOString().split('T')[0];
+
+            if (leaveType == "2") {  //  Vacation Leave
+                if (isEmergency) {
+                    // Emergency: bypass 3 ays rule
+                    fromInput.attr("min", todayStr).removeAttr("max");
+                    toInput.attr("min", todayStr).removeAttr("max");
+                } else {
+                    // Normal VL: enforce 3 days rule
+                    var minDate = new Date();
+                    minDate.setDate(today.getDate() + 3);
+                    var minStr = minDate.toISOString().split('T')[0];
+
+                    fromInput.attr("min", minStr).removeAttr("max");
+                    toInput.attr("min", todayStr).removeAttr("max");
+
+                    if (fromInput.val() && fromInput.val() < minStr) fromInput.val(minStr);
+                    if (toInput.val() && toInput.val() < todayStr) toInput.val(todayStr);
+                }
+            }
+            else if (leaveType == "1") {  //  Sick Leave
+                var minDate = getWorkingDaysAgo(today, 5);
+                var minStr = minDate.toISOString().split('T')[0];
+
+                fromInput.attr("min", minStr).removeAttr("max");
+                toInput.attr("min", minStr).removeAttr("max");
+
+                if (fromInput.val() && fromInput.val() < minStr) fromInput.val(minStr);
+                if (toInput.val() && toInput.val() < minStr) toInput.val(minStr);
+            }
+            else {
+                fromInput.removeAttr("min").removeAttr("max");
+                toInput.removeAttr("min").removeAttr("max");
+            }
+        }
+
+        setDateRules();
+
+        $("#LeaveTypeId").on("change", setDateRules);
+        $("#checkbox").on("change", setDateRules); 
+    });
+</script>

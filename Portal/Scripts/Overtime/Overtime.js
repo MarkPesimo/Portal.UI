@@ -121,12 +121,12 @@
                         }
                     }, 
                     {
-                        title: 'OT from',
+                        title: 'From',
                         class: "d-none d-sm-table-cell text-center",
                         target: 1
                     },
                     {
-                        title: 'OT to',
+                        title: 'To',
                         class: "d-none d-sm-table-cell text-center",
                         target: 2
                     },

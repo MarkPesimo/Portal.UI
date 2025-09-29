@@ -8,7 +8,7 @@
 
 
         var curr_date = date.getDate();
-        var curr_month = date.getMonth() + 1; //Months are zero based
+        var curr_month = date.getMonth() + 1;
         var curr_year = date.getFullYear();
 
 
@@ -16,8 +16,8 @@
         if (curr_date.toString().length == 1) { curr_date = "0" + curr_date; }
 
 
-        document.getElementById("correction_from").value = curr_year + "-" + curr_month + "-01"; //  firstDay.toString( "yy-mm-dd"); "2021-01-01";  //
-        document.getElementById("correction_to").value = curr_year + "-" + curr_month + "-" + curr_date; //lastDay;
+        document.getElementById("correction_from").value = curr_year + "-" + curr_month + "-01"; // 
+        document.getElementById("correction_to").value = curr_year + "-" + curr_month + "-" + curr_date; 
 
         ShowLoading('HIDE');
         BindTable();
@@ -86,6 +86,7 @@
                     { 'data': 'DateLog' },
                     { 'data': 'ShiftDescription' },
                     { 'data': 'TimeIn' },
+                    { 'data': 'Remarks' },
                     { 'data': 'Reason' },
                     { 'data': 'Status' },
                     { 'data': 'Status' },
@@ -93,7 +94,7 @@
                 order: [[1, "desc"]],
                 columnDefs: [
                     {
-                        title: 'Date Filed',
+                        title: 'Date of Correction',
                         target: 0,
                         class: "d-none d-sm-table-cell text-center",
                     },
@@ -121,16 +122,20 @@
                                 ' <small class="d-block">' + row.TimeOut + ' </small> '
                         }
                     },
-                     
+                    {
+                        title: 'Remarks',
+                        target: 4,
+                        class: "d-none d-sm-table-cell",
+                    },
                     {
                         title: 'Reason',
-                        target: 4,
+                        target: 5,
                         class: "d-none d-sm-table-cell",
                     },
                     {
                         title: 'Status',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 5,
+                        target: 6,
                         "render": function (data, type, row, meta) {                            
                             return SetTableBGColor(row.Status)
                         }
@@ -138,7 +143,7 @@
                     {
                         title: 'Details',
                         class: "d-xs-block d-sm-none d-m-none d-lg-none",
-                        target: 6,
+                        target: 7,
                         "render": function (data, type, row, meta) {
                             const date = new Date(row.DateLog);
                             return '<small class="d-block"> Date log : <strong class="text-primary"> ' + row.DateLog + '</strong> </small>  ' +
@@ -150,7 +155,7 @@
                         }
                     },
                     {
-                        target: 7,
+                        target: 8,
                         className: 'dt-body-right',
                         "render": function (data, type, row, meta) {
                             return '<div class="btn-group"> ' +
@@ -333,6 +338,7 @@
     });
 
     $('#post_correction_modal').on('click', '#post_correction', function (e) {
+
         ShowLoading('SHOW');
         $.ajax({
             url: '/Attendance/_PostCorrection',
@@ -346,6 +352,14 @@
 
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Attendance Correction successfully Posted.');
+
+                    //$.post('/Attendance/GenerateAttendanceCorrectionForm', { _id: result.Id }, function (genResult) {
+                    //    if (genResult.Result === "SUCCESS") {
+                    //        console.log("Correction form saved: " + genResult.FilePath);
+                    //    } else {
+                    //        console.error("Correction form generation failed: " + genResult.Message);
+                    //    }
+                    //});
                     BindTable();
                 }
             }

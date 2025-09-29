@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using static APWModel.ViewModel.Portal.Attendance_model;
 using static APWModel.ViewModel.Portal.DTR_model;
+using static APWModel.ViewModel.Portal.DTR_model.DTRmodel;
 
 namespace Portal.Repository
 {
@@ -201,7 +202,8 @@ namespace Portal.Repository
                 {"Id",                      _model.Id.ToString() },
                 {"DateLog",                 _model.DateLog.ToString() },
                 {"EmpId",                   _model.EmpId.ToString() },
-                {"ShiftId",                 _model.ShiftId.ToString() },                
+                {"ShiftId",                 _model.ShiftId.ToString() },
+                {"WorkLocation",            _model.WorkLocation.ToString() },
                 {"TimeInDate",              _model.TimeInDate.ToString() },
                 {"TimeInTime",              _model.TimeInTime.ToString() },
                 {"TimeOutDate",             _model.TimeOutDate.ToString() },
@@ -273,7 +275,7 @@ namespace Portal.Repository
             int _id = 0;
             string _endpoint = "Attendance/ManageDTR";
             if (_model.Remarks == null) { _model.Remarks = ""; }
-
+            if (_model.Description == null) { _model.Description= ""; }
             var _content_prop = new Dictionary<string, string>
             {
                 {"Id",                  _model.Id.ToString() },
@@ -283,7 +285,10 @@ namespace Portal.Repository
                 {"Dateto",              _model.Dateto.ToString() },
                 {"DateCreated",         _model.DateCreated.ToString() },
                 {"UserId",              _model.UserId.ToString() },
-                {"Mode",                _model.Mode.ToString() }
+                {"Mode",                _model.Mode.ToString() },
+                {"CutOff",              _model.CutOff.ToString() },
+                {"Month",               _model.Month.ToString() },
+                {"Year",                _model.Year.ToString() }
             };
 
             string _body_content = JsonConvert.SerializeObject(_content_prop);
@@ -318,5 +323,43 @@ namespace Portal.Repository
             catch (Exception) { throw; }
         }
         //------------------------------------------END DTR----------------------------------
+
+        public DTRPostDetailResult GetPostDTR(int dtrId)
+        {
+            try
+            {
+                DTRPostDetailResult _obj = new DTRPostDetailResult();
+
+                string _endpoint = "Attendance/GetPostDTR/" + dtrId.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<DTRPostDetailResult>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
+        public APWModel.ViewModel.Portal.DTR_model.DTRmodel GetClientCutoffDate(int clientId, string cutoff, int month, int year)
+        {
+            try
+            {
+                APWModel.ViewModel.Portal.DTR_model.DTRmodel _obj = new APWModel.ViewModel.Portal.DTR_model.DTRmodel();
+
+                string _endpoint = "Attendance/GetClientCutoffDate/" + clientId.ToString() + "/" + cutoff.ToString() + "/" + month.ToString() + "/" + year.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<APWModel.ViewModel.Portal.DTR_model.DTRmodel>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
     }
 }

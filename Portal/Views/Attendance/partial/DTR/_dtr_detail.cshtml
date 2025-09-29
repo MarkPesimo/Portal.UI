@@ -1,5 +1,15 @@
 ﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
 
+<style>
+    input[type="month"].month-only::-webkit-datetime-edit-year-field {
+        display: none;
+    }
+
+    input[type="month"].month-only::-moz-datetime-edit-year-field {
+        display: none;
+    }
+</style>
+
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "dtr-Form", id = "dtr-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -10,32 +20,96 @@
     @Html.HiddenFor(m => m.Remarks)
 
     <div class="row" id="div-validation" style="display: none;">
-        <div class="col-lg-6 mb-3">
-            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <label for="" class="form-label">Description</label>
-            @Html.TextAreaFor(m => m.Description, 4, 40, new { @class = "form-control", @placeholder = "Enter a Description" })
+        <div class="col-lg-12 mb-3">
+            <label id="error-message-label" class="form-label text-danger"></label>
         </div>
     </div>
 
     <div class="row mt-2">
-        <div class="col-6 mb-3">
-            <label for="" class="form-label">Date From</label>
-            @Html.TextBoxFor(m => m.DateFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateFrom.ToString("yyyy-MM-dd") })
-        </div>
-
-        <div class="col mb-3">
-            <label for="" class="form-label">Date To</label>
-            @Html.TextBoxFor(m => m.Dateto, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.Dateto.ToString("yyyy-MM-dd") })
+        <div class="col-12 mb-3 position-relative">
+            <label class="form-label">Cutoff</label>
+            @Html.DropDownListFor(m => m.CutOff,
+                new SelectList(new[]
+                {
+                    new { Value = "1ST CUTOFF", Text = "1ST CUT OFF" },
+                    new { Value = "2ND CUTOFF", Text = "2ND CUT OFF" }
+                }, "Value", "Text", Model.CutOff),
+                new { @class = "form-select", id = "Cutoff", name = "Cutoff" })
         </div>
     </div>
+    
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="form-label">Month</label>
+            @Html.TextBoxFor(m => m.Month, new {
+                @class = "form-control month-only",
+                type = "month",
+                id = "Month",
+                name = "Month"
+            })
+        </div>
 
+
+        <div class="col-6 mb-3">
+            <label class="form-label">Year</label>
+            @Html.DropDownListFor(m => m.Year,
+                new SelectList(
+                    Enumerable.Range(DateTime.Now.Year - 5, 11)
+                              .Select(y => new { Value = y.ToString(), Text = y.ToString() }),
+                    "Value", "Text", Model.Year ?? DateTime.Now.Year.ToString()
+                ),
+                new { @class = "form-select", id = "Year", name = "Year" })
+        </div>
+
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="form-label">Date From</label>
+            @Html.TextBoxFor(m => m.DateFrom, "{0:MM/dd/yyyy}",
+                new {
+                    @class = "form-control fw-bold",
+                    style = "background-color: #dcdcdc; color: #6c757d; cursor: not-allowed;",
+                    @readonly = "readonly",
+                    id = "DateFrom",
+                    name = "DateFrom"
+                })
+        </div>
+        <div class="col-6 mb-3">
+            <label class="form-label">Date To</label>
+            @Html.TextBoxFor(m => m.Dateto, "{0:MM/dd/yyyy}",
+                new {
+                    @class = "form-control fw-bold",
+                    style = "background-color: #dcdcdc; color: #6c757d; cursor: not-allowed;",
+                    @readonly = "readonly",
+                    id = "DateTo",
+                    name = "DateTo"
+                })
+        </div>
+    </div>
 
 }
 
 
+<script>
+    $("#Cutoff, #Month, #Year").change(function () {
+        var cutoff = $("#Cutoff").val();
+        var year = $("#Year").val();
+        
+        var monthInput = $("#Month").val(); 
+        var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
 
+        if (cutoff && month > 0 && year) {
+            $.getJSON('/Attendance/GetClientCutoffDate',
+                { cutoff: cutoff, month: month, year: year },
+                function (data) {
+                    if (data.success) {
+                        $("#DateFrom").val(data.dateFrom);
+                        $("#DateTo").val(data.dateTo);
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                });
+        }
+    });
+</script>

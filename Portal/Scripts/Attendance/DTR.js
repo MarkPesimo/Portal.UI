@@ -80,7 +80,7 @@
                 columns: [
                     { 'data': 'DateFiled' },
                     { 'data': 'Description' },
-                    { 'data': 'DateFrom' },                   
+                    //{ 'data': 'DateFrom' },                   
                     { 'data': 'Status' },
                     { 'data': 'Status' },
                 ],
@@ -101,17 +101,8 @@
                         target: 1,
                     },
                     {
-                        title: 'Date Range',
-                        target: 2,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateLog);
-                            return ' <p>' + row.DateFrom + ' to ' + row.DateTo + ' </p> '
-                        }
-                    },
-                    {
                         title: 'Status',
-                        target: 3,
+                        target: 2,
                         class: "d-none d-sm-table-cell text-center",
                         "render": function (data, type, row, meta) {
                             return SetTableBGColor(row.Status)
@@ -119,7 +110,7 @@
                     },
                     {
                         title: 'Details',
-                        target: 4,
+                        target: 3,
                         class: "d-xs-block d-sm-none d-m-none d-lg-none",
                         "render": function (data, type, row, meta) {
                             return 'Date Filed : ' + row.DateFiled  + ' ' +
@@ -131,7 +122,7 @@
                         }
                     },
                     {
-                        target: 5,
+                        target: 4,
                         className: 'dt-body-right',
                         "render": function (data, type, row, meta) {
                             return '<div class="btn-group"> ' +
@@ -226,8 +217,9 @@
 
     //----------------------------------BEGIN EDIT DTR--------------------------------------
     $('#dtr-table').on('click', '.edit-dtr', function () {
+
         var DTRId = $(this).attr("DTRid");
-        
+
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
@@ -270,7 +262,7 @@
     //----------------------------------BEGIN POST CORRECTION--------------------------------------
     $('#dtr-table').on('click', '.post-dtr', function () {
         var DTRId = $(this).attr("DTRid");
-
+    
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",

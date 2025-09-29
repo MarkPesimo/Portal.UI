@@ -1,41 +1,164 @@
-﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
+﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel.DTRPostDetailResult
+
+<style>
+    .uniform-table th,
+    .uniform-table td {
+        width: 15%; /* base width, overridden by .reason-col */
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Reason column: wider + wraps text */
+    .uniform-table .reason-col {
+        width: 25% !important;
+        white-space: normal; /* allow wrapping */
+        word-break: break-word; /* break long words if needed */
+        text-align: left; /* better readability */
+    }
+</style>
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-dtr-Form", id = "post-dtr-Form" }))
 {
-    @Html.HiddenFor(m => m.Id)
-    @Html.HiddenFor(m => m.UserId)
-    @Html.HiddenFor(m => m.EmpId)
-    @Html.HiddenFor(m => m.Description)
-    @Html.HiddenFor(m => m.DateFrom)
-    @Html.HiddenFor(m => m.Dateto)
-    @Html.HiddenFor(m => m.Remarks)
-    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.DTR.Id, new { Name = "Id" })
+    @Html.HiddenFor(m => m.DTR.UserId, new { Name = "UserId" })
+    @Html.HiddenFor(m => m.DTR.EmpId, new { Name = "EmpId" })
+    @Html.HiddenFor(m => m.DTR.Description, new { Name = "Description" })
+    @Html.HiddenFor(m => m.DTR.DateFrom, new { Name = "DateFrom" })
+    @Html.HiddenFor(m => m.DTR.Dateto, new { Name = "Dateto" })
+    @Html.HiddenFor(m => m.DTR.Remarks, new { Name = "Remarks" })
+    @Html.HiddenFor(m => m.DTR.Mode, new { Name = "Mode" })
+
 }
 
-Are you sure you want to mark this DTR as <strong><span class="text-success">Posted</span></strong>?
+<p>
+    Are you sure you want to mark this DTR as
+    <strong><span class="text-success">Posted</span></strong>?
+</p>
 
-<div class="widget widget-table mt-2">
+<div class="mb-3 text-l">
+    <h6 class="fw-bold">
+        Date Range:
+        @Model.DTR.DateFrom.ToString("MMMM dd, yyyy") - @Model.DTR.Dateto.ToString("MMMM dd, yyyy")
+    </h6>
+    @*<h6 class="text-muted">Title: @Model.DTR.Description</h6>*@
+</div>
+
+
+<div class="widget widget-table mt-3">
+    <h6 class="fw-bold mb-2">Attendance</h6>
     <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover align-middle" id="dtr-details-table">
+        <table class="table table-sm table-striped table-hover align-middle">
             <thead>
-                <tr>
-                    <th class="bg-primary text-white">Date Log</th>
-                    <th class="bg-primary text-white">Date name</th>
-                    <th class="bg-primary text-white">Shift Schedule</th>
+                <tr class="text-center">
+                    <th class="bg-primary text-white">Date</th>
+                    <th class="bg-primary text-white">Work Schedule</th>
                     <th class="bg-primary text-white">Time In</th>
                     <th class="bg-primary text-white">Time Out</th>
-                    <th class="bg-primary text-white">Remarks</th>
-                    <th class="bg-primary text-white">Details</th>
+                    <th class="bg-primary text-white">With Correction</th>
+                    <th class="bg-primary text-white">Status</th>
                 </tr>
             </thead>
-
-                                                      
+            <tbody>
+                @if (Model.Attendance != null && Model.Attendance.Any())
+                {
+                    foreach (var a in Model.Attendance)
+                    {
+                        <tr class="text-center">
+                            <td>@a.Date</td>
+                            <td class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
+                            <td>@a.TimeIn</td>
+                            <td>@a.TimeOut</td>
+                            <td>@a.HasCorrection</td>
+                            <td>@a.Status</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            No attendance records available
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- ================= Overtime Table ================= -->
+<div class="widget widget-table mt-4">
+    <h6 class="fw-bold mb-2">Overtime</h6>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover align-middle uniform-table">
+            <thead>
+                <tr>
+                    <th class="bg-primary text-white">Date</th>
+                    <th class="bg-primary text-white">Start</th>
+                    <th class="bg-primary text-white">End</th>
+                    <th class="bg-primary text-white">No. of Hours</th>
+                    <th class="bg-primary text-white reason-col">Reason</th>
+                    <th class="bg-primary text-white">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Overtime != null && Model.Overtime.Any())
+                {
+                    foreach (var ot in Model.Overtime)
+                    {
+                        <tr>
+                            <td>@ot.Date</td>
+                            <td>@ot.Start</td>
+                            <td>@ot.End</td>
+                            <td>@ot.TotalHours</td>
+                            <td class="reason-col">@ot.Reason</td>
+                            <td>@ot.Status</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center text-muted">No overtime records available</td></tr>
+                }
+            </tbody>
         </table>
     </div>
 </div>
 
-@*@{
-    Html.RenderAction("GetDTRDetails", "Attendance", new { _id = Model.Id});
-}*@
-
-
+<!-- ================= Leave Table ================= -->
+<div class="widget widget-table mt-4">
+    <h6 class="fw-bold mb-2">Leave</h6>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover align-middle uniform-table">
+            <thead>
+                <tr>
+                    <th class="bg-primary text-white">Date</th>
+                    <th class="bg-primary text-white">Leave From</th>
+                    <th class="bg-primary text-white">Leave To</th>
+                    <th class="bg-primary text-white">No. of Days</th>
+                    <th class="bg-primary text-white reason-col">Reason</th>
+                    <th class="bg-primary text-white">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Leave != null && Model.Leave.Any())
+                {
+                    foreach (var l in Model.Leave)
+                    {
+                        <tr>
+                            <td>@l.Date</td>
+                            <td>@l.LeaveFrom</td>
+                            <td>@l.LeaveTo</td>
+                            <td>@l.NoOfDays</td>
+                            <td class="reason-col">@l.Reason</td>
+                            <td>@l.Status</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center text-muted">No leave records available</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
