@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewBag.Title = "Required Documents";
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/Scripts/Document/RequiredDocument.js")"></script>
+}
+
+<section class="main">
+    <div class="main-title py-3">
+        <div class="container-fluid" id="industry-header-div">
+            <div class="row justify-content-between align-items-center">
+
+                <div class="col-lg-auto text-center text-lg-start b-lg-0">
+                    <h1 class="h4 mt-2 mb-lg-0">Required Documents</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Document")">Document</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Required Documents</li>
+                        </ol>
+                    </nav>
+                </div>
+
+ 
+
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content py-3">
+        <div class="container-fluid">
+            <div class="widget widget-table">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle" id="required-document-table">
+                        <thead>
+                            <tr>
+                                <th class="bg-primary text-white">id</th>
+                                <th class="bg-primary text-white">Sort no</th>
+                                <th class="bg-primary text-white">Document name</th>
+                                <th class="bg-primary text-white">Has Document</th>
+                                <th class="bg-primary text-white">mandatory</th>
+                                <th class="bg-primary text-white">docid</th>
+                                <th class="bg-primary text-white">&nbsp;</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--
+@Html.Partial("~/Views/Attendance/Modal/ClockInOut/_filter_clockinout_modal.cshtml")
+
+
+@Html.Partial("~/Views/Attendance/Modal/Correction/_add_post_correction_modal.cshtml")
+@Html.Partial("~/Views/Attendance/Modal/Leave/_add_post_leave_modal.cshtml")
+@Html.Partial("~/Views/Attendance/Modal/Overtime/_add_post_overtime_modal.cshtml")
+
+-->

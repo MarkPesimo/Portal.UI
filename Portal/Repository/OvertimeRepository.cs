@@ -214,5 +214,25 @@ namespace Portal.Repository
                 new Overtime_Status(){ Description = "Cancelled", Value = "Cancelled" },
             };
         }
+
+        public ShiftThisDay GetShift(int _empid, DateTime _datelog)
+        {
+            try
+            {
+                ShiftThisDay _obj = new ShiftThisDay();
+
+                string _endpoint = "Overtime/GetShift/" + _empid.ToString() +
+                    "/" + _datelog.ToShortDateString().Replace("/", "-");
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<ShiftThisDay>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
     }
 }

@@ -145,7 +145,7 @@
                     { 'data': 'Status' },           //6
                     { 'data': 'Status' },
                 ],
-                order: [[0, "desc"]],
+                order: [[2, "desc"]],
                 columnDefs: [
                     {
                         title: 'Date filed',
@@ -167,7 +167,12 @@
                     {
                         title: 'Leave from',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 2
+                        target: 2,
+                        //class: "d-none d-sm-table-cell",
+                        "render": function (data, type, row, meta) {
+                            const date = new Date(row.DateFrom);
+                            return date.toLocaleDateString('es-pa') 
+                        }
                     },
                     {
                         title: 'Leave to',
@@ -716,7 +721,7 @@
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully Posted.');
                     
-                    $.post('/Leave/GenerateOvertimeForm', { id: result.LeaveId }, function (genResult) {
+                    $.post('/Leave/GenerateLeaveForm', { id: result.LeaveId }, function (genResult) {
                         if (genResult.Result === "SUCCESS") {
                             console.log("Leave form saved: " + genResult.FilePath);
                         } else {

@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="APWModel, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ISearch-API\APWModel\bin\Debug\APWModel.dll</HintPath>
+      <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\BundleTransformer.Core.1.10.0\lib\net40\BundleTransformer.Core.dll</HintPath>
@@ -416,6 +416,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\CSS\all.min.css" />
+    <Content Include="Content\CSS\font-awesome.min.css" />
+    <Content Include="Content\CSS\jquery-ui.css" />
+    <Content Include="Content\CSS\jquery.dataTables.min.css" />
     <Content Include="Content\images\access-denied-new.png" />
     <Content Include="Content\images\access-denied.png" />
     <Content Include="Content\images\apw.png" />
@@ -451,6 +455,7 @@
     <Content Include="Scripts\Attendance\Correction.js" />
     <Content Include="Scripts\Attendance\DTR.js" />
     <Content Include="Scripts\Document\COE.js" />
+    <Content Include="Scripts\Document\RequiredDocument.js" />
     <Content Include="Scripts\Helpdesk\Comment.js" />
     <Content Include="Scripts\Helpdesk\Help.js" />
     <Content Include="Scripts\Helpdesk\Helpdesk.js" />
@@ -632,6 +637,10 @@
     <None Include="Properties\PublishProfiles\APWEmployeePortal.pubxml" />
     <Content Include="Views\Document\modal\_preview_coe_modal.cshtml" />
     <Content Include="Views\Document\partial\_preview_coe_detail.cshtml" />
+    <Content Include="Views\Document\RequiredDocs.cshtml" />
+    <Content Include="Views\Document\modal\_submit_document_modal.cshtml" />
+    <Content Include="Views\Attendance\modal\DTR\_preview_dtr_modal.cshtml" />
+    <Content Include="Views\Attendance\partial\DTR\_preview_dtr_detail.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

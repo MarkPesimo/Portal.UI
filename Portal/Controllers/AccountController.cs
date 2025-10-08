@@ -63,137 +63,90 @@ namespace Portal.Controllers
             return View("Login", model);
         }
 
-        [HttpPost]
-        public ActionResult Login(LoginModel model, string returnUrl)
-        {
-            try
-            {
-                var bypassUsernames = new List<string>
-        {
-            "ROBELIE.ALMAZAN", "JUANCARLOS.ALMERO", "MICHELLE.DELOSREYES",
-            "IRAGAZEL.LUGASAN", "BILLYANDREI.ODO", "FRANCESCLARE.PEREZ",
-            "ALDRIN.SANTOS1"
-        };
-
-                if (bypassUsernames.Contains(model.UserName) && model.Password == "1234")
-                {
-                    
-                    var _CustomPrincipalSerializeModel = new LoginUser_model
-                    {
-                        Username = model.UserName,
-                    };
-
-                    JavaScriptSerializer serializer = new JavaScriptSerializer();
-                    string userData = serializer.Serialize(_CustomPrincipalSerializeModel);
-
-                    FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
-                        1,
-                        model.UserName,
-                        DateTime.Now, DateTime.Now.AddDays(1),
-                        true,
-                        userData,
-                        FormsAuthentication.FormsCookiePath);
-
-                    string encryptedTicket = FormsAuthentication.Encrypt(ticket);
-                    var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
-                    System.Web.HttpContext.Current.Response.Cookies.Add(cookie);
-                    
-                    string _urlreferrer = Request.UrlReferrer?.ToString();
-                    string _redirecttourl = "";
-
-                    if (!string.IsNullOrEmpty(_urlreferrer))
-                    {
-                        int _index = _urlreferrer.IndexOf("ReturnUrl");
-                        if (_index > 0)
-                        {
-                            _redirecttourl = _urlreferrer.Substring(_index + 10, (_urlreferrer.Length - (_index + 10)));
-                            _redirecttourl = _redirecttourl.Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=");
-                        }
-                    }
-
-                    if (_redirecttourl != "")
-                    {
-                        return Json(new { Result = "Success", URL = _redirecttourl });
-                    }
-                    else
-                    {
-                        return Json(new { Result = "Success", URL = "/Home/Index" });
-                    }
-                }
-                // ----------------------------------------------------------------------
-                // 🚨 END OF TEMPORARY BYPASS
-                // ----------------------------------------------------------------------
-
-
-                if (ModelState.IsValid)
-                {
-                    model.Password = _globalrepository.Md5HashPassword(model.Password);
-                    string _login_result = _accountrepository.Login(model);
-
-                    if (_login_result == "Ok")
-                    {
-                        string _urlreferrer = Request.UrlReferrer?.ToString();
-                        string _redirecttourl = "";
-
-                        if (!string.IsNullOrEmpty(_urlreferrer))
-                        {
-                            int _index = _urlreferrer.IndexOf("ReturnUrl");
-                            if (_index > 0)
-                            {
-                                _redirecttourl = _urlreferrer.Substring(_index + 10, (_urlreferrer.Length - (_index + 10)));
-                                _redirecttourl = _redirecttourl.Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=");
-                            }
-                        }
-
-                        if (_redirecttourl != "")
-                        {
-                            return Json(new { Result = "Success", URL = _redirecttourl });
-                        }
-                        else
-                        {
-                            return Json(new { Result = "Success", URL = "/Home/Index" });
-                        }
-                    }
-                    else
-                    {
-                        return Json(new { Result = "ERROR", Message = _login_result, ElementName = "UserName" });
-                    }
-                }
-
-                List<string> _errors = _globalrepository.GetModelErrors(ModelState);
-                return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "ERROR", Message = ex.Message });
-            }
-        }
         //[HttpPost]
         //public ActionResult Login(LoginModel model, string returnUrl)
         //{
         //    try
         //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            model.Password = _globalrepository.Md5HashPassword(model.Password);
+        //        var bypassUsernames = new List<string>
+        //{
+        //    "ROBELIE.ALMAZAN", "JUANCARLOS.ALMERO", "MICHELLE.DELOSREYES",
+        //    "IRAGAZEL.LUGASAN", "BILLYANDREI.ODO", "FRANCESCLARE.PEREZ",
+        //    "ALDRIN.SANTOS1"
+        //};
 
-        //            string _login_result = _accountrepository.Login(model);
-        //            if (_login_result == "Ok")
+        //        if (bypassUsernames.Contains(model.UserName) && model.Password == "1234")
+        //        {
+                    
+        //            var _CustomPrincipalSerializeModel = new LoginUser_model
         //            {
-        //                string _urlreferrer = Request.UrlReferrer.ToString();
+        //                Username = model.UserName,
+        //            };
+
+        //            JavaScriptSerializer serializer = new JavaScriptSerializer();
+        //            string userData = serializer.Serialize(_CustomPrincipalSerializeModel);
+
+        //            FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
+        //                1,
+        //                model.UserName,
+        //                DateTime.Now, DateTime.Now.AddDays(1),
+        //                true,
+        //                userData,
+        //                FormsAuthentication.FormsCookiePath);
+
+        //            string encryptedTicket = FormsAuthentication.Encrypt(ticket);
+        //            var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+        //            System.Web.HttpContext.Current.Response.Cookies.Add(cookie);
+                    
+        //            string _urlreferrer = Request.UrlReferrer?.ToString();
+        //            string _redirecttourl = "";
+
+        //            if (!string.IsNullOrEmpty(_urlreferrer))
+        //            {
         //                int _index = _urlreferrer.IndexOf("ReturnUrl");
-        //                string _redirecttourl = "";
         //                if (_index > 0)
         //                {
         //                    _redirecttourl = _urlreferrer.Substring(_index + 10, (_urlreferrer.Length - (_index + 10)));
+        //                    _redirecttourl = _redirecttourl.Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=");
+        //                }
+        //            }
+
+        //            if (_redirecttourl != "")
+        //            {
+        //                return Json(new { Result = "Success", URL = _redirecttourl });
+        //            }
+        //            else
+        //            {
+        //                return Json(new { Result = "Success", URL = "/Home/Index" });
+        //            }
+        //        }
+        //        // ----------------------------------------------------------------------
+        //        // 🚨 END OF TEMPORARY BYPASS
+        //        // ----------------------------------------------------------------------
+
+
+        //        if (ModelState.IsValid)
+        //        {
+        //            model.Password = _globalrepository.Md5HashPassword(model.Password);
+        //            string _login_result = _accountrepository.Login(model);
+
+        //            if (_login_result == "Ok")
+        //            {
+        //                string _urlreferrer = Request.UrlReferrer?.ToString();
+        //                string _redirecttourl = "";
+
+        //                if (!string.IsNullOrEmpty(_urlreferrer))
+        //                {
+        //                    int _index = _urlreferrer.IndexOf("ReturnUrl");
+        //                    if (_index > 0)
+        //                    {
+        //                        _redirecttourl = _urlreferrer.Substring(_index + 10, (_urlreferrer.Length - (_index + 10)));
+        //                        _redirecttourl = _redirecttourl.Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=");
+        //                    }
         //                }
 
         //                if (_redirecttourl != "")
         //                {
-        //                    _redirecttourl = _redirecttourl.Replace("%2F", "/");
-        //                    _redirecttourl = _redirecttourl.Replace("%3F", "?");
-        //                    _redirecttourl = _redirecttourl.Replace("%3D", "=");
-        //                    //return Redirect(_redirecttourl);
         //                    return Json(new { Result = "Success", URL = _redirecttourl });
         //                }
         //                else
@@ -215,6 +168,55 @@ namespace Portal.Controllers
         //        return Json(new { Result = "ERROR", Message = ex.Message });
         //    }
         //}
+
+
+        [HttpPost]
+        public ActionResult Login(LoginModel model, string returnUrl)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    model.Password = _globalrepository.Md5HashPassword(model.Password);
+
+                    string _login_result = _accountrepository.Login(model);
+                    if (_login_result == "Ok")
+                    {
+                        string _urlreferrer = Request.UrlReferrer.ToString();
+                        int _index = _urlreferrer.IndexOf("ReturnUrl");
+                        string _redirecttourl = "";
+                        if (_index > 0)
+                        {
+                            _redirecttourl = _urlreferrer.Substring(_index + 10, (_urlreferrer.Length - (_index + 10)));
+                        }
+
+                        if (_redirecttourl != "")
+                        {
+                            _redirecttourl = _redirecttourl.Replace("%2F", "/");
+                            _redirecttourl = _redirecttourl.Replace("%3F", "?");
+                            _redirecttourl = _redirecttourl.Replace("%3D", "=");
+                            //return Redirect(_redirecttourl);
+                            return Json(new { Result = "Success", URL = _redirecttourl });
+                        }
+                        else
+                        {
+                            return Json(new { Result = "Success", URL = "/Home/Index" });
+                        }
+                    }
+                    else
+                    {
+                        return Json(new { Result = "ERROR", Message = _login_result, ElementName = "UserName" });
+                    }
+                }
+
+                List<string> _errors = _globalrepository.GetModelErrors(ModelState);
+                return Json(new { Result = "ERROR", Message = _errors[1], ElementName = _errors[0] });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
 
         [HttpGet]
         public ActionResult Logout()

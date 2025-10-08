@@ -65,8 +65,8 @@
                             <td>@a.Date</td>
                             <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
                             <td class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
-                            <td>@a.TimeIn</td>
-                            <td>@a.TimeOut</td>
+                            <td style="color: @a.LateColor">@a.TimeIn</td>
+                            <td style="color: @a.UndertimeColor">@a.TimeOut</td>
                             <td>@a.HasCorrection</td>
                             <td>@a.Status</td>
                         </tr>

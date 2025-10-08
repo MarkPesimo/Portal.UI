@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Web;
+using static APWModel.ViewModel.HRMS.Employee.EmployeeDocument_model;
 
 namespace Portal.Repository
 {
@@ -34,6 +35,7 @@ namespace Portal.Repository
 
             return false;
         }
+
         public bool SaveCOEGeneration(string _reason, string _filename )
         {
             string _endpoint = "Employee/SaveCOEGeneration";
@@ -84,5 +86,29 @@ namespace Portal.Repository
             
             return false;
         }
+
+        public List<RequiredDocument_model> GetRequiredDocuments(int _candidateid)
+        {
+            try
+            {
+                List<RequiredDocument_model> _obj = new List<RequiredDocument_model>();
+                string _endpoint = "Candidate/GetRequiredDocuments/" +
+                    _candidateid.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<RequiredDocument_model>>(_value);
+
+
+                }
+                return _obj;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }            
+        }
+
     }
 }

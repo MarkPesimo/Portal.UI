@@ -140,11 +140,12 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item print-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
-                                ' <li> <a class="dropdown-item edit-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-dtr"' + row.PostVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-dtr"' + row.UnpostVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-dtr"' + row.CancelVisible + ' DTRid="' + row.Id + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
+                                
+                                ' <li> <a class="dropdown-item edit-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
+                                ' <li> <a class="dropdown-item post-dtr"' + row.PostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
+                                ' <li> <a class="dropdown-item unpost-dtr"' + row.UnpostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
+                                ' <li> <a class="dropdown-item print-dtr"' + row.PrintVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item cancel-dtr"' + row.CancelVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
                                 '</ul>' +
                                 '</div> '
                         }
@@ -416,6 +417,29 @@
     };
 
     //----------------------------------END POST CORRECTION--------------------------------------
+
+    //----------------------------------END PRINT CORRECTION--------------------------------------
+    $('#dtr-table').on('click', '.print-dtr', function () {
+        var guid = $(this).attr("guid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_PreviewDTR',
+            data: { '_guid': guid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_dtr_modal').find(".modal-body").html(response);
+                $("#preview_dtr_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    //----------------------------------END PRINT CORRECTION--------------------------------------
 
     //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------
     $('#dtr-table').on('click', '.unpost-dtr', function () {

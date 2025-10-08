@@ -23,7 +23,7 @@ namespace Portal.Controllers
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
         public int _client_id { get; set; }
-
+        private string _EmployeeName { get; set; }
 
         private string _LeaveAttendance_Index = "~/Views/Leave/LeaveAttendance_Index.cshtml";
         private string _Leave_Index = "~/Views/Leave/Leave_index.cshtml";
@@ -40,6 +40,7 @@ namespace Portal.Controllers
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
                     _client_id = _user.ClientId;
+                    _EmployeeName = _user.EmployeeName;
                 }
             }
         }
@@ -341,6 +342,8 @@ namespace Portal.Controllers
                 if (leave == null)
                     return Json(new { Result = "ERROR", Message = "Leave record not found." });
 
+                string guid = leave.guid.ToString();
+
                 string templatePath = Server.MapPath("~/LeaveAttachments/Leave_Notification_Form_Template.xlsx");
                 if (!System.IO.File.Exists(templatePath))
                     return Json(new { Result = "ERROR", Message = "Template not found." });
@@ -386,8 +389,35 @@ namespace Portal.Controllers
                     ws.Cell("D15").Value = leave.LeaveDays;
                     ws.Cell("D17").Value = leave.Reason;
 
+
+                    ws.Cell("B25").Value = _EmployeeName;
+
                     using (var ms = new MemoryStream())
                     {
+                        // --- QR Code Embedding ---
+                        using (var client = new System.Net.WebClient())
+                        {
+                            string _url = PortalConstant.RootPath + "_PreviewLeaveForm";
+
+                            //string baseUrl = "http://localhost:50393/Leave/_PreviewPostedLeaveForm";
+                            string baseUrl = _url;
+                            string qrText = baseUrl + "?_guid=" + guid;
+
+                            string qrUrl = "https://quickchart.io/qr?text=" +
+                                           Uri.EscapeDataString(qrText) +
+                                           "&dark=950808&light=ffffff";
+
+                            byte[] qrBytes = client.DownloadData(qrUrl);
+
+                            using (var qrStream = new MemoryStream(qrBytes))
+                            {
+                                var picture = ws.AddPicture(qrStream)
+                                                .MoveTo(ws.Cell("B35"))
+                                                .Scale(1.2);
+                            }
+                        }
+                        // -------------------------
+
                         wb.SaveAs(ms);
                         ms.Position = 0;
                         
@@ -430,6 +460,20 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        public ActionResult _PreviewPostedLeaveForm(string _guid)
+        {
+            string approvedBaseFolder = Server.MapPath($"~/LeaveAttachments/LeaveFormsGenerated/Posted/{_guid}/{_guid}.pdf");
+
+            if (!System.IO.File.Exists(approvedBaseFolder))
+            {
+                return HttpNotFound("PDF file not found.");
+            }
+
+            return File(approvedBaseFolder, "application/pdf");
+        }
+
 
         [HttpPost]
         public ActionResult _LeaveAttachment(int _id, HttpPostedFileBase Leave_Attachment)

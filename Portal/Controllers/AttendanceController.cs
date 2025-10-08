@@ -24,7 +24,7 @@ namespace Portal.Controllers
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
         private int _client_id { get; set; }
-
+        private string _EmployeeName { get; set; }
 
         private string _Attendance_Index = "~/Views/Attendance/Attendance_index.cshtml";
         private string _ClockInOut = "~/Views/Attendance/ClockInOut.cshtml";
@@ -43,6 +43,7 @@ namespace Portal.Controllers
                     _loginuserid = _user.UserId;
                     _candidate_id = _user.CandidateId;
                     _client_id = _user.ClientId;
+                    _EmployeeName = _user.EmployeeName;
                 }
             }
         }
@@ -360,9 +361,10 @@ namespace Portal.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    GenerateAttendanceCorrectionForm(_model.Id); 
-
+                    
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
+                    GenerateAttendanceCorrectionForm(_model.Id);
+
                     return Json(new { Result = "SUCCESS", Id = _id });
                 }
 
@@ -384,6 +386,7 @@ namespace Portal.Controllers
                 if (_attndnancecorrection == null)
                     return Json(new { Result = "ERROR", Message = "Attendance correction record not found." });
 
+                string guid = _attndnancecorrection.guid;
                 string templatePath = Server.MapPath("~/AttendanceCorrectionAttachments/Attendance_Correction_Template.xlsx");
                 if (!System.IO.File.Exists(templatePath))
                     return Json(new { Result = "ERROR", Message = "Template not found." });
@@ -410,8 +413,33 @@ namespace Portal.Controllers
                     ws.Cell("H15").Value = _attndnancecorrection.TimeOutTime.ToString("hh:mm tt");
                     ws.Cell("E17").Value = _attndnancecorrection.Reason;
 
+                    ws.Cell("C25").Value = _EmployeeName;
+
                     using (var ms = new MemoryStream())
                     {
+                        // --- QR Code Embedding ---
+                        using (var client = new System.Net.WebClient())
+                        {
+                            string _url = PortalConstant.RootPath + "_PreviewPostedAttendanceCorrection";
+                            //string baseUrl = "http://localhost:50393/Attendance/_PreviewAttendanceCorrection";
+                            string baseUrl = _url;
+                            string qrText = baseUrl + "?_guid=" + guid;
+
+                            string qrUrl = "https://quickchart.io/qr?text=" +
+                                           Uri.EscapeDataString(qrText) +
+                                           "&dark=950808&light=ffffff";
+
+                            byte[] qrBytes = client.DownloadData(qrUrl);
+
+                            using (var qrStream = new MemoryStream(qrBytes))
+                            {
+                                var picture = ws.AddPicture(qrStream)
+                                                .MoveTo(ws.Cell("B34"))
+                                                .Scale(1.2);
+                            }
+                        }
+                        // -------------------------
+
                         wb.SaveAs(ms);
                         ms.Position = 0;
 
@@ -577,7 +605,7 @@ namespace Portal.Controllers
                 EmpId = _loginuserid,
                 Mode = 0
             };
-
+            _model.Month = DateTime.Now.Year.ToString() + "-" + DateTime.Now.Month.ToString();
             //DefaultShift _defaultshift = _attendancerepository.GetDefaultShift();
             //if (_defaultshift != null)
             //{
@@ -597,6 +625,7 @@ namespace Portal.Controllers
         public ActionResult _EditDTR(int _id)
         {
             DTRmodel _obj = _attendancerepository.GetDTR(_id);
+            _obj.Month = _obj.Year.ToString() + "-" + _obj.Month.ToString();
             _obj.Id = _id;
             _obj.EmpId = _loginuserid;
             _obj.Mode = 1;
@@ -654,11 +683,12 @@ namespace Portal.Controllers
                         _model.Month = _model.Month.Split('-')[1]; 
                     }
 
+                
+                    int _id = _attendancerepository.ManageDTR(_model);
                     if (_model.Mode == 3)
                     {
                         GenerateDTRForm(_model.Id);
                     }
-                    int _id = _attendancerepository.ManageDTR(_model);
                     return Json(new { Result = "Success" });
                 }
 
@@ -676,9 +706,11 @@ namespace Portal.Controllers
         {
             try
             {
-                List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = _attendancerepository.GetDTRDetails(id);
+                //List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = _attendancerepository.GetDTRDetails(id);
+                DTRPostDetailResult _obj = _attendancerepository.GetPostDTR(id);
                 DTRmodel _getdtr = _attendancerepository.GetDTR(id);
 
+                string guid = _getdtr.guid;
                 if (_getdtr == null)
                     return Json(new { Result = "ERROR", Message = "DTR record not found." });
 
@@ -698,37 +730,96 @@ namespace Portal.Controllers
                 {
                     var ws = wb.Worksheet(1);
 
-                    DateTime monthDate = DateTime.ParseExact(_getdtr.Month, "yyyy-MM", CultureInfo.InvariantCulture);
+                    //DateTime monthDate = DateTime.ParseExact(_getdtr.Month, "yyyy-MM", CultureInfo.InvariantCulture);
+                    DateTime monthDate = DateTime.Parse( _getdtr.Month.ToString() + "/1/" + _getdtr.Year.ToString());
                     string monthName = monthDate.ToString("MMMM");
 
                     //ws.Cell("G7").Value = _obj.DateFiled.ToString("MM/dd/yyyy");
                     ws.Cell("C2").Value = _getdtr.EmpName;
                     ws.Cell("C3").Value = _getdtr.ClientName;
                     ws.Cell("C4").Value = _getdtr.CutOff + " - " + monthName + " - " + _getdtr.Year;
+                    ws.Cell("D44").Value = _EmployeeName;
 
-                    int startRow = 7;   
-                    for (int i = 0; i < _obj.Count; i++)
+                    int startRow = 7;
+                    foreach (AttendanceDetail _res in _obj.Attendance)
                     {
-                        var detail = _obj[i];
-                        int row = startRow + i;
+                        //var detail = _obj[i];
+                        
 
-                        ws.Cell("A" + row).Value = detail.DateLog;
-                        ws.Cell("B" + row).Value = detail.ShiftDescription;
-                        
-                        if (DateTime.TryParse(detail.TimeIn, out DateTime parsedTimeIn))
-                            ws.Cell("C" + row).Value = parsedTimeIn.ToString("hh:mm tt"); 
+                        ws.Cell("A" + startRow).Value = _res.DateLog;
+                        ws.Cell("B" + startRow).Value = _res.WorkSchedule;
+
+                        if (DateTime.TryParse(_res.TimeIn, out DateTime parsedTimeIn))
+                            ws.Cell("C" + startRow).Value = parsedTimeIn.ToString("hh:mm tt");
                         else
-                            ws.Cell("C" + row).Value = "";
-                        
-                        if (DateTime.TryParse(detail.TimeOut, out DateTime parsedTimeOut))
-                            ws.Cell("F" + row).Value = parsedTimeOut.ToString("hh:mm tt");
+                            ws.Cell("C" + startRow).Value = "";
+
+                        if (DateTime.TryParse(_res.TimeOut, out DateTime parsedTimeOut))
+                            ws.Cell("F" + startRow).Value = parsedTimeOut.ToString("hh:mm tt");
                         else
-                            ws.Cell("F" + row).Value = "";
+                            ws.Cell("F" + startRow).Value = "";
+
+
+                        startRow++;
                     }
+
+
+                    startRow = 27;
+                    foreach (OvertimeDetail _res in _obj.Overtime)
+                    {
+                        ws.Cell("A" + startRow).Value = _res.Date;
+                        ws.Cell("B" + startRow).Value = _res.ShiftSchedule;
+                        ws.Cell("C" + startRow).Value = _res.Start;
+                        ws.Cell("E" + startRow).Value = _res.End;
+                        ws.Cell("F" + startRow).Value = _res.TotalHours;
+                        ws.Cell("G" + startRow).Value = _res.Reason;
+
+                        startRow++;
+                    }
+
+                    //for (int i = 0; i < _obj.Count; i++)
+                    //{
+                    //    var detail = _obj[i];
+                    //    int row = startRow + i;
+
+                    //    ws.Cell("A" + row).Value = detail.DateLog;
+                    //    ws.Cell("B" + row).Value = detail.ShiftDescription;
+
+                    //    if (DateTime.TryParse(detail.TimeIn, out DateTime parsedTimeIn))
+                    //        ws.Cell("C" + row).Value = parsedTimeIn.ToString("hh:mm tt"); 
+                    //    else
+                    //        ws.Cell("C" + row).Value = "";
+
+                    //    if (DateTime.TryParse(detail.TimeOut, out DateTime parsedTimeOut))
+                    //        ws.Cell("F" + row).Value = parsedTimeOut.ToString("hh:mm tt");
+                    //    else
+                    //        ws.Cell("F" + row).Value = "";
+                    //}
 
 
                     using (var ms = new MemoryStream())
                     {
+                        // --- QR Code Embedding ---
+                        using (var client = new System.Net.WebClient())
+                        {
+                            string _url = PortalConstant.RootPath + "_PreviewPostedDTRForm";
+                            string baseUrl = _url;
+                            string qrText = baseUrl + "?_guid=" + guid;
+
+                            string qrUrl = "https://quickchart.io/qr?text=" +
+                                Uri.EscapeDataString(qrText) + 
+                                "&dark=950808&light=ffffff";
+                            byte[] qrBytes = client.DownloadData(qrUrl);
+
+                            using (var qrStream = new MemoryStream(qrBytes))
+                            {
+                                var picture = ws.AddPicture(qrStream)
+                                                .MoveTo(ws.Cell("B53"))
+                                                .Scale(1.2);
+                            }
+                        }
+                        // -------------------------
+
                         wb.SaveAs(ms);
                         ms.Position = 0;
 
@@ -771,7 +862,41 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        public ActionResult _PreviewPostedDTRForm(string _guid)
+        {
+            string approvedBaseFolder = Server.MapPath($"~/DTRAttachments/DTRFormsGenerated/Posted/{_guid}/{_guid}.pdf");
+
+            if (!System.IO.File.Exists(approvedBaseFolder))
+            {
+                return HttpNotFound("PDF file not found.");
+            }
+
+            return File(approvedBaseFolder, "application/pdf");
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewDTR(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Attendance/Partial/DTR/_preview_dtr_detail.cshtml", _filename);
+        }
         //=======================================END DTR==============================
+
+        [HttpGet]
+        public ActionResult _PreviewPostedAttendanceCorrection(string _guid)
+        {
+            string approvedBaseFolder = Server.MapPath($"~/AttendanceCorrectionAttachments/AttendanceCorrectionFormsGenerated/Posted/{_guid}/{_guid}.pdf");
+
+            if (!System.IO.File.Exists(approvedBaseFolder))
+            {
+                return HttpNotFound("PDF file not found.");
+            }
+
+            return File(approvedBaseFolder, "application/pdf");
+        }
+
 
         [HttpGet]
         public JsonResult GetClientCutoffDate(string cutoff, int month, int year)

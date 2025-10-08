@@ -112,18 +112,19 @@
                 order: [[0, "desc"]],
                 columnDefs: [
                     {
-                        title: 'Date filed',
+                        title: 'OT Date',
                         target: 0,
                         class: "d-none d-sm-table-cell",
                         "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateFiled);
+                            const date = new Date(row.OTFrom);
                             return date.toLocaleDateString('es-pa')
                         }
                     }, 
                     {
                         title: 'From',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 1
+                        target: 1,
+
                     },
                     {
                         title: 'To',
@@ -236,18 +237,59 @@
                 $('#add_overtime_modal').find(".modal-body").html(response);
                 $("#add_overtime_modal").modal('show');
 
+                var _modal = '#add_overtime_modal';
                 var _form = '#overtime-Form';
-                //document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                //document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
-
-                
-
-                //ComputeLeaveDays();
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", GetShiftOnSelectedDate);
+                GetShiftOnSelectedDate();                
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+    
+    function GetShiftOnSelectedDate() {
+        var _modal = '#add_overtime_modal';
+        var _form = '#overtime-Form';
+
+        var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+
+        var url = `/Overtime/GetShift?_datelog=${DateLog}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-in').value = data.ShiftIn;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-out').value = data.ShiftOut;
+                    //console.log(data);
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
+
+    function EditGetShiftOnSelectedDate() {
+        var _modal = '#edit_overtime_modal';
+        var _form = '#overtime-Form';
+
+        var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+
+        var url = `/Overtime/GetShift?_datelog=${DateLog}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-in').value = data.ShiftIn;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-out').value = data.ShiftOut;
+                    //console.log(data);
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
 
     $('#add_overtime_modal').on('click', '#submit-overtime-button', function (e) {
         ShowLoading('SHOW');
@@ -304,10 +346,16 @@
                 var _view_button = document.querySelector('#edit_overtime_modal').querySelector('#view_attached_btn');
                 _view_button.style.visibility = _has_attachment;
 
+
                 //var _edit_button = document.querySelector('#edit_task_modal').querySelector('#edit_task_btn');
                 //if (_det_status == 'Draft') { _edit_button.style.visibility = 'none'; }
                 //else { _edit_button.style.visibility = 'hidden'; }
                 //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+
+                var _modal = '#edit_overtime_modal';
+                var _form = '#overtime-Form';
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", EditGetShiftOnSelectedDate);
+                EditGetShiftOnSelectedDate();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -408,7 +456,7 @@
 
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Overtime successfully Posted.');
-
+                    console.log(result);
                     ClearTable('#overtime-table');
                     LoadDefault();
                 }

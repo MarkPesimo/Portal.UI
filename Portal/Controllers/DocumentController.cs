@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using static APWModel.ViewModel.HRMS.Employee.EmployeeDocument_model;
 using static Portal.Models.VW_COE;
 
 namespace Portal.Controllers
@@ -26,6 +27,7 @@ namespace Portal.Controllers
 
         private string _Document_Index = "~/Views/Document/Document_index.cshtml";
         private string _COE_Index = "~/Views/Document/COE.cshtml";
+        private string _DocumentRequirement_Index = "~/Views/Document/RequiredDocs.cshtml";
 
         public DocumentController()
         {
@@ -60,11 +62,28 @@ namespace Portal.Controllers
         {
             if (_globalrepository.HasClientAccess(_client_id, "REQUIREMENTS"))
             {
-                return View(_Document_Index);
+                return View(_DocumentRequirement_Index);
             }
 
             return View("AccessDenied");
         }
+
+        [HttpGet]
+        public ActionResult GetRequiredDocuments()
+        {
+            try
+            {
+                List<RequiredDocument_model> _obj = _documentrepository.GetRequiredDocuments(_candidate_id);
+                return Json(_obj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        //=======================================================================================================================================
 
         [HttpGet]
         public ActionResult COE()

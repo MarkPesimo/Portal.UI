@@ -40,6 +40,7 @@
             "Device ID (hashed): " + deviceId
         );
         var formData = $('#login-Form').serialize() + "&deviceId=" + encodeURIComponent(deviceId);
+        btn.disabled = true;
 
         $.ajax({
             url: '/Account/Login',

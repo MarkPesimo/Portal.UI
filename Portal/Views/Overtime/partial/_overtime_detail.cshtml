@@ -25,6 +25,16 @@
 
 
     <div class="row">
+        <label for="" class="form-label">Shift Schedule on the selected date</label>
+        <div class="col">
+            <input class="text-center form-control text-primary bg-secondary" id="ot-shift-in" name="ot-shift-in" readonly="true"/>            
+        </div>
+        <div class="col">
+            <input class="text-center form-control text-primary bg-secondary" id="ot-shift-out" name="ot-shift-out" readonly="true" />
+        </div>
+    </div>
+
+    <div class="row">
         <label for="" class="form-label">Overtime start</label>
         <div class="col">
             @Html.TextBoxFor(m => m.OTFrom, new {@class = "form-control",@placeholder = "mm/dd/yyyy", @type = "date",  @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })

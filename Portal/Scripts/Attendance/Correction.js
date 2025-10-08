@@ -86,9 +86,11 @@
                     { 'data': 'DateLog' },
                     { 'data': 'ShiftDescription' },
                     { 'data': 'TimeIn' },
-                    { 'data': 'Remarks' },
                     { 'data': 'Reason' },
+                    
+                    
                     { 'data': 'Status' },
+                    { 'data': 'Remarks' },
                     { 'data': 'Status' },
                 ],
                 order: [[1, "desc"]],
@@ -123,23 +125,25 @@
                         }
                     },
                     {
-                        title: 'Remarks',
-                        target: 4,
-                        class: "d-none d-sm-table-cell",
-                    },
-                    {
                         title: 'Reason',
-                        target: 5,
+                        target: 4,
                         class: "d-none d-sm-table-cell",
                     },
                     {
                         title: 'Status',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 6,
-                        "render": function (data, type, row, meta) {                            
+                        target: 5,
+                        "render": function (data, type, row, meta) {
                             return SetTableBGColor(row.Status)
                         }
-                    },                    
+                    },
+                    {
+                        title: 'Remarks',
+                        target: 6,
+                        class: "d-none d-sm-table-cell",
+                    },
+            
+                               
                     {
                         title: 'Details',
                         class: "d-xs-block d-sm-none d-m-none d-lg-none",
@@ -213,9 +217,11 @@
                 $('#add_correction_modal').find(".modal-body").html(response);
                 $('#add_correction_modal').modal('show');
 
+                var _modal = '#add_correction_modal';
                 var _form = '#attendance-correction-Form';
-                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
-                
+                document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
+
+                ChangeDateLogAdd();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -223,19 +229,21 @@
     });
 
     function ChangeDateLogAdd() {
+        var _modal = '#add_correction_modal';
         var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
+        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
 
-        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
     };
 
     function ChangeDateLogEdit() {
+        var _modal = '#edit_correction_modal';
         var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
+        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
 
-        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
     };
 
 
