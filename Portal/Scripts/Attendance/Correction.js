@@ -17,7 +17,7 @@
 
 
         document.getElementById("correction_from").value = curr_year + "-" + curr_month + "-01"; // 
-        document.getElementById("correction_to").value = curr_year + "-" + curr_month + "-" + curr_date; 
+        document.getElementById("correction_to").value = curr_year + "-12-31"; 
 
         ShowLoading('HIDE');
         BindTable();
@@ -167,10 +167,11 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item edit-correction"' + row.EditVisible + ' Correctionid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-correction"' + row.PostVisible + ' Correctionid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-correction"' + row.UnpostVisible + ' Correctionid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-correction"' + row.CancelVisible + ' Correctionid="' + row.Id + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
+                                ' <li> <a class="dropdown-item edit-correction"' + row.EditVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
+                                ' <li> <a class="dropdown-item post-correction"' + row.PostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
+                                ' <li> <a class="dropdown-item unpost-correction"' + row.UnpostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
+                                ' <li> <a class="dropdown-item print-correction"' + row.PrintVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item cancel-correction"' + row.CancelVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
                                 '</ul>' +
                                 '</div> '
                         }
@@ -374,6 +375,28 @@
         });
     });
     //----------------------------------END POST CORRECTION--------------------------------------
+
+    //----------------------------------END PRINT CORRECTION--------------------------------------
+    $('#overtime-table').on('click', '.print-overtime', function () {
+        var guid = $(this).attr("guid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_PreviewCorrection',
+            data: { '_guid': guid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_correction_modal').find(".modal-body").html(response);
+                $("#preview_correction_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+    //----------------------------------END PRINT CORRECTION--------------------------------------
 
     //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------
     $('#correction-table').on('click', '.unpost-correction', function () {

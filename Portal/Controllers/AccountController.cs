@@ -5,6 +5,7 @@ using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+//using System.Management;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -23,6 +24,44 @@ namespace Portal.Controllers
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_accountrepository == null) { _accountrepository = new AccountRepository(); }
+        }
+
+        public void GetDevinceInfo()
+        {
+            //string _name = "";
+            //string _manufacture = "";
+            //string _core = "";
+
+            //try
+            //{
+            //    ManagementObjectSearcher cpuSearcher = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+
+            //    foreach (ManagementObject obj in cpuSearcher.Get())
+            //    {
+            //        _name = obj["Name"].ToString();
+            //        _manufacture = obj["Manufacturer"].ToString();
+            //        _core = obj["NumberOfCores"].ToString();
+
+            //        //Console.WriteLine($"CPU Name: {obj["Name"]}");
+            //        //Console.WriteLine($"CPU Manufacturer: {obj["Manufacturer"]}");
+            //        //Console.WriteLine($"Number of Cores: {obj["NumberOfCores"]}");
+            //    }
+
+            //}
+            //catch (Exception)
+            //{
+
+            //    throw;
+            //}
+            try
+            {
+                
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         [HttpGet]
@@ -77,7 +116,7 @@ namespace Portal.Controllers
 
         //        if (bypassUsernames.Contains(model.UserName) && model.Password == "1234")
         //        {
-                    
+
         //            var _CustomPrincipalSerializeModel = new LoginUser_model
         //            {
         //                Username = model.UserName,
@@ -97,7 +136,7 @@ namespace Portal.Controllers
         //            string encryptedTicket = FormsAuthentication.Encrypt(ticket);
         //            var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
         //            System.Web.HttpContext.Current.Response.Cookies.Add(cookie);
-                    
+
         //            string _urlreferrer = Request.UrlReferrer?.ToString();
         //            string _redirecttourl = "";
 
@@ -169,10 +208,12 @@ namespace Portal.Controllers
         //    }
         //}
 
+ 
 
         [HttpPost]
         public ActionResult Login(LoginModel model, string returnUrl)
         {
+            //GetDevinceInfo();
             try
             {
                 if (ModelState.IsValid)
@@ -214,7 +255,7 @@ namespace Portal.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "ERROR", Message = ex.Message });
+                return Json(new { Result = "ERROR", Message = ex });
             }
         }
 

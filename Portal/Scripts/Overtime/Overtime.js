@@ -185,10 +185,11 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item edit-overtime"' + row.EditVisible + ' Overtimeid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-overtime"' + row.PostVisible + ' Overtimeid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-overtime"' + row.UnpostVisible + ' Overtimeid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-overtime"' + row.CancelVisible + ' Overtimeid="' + row.Id + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
+                                ' <li> <a class="dropdown-item edit-overtime"' + row.EditVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
+                                ' <li> <a class="dropdown-item post-overtime"' + row.PostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
+                                ' <li> <a class="dropdown-item unpost-overtime"' + row.UnpostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
+                                ' <li> <a class="dropdown-item print-overtime"' + row.PrintVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item cancel-overtime"' + row.CancelVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
                                 '</ul>' +
                                 '</div> '
                         }
@@ -363,11 +364,13 @@
     });
 
     $('#edit_overtime_modal').on('click', '#update-overtime-button', function (e) {
+        //console.log($('#overtime-Form').serialize());
         ShowLoading('SHOW');
         $.ajax({
             url: '/Overtime/_ManageOvertime',
             type: "POST",
             data: $('#overtime-Form').serialize(),
+            //data: $('#edit_overtime_modal').find('#overtime-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
@@ -464,6 +467,28 @@
         });
     });
     //----------------------------------END POST LEAVE--------------------------------------
+
+    //----------------------------------END PRINT OVERTIME--------------------------------------
+    $('#overtime-table').on('click', '.print-overtime', function () {
+        var guid = $(this).attr("guid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Overtime/_PreviewOvertime',
+            data: { '_guid': guid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_overtime_modal').find(".modal-body").html(response);
+                $("#preview_overtime_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+    //----------------------------------END PRINT OVERTIME--------------------------------------
 
     //----------------------------------BEGIN UNPOST OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.unpost-overtime', function () {

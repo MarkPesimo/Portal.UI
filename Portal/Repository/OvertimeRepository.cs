@@ -93,6 +93,7 @@ namespace Portal.Repository
                 
                 {"Reason",                  _model.Reason.ToString() },
                 {"Remarks",                 _model.Remarks.ToString() },
+                {"ContinuousOt",            _model.ContinuousOt.ToString() },
                 {"Mode",                    _model.Mode.ToString() },
                 {"Message",                 _model.Message.ToString() },
                 {"UserId",                  _model.UserId.ToString() },

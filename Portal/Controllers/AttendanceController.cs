@@ -361,10 +361,9 @@ namespace Portal.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    
+                    //GenerateAttendanceCorrectionForm(_model.Id);
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
-                    GenerateAttendanceCorrectionForm(_model.Id);
-
+                    
                     return Json(new { Result = "SUCCESS", Id = _id });
                 }
 
@@ -435,7 +434,7 @@ namespace Portal.Controllers
                             {
                                 var picture = ws.AddPicture(qrStream)
                                                 .MoveTo(ws.Cell("B34"))
-                                                .Scale(1.2);
+                                                .Scale(0.6);
                             }
                         }
                         // -------------------------
@@ -483,6 +482,20 @@ namespace Portal.Controllers
             }
         }
         //---------------------------------------END POST ATTENDANCE CORRECTION---------------------------------------
+
+        [HttpGet]
+        public ActionResult _PreviewCorrection(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Attendance/Partial/Correction/_preview_correction_detail.cshtml", _filename);
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewApprovedCorrection(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Attendance/Partial/Correction/_preview_approved_correction_detail.cshtml", _filename);
+        }
 
         //---------------------------------------BEGIN UNPOST ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]
@@ -683,12 +696,9 @@ namespace Portal.Controllers
                         _model.Month = _model.Month.Split('-')[1]; 
                     }
 
-                
+                    //if (_model.Mode == 3) { GenerateDTRForm(_model.Id); }
                     int _id = _attendancerepository.ManageDTR(_model);
-                    if (_model.Mode == 3)
-                    {
-                        GenerateDTRForm(_model.Id);
-                    }
+                    
                     return Json(new { Result = "Success" });
                 }
 
@@ -814,8 +824,8 @@ namespace Portal.Controllers
                             using (var qrStream = new MemoryStream(qrBytes))
                             {
                                 var picture = ws.AddPicture(qrStream)
-                                                .MoveTo(ws.Cell("B53"))
-                                                .Scale(1.2);
+                                                .MoveTo(ws.Cell("J2"))
+                                                .Scale(0.6);
                             }
                         }
                         // -------------------------
@@ -881,6 +891,13 @@ namespace Portal.Controllers
         {
             string _filename = _guid;
             return PartialView("~/Views/Attendance/Partial/DTR/_preview_dtr_detail.cshtml", _filename);
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewApprovedDTR(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Attendance/Partial/DTR/_preview_approved_dtr_detail.cshtml", _filename);
         }
         //=======================================END DTR==============================
 

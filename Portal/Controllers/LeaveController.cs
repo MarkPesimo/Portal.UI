@@ -314,7 +314,7 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    if (_model.Mode == 3) { GenerateLeaveForm(_model.Id); }
+                    //if (_model.Mode == 3) { GenerateLeaveForm(_model.Id); }
 
                     int _id = _leaverepository.ManageLeave(_model);
                     return Json(new { Result = "Success", LeaveId = _id });
@@ -413,7 +413,7 @@ namespace Portal.Controllers
                             {
                                 var picture = ws.AddPicture(qrStream)
                                                 .MoveTo(ws.Cell("B35"))
-                                                .Scale(1.2);
+                                                .Scale(0.6);
                             }
                         }
                         // -------------------------
@@ -474,6 +474,19 @@ namespace Portal.Controllers
             return File(approvedBaseFolder, "application/pdf");
         }
 
+        [HttpGet]
+        public ActionResult _PreviewLeave(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Leave/Partial/_preview_leave_detail.cshtml", _filename);
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewApprovedLeave(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Leave/Partial/_preview_approved_leave_detail.cshtml", _filename);
+        }
 
         [HttpPost]
         public ActionResult _LeaveAttachment(int _id, HttpPostedFileBase Leave_Attachment)

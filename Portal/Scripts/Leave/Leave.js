@@ -220,10 +220,11 @@
                                 ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
                                 '             </button> ' +
                                 ' <ul class="dropdown-menu">' +                                
-                                ' <li> <a class="dropdown-item edit-leave"' + row.EditVisible + ' Leaveid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-leave"' + row.PostVisible + ' Leaveid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-leave"' + row.UnpostVisible + ' Leaveid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-leave"' + row.CancelVisible + ' Leaveid="' + row.Id + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
+                                ' <li> <a class="dropdown-item edit-leave"' + row.EditVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
+                                ' <li> <a class="dropdown-item post-leave"' + row.PostVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
+                                ' <li> <a class="dropdown-item unpost-leave"' + row.UnpostVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
+                                ' <li> <a class="dropdown-item print-leave"' + row.PrintVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item cancel-leave"' + row.CancelVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
 
                                 '</ul>' +
                                 '</div> '
@@ -736,6 +737,28 @@
         });
     });
     //----------------------------------END POST LEAVE--------------------------------------
+
+    //----------------------------------END PRINT LEAVE--------------------------------------
+    $('#leave-table').on('click', '.print-leave', function () {
+        var guid = $(this).attr("guid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Leave/_PreviewLeave',
+            data: { '_guid': guid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_leave_modal').find(".modal-body").html(response);
+                $("#preview_leave_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+    //----------------------------------END PRINT LEAVE--------------------------------------
 
     //----------------------------------BEGIN UNPOST LEAVE--------------------------------------
     $('#leave-table').on('click', '.unpost-leave', function () {

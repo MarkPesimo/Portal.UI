@@ -1,5 +1,5 @@
 ﻿using APWModel.ViewModel.Global;
-using ClosedXML.Excel;
+
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Mvc;
 using static APWModel.ViewModel.Portal.Overtime_model;
 using System.Runtime.InteropServices;
+
 using ClosedXML.Excel;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -130,8 +131,10 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    int _id = _overtimerepository.ManageOvertime(_model);
-                    _model.Id = _id;
+                    //int _id = _overtimerepository.ManageOvertime(_model);
+                    //_model.Id = _id;
+
+                    int _id = 0; // _overtimerepository.ManageOvertime(_model);
                     _model.Mode = 3;
                     _id = _overtimerepository.ManageOvertime(_model);
 
@@ -274,11 +277,11 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-
+                    string _gen_result = "";
+                    if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
 
-                    string _gen_result = "";
-                    if (_model.Mode == 3) { _gen_result =  GenerateOvertimeForm(_id); }
+                    
                     return Json(new { Result = "Success", MemoryResult = _gen_result, OvertimeId = _id });
                 }
 
@@ -295,6 +298,7 @@ namespace Portal.Controllers
         public string GenerateOvertimeForm(int id)
         {
             string tempPath = "";
+            string outputPdf = "";
             try
             {
                 OvertimeModel _overtime = _overtimerepository.GetOvertime(id);
@@ -307,65 +311,67 @@ namespace Portal.Controllers
                 //if (!System.IO.File.Exists(templatePath))
                 //    return Json(new { Result = "ERROR", Message = "Template not found." });
 
-                string baseFolder = Server.MapPath("~/OvertimeAttachments/OvertimeFormsGenerated/Posted/");
-                
+                //string baseFolder = Server.MapPath("~/OvertimeAttachments/OvertimeFormsGenerated/Posted/");
+                string baseFolder = PortalConstant.ActualGeneratedFormPath + @"OvertimeAttachments\OvertimeFormsGenerated\Posted\";
+
+
                 if (!Directory.Exists(baseFolder)) Directory.CreateDirectory(baseFolder);
 
-                string guidFolder = Path.Combine(baseFolder, _overtime.guid.ToString());
+                string guidFolder = Path.Combine(baseFolder, _overtime.guid.ToString() + @"\");
                 if (!Directory.Exists(guidFolder)) Directory.CreateDirectory(guidFolder);
 
-                string outputPdf = Path.Combine(guidFolder, _overtime.guid + ".pdf");
+                 outputPdf = Path.Combine(guidFolder, _overtime.guid + ".pdf");
 
                 using (XLWorkbook wb = new XLWorkbook(templatePath))
                 {
                     var ws = wb.Worksheet(1);
 
-                    //ws.Cell("H8").Value = _overtime.DateFiled.ToString("MM/dd/yyyy");
-                    //ws.Cell("E10").Value = _overtime.EmpName;
-                    //ws.Cell("E11").Value = _overtime.ClientName;
-                    //ws.Cell("E13").Value = _overtime.OTFrom.ToString("MM/dd/yyyy");
-                    //ws.Cell("H13").Value = _overtime.OTFromTime.ToString("hh:mm tt");
-                    //ws.Cell("E14").Value = _overtime.OTTo.ToString("MM/dd/yyyy");
-                    //ws.Cell("H14").Value = _overtime.OTToTime.ToString("hh:mm tt");
-                    //ws.Cell("E16").Value = _overtime.Reason;
+                    ws.Cell("H8").Value = _overtime.DateFiled.ToString("MM/dd/yyyy");
+                    ws.Cell("E10").Value = _overtime.EmpName;
+                    ws.Cell("E11").Value = _overtime.ClientName;
+                    ws.Cell("E13").Value = _overtime.OTFrom.ToString("MM/dd/yyyy");
+                    ws.Cell("H13").Value = _overtime.OTFromTime.ToString("hh:mm tt");
+                    ws.Cell("E14").Value = _overtime.OTTo.ToString("MM/dd/yyyy");
+                    ws.Cell("H14").Value = _overtime.OTToTime.ToString("hh:mm tt");
+                    ws.Cell("E16").Value = _overtime.Reason;
 
 
-                    //ws.Cell("C24").Value = _EmployeeName;
+                    ws.Cell("C24").Value = _EmployeeName;
 
-                    //// --- QR Code Embedding ---
-                    //using (var client = new System.Net.WebClient())
-                    //{
-                    //    string _url = PortalConstant.RootPath + "_PreviewOvertimeForm";
+                    // --- QR Code Embedding ---
+                    using (var client = new System.Net.WebClient())
+                    {
+                        string _url = PortalConstant.RootPath + "_PreviewOvertimeForm";
 
-                    //    //string baseUrl = "http://localhost:50393/Overtime/_PreviewPostedOvertimeForm";
-                    //    string baseUrl = _url;
-                    //    string qrText = baseUrl + "?_guid=" + _overtime.guid;
+                        //string baseUrl = "http://localhost:50393/Overtime/_PreviewPostedOvertimeForm";
+                        string baseUrl = _url;
+                        string qrText = baseUrl + "?_guid=" + _overtime.guid;
 
-                    //    string qrUrl = "https://quickchart.io/qr?text=" +
-                    //                   Uri.EscapeDataString(qrText) +
-                    //                   "&dark=950808&light=ffffff";
+                        string qrUrl = "https://quickchart.io/qr?text=" +
+                                       Uri.EscapeDataString(qrText) +
+                                       "&dark=950808&light=ffffff";
 
-                    //    byte[] qrBytes = client.DownloadData(qrUrl);
+                        byte[] qrBytes = client.DownloadData(qrUrl);
 
-                    //    using (var qrStream = new MemoryStream(qrBytes))
-                    //    {
-                    //        var picture = ws.AddPicture(qrStream)
-                    //                        .MoveTo(ws.Cell("C35"))
-                    //                        .Scale(1.2);
-                    //    }
-                    //}
+                        using (var qrStream = new MemoryStream(qrBytes))
+                        {
+                            var picture = ws.AddPicture(qrStream)
+                                            .MoveTo(ws.Cell("C35"))
+                                            .Scale(0.6);
+                        }
+                    }
                     // -------------------------
 
 
                     using (var ms = new MemoryStream())
-                    {
-                        wb.SaveAs(ms);
+                    {                                                
+                        wb.SaveAs(ms);                        
                         ms.Position = 0;
 
 
-                        //string tempPath = PortalConstant._ReportPath + "Overtime_Form_Template.xlsx";
+                        tempPath = PortalConstant.GeneratedFormPath + @"Overtime\" + _overtime.guid + ".xlsx";
                         //string tempPath = Server.MapPath("~/OvertimeAttachments/Overtime_Form_Template.xlsx");
-                        tempPath = Path.GetTempFileName() + ".xlsx";
+                        //tempPath = Path.GetTempFileName() + ".xlsx";
 
                         System.IO.File.WriteAllBytes(tempPath, ms.ToArray());
 
@@ -394,14 +400,16 @@ namespace Portal.Controllers
                     }
                 }
 
-                return tempPath;
+                return outputPdf;
             }
             catch (Exception ex)
             {
+                //return ex;
                 return ex.Message;
             }
         }
 
+         
 
         [HttpGet]
         public ActionResult _PreviewPostedOvertimeForm(string _guid)
@@ -414,6 +422,20 @@ namespace Portal.Controllers
             }
 
             return File(approvedBaseFolder, "application/pdf");
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewOvertime(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Overtime/Partial/_preview_overtime_detail.cshtml", _filename);
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewApprovedOvertime(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Overtime/Partial/_preview_approved_overtime_detail.cshtml", _filename);
         }
 
         [HttpPost]

@@ -1,0 +1,14 @@
+﻿
+@model string
+
+@{ 
+    string _filename = Model + ".pdf";
+
+}
+<div class="row">
+    
+    <iframe src="\AttendanceCorrectionAttachments\AttendanceCorrectionFormGenerated\Approved\@Model\@_filename".pdf" width="500" height="800" frameborder="0"></iframe>
+    
+</div>
+
+

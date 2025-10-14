@@ -16,6 +16,8 @@
         return {
             userAgent: navigator.userAgent,
             language: navigator.language,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
             screen: screen.width + "x" + screen.height,
             cpuCores: navigator.hardwareConcurrency || "N/A"
         };
@@ -24,22 +26,27 @@
     $("#login-btn").click(function (e) {
         e.preventDefault();
 
+        //var deviceId = getDeviceId();
+        //var device = getDeviceDetails();
+
+        //console.log(
+        //    "Device Info:\n\n" +
+        //    "Browser/UserAgent: " + device.userAgent + "\n" +
+        //    "Flatform: " + device.platform + "\n" +
+        //    "Vendor: " + device.vendor + "\n" +
+        //    "Language: " + device.language + "\n" +
+        //    "Screen: " + device.screen + "\n" +
+        //    "CPU Cores: " + device.cpuCores + "\n\n" +
+        //    "Device ID (hashed): " + deviceId
+        //);
+
+
         var btn = document.getElementById("login-btn");
         btn.disabled = true;
         ShowLoading('SHOW');
         
-        var deviceId = getDeviceId();
-        var device = getDeviceDetails();
-        
-        console.log(
-            "Device Info:\n\n" +
-            "Browser/UserAgent: " + device.userAgent + "\n" +
-            "Language: " + device.language + "\n" +
-            "Screen: " + device.screen + "\n" +
-            "CPU Cores: " + device.cpuCores + "\n\n" +
-            "Device ID (hashed): " + deviceId
-        );
-        var formData = $('#login-Form').serialize() + "&deviceId=" + encodeURIComponent(deviceId);
+ 
+        var formData = $('#login-Form').serialize(); // + "&deviceId=" + encodeURIComponent(deviceId);
         btn.disabled = true;
 
         $.ajax({
