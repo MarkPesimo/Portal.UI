@@ -255,13 +255,20 @@ namespace Portal.Controllers
                 if (_model.Remarks == null) { _model.Remarks = ""; }
                 if (_model.Message == null) { _model.Message = ""; }
 
-  
+               
 
                 if (_model.Mode == 0 || _model.Mode == 1)
                 {
                     if (_model.OTFrom.Date > _model.OTTo.Date)
                     {
                         return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
+                    }
+
+                    DateTime _datetodate = DateTime.Now;
+                    double _noofdays = (_datetodate - DateTime.Parse(_model.OTFrom.ToString())).TotalDays;
+                    if (_noofdays > 2)
+                    {
+                        return Json(new { Result = "ERROR", Message = "You cannot submit an overtime request for work performed more than two days ago.", ElementName = "OTFrom" });
                     }
 
                     DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());

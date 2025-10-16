@@ -377,7 +377,7 @@
     //----------------------------------END POST CORRECTION--------------------------------------
 
     //----------------------------------END PRINT CORRECTION--------------------------------------
-    $('#overtime-table').on('click', '.print-overtime', function () {
+    $('#correction-table').on('click', '.print-correction', function () {
         var guid = $(this).attr("guid");
 
         ShowLoading('SHOW');
