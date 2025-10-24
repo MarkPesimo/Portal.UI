@@ -131,10 +131,10 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    //int _id = _overtimerepository.ManageOvertime(_model);
-                    //_model.Id = _id;
+                    int _id = _overtimerepository.ManageOvertime(_model);
+                    _model.Id = _id;
 
-                    int _id = 0; // _overtimerepository.ManageOvertime(_model);
+                    
                     _model.Mode = 3;
                     _id = _overtimerepository.ManageOvertime(_model);
 
@@ -285,7 +285,7 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     string _gen_result = "";
-                    if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
+                    //if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
 
                     
@@ -434,16 +434,25 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _PreviewOvertime(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Overtime/Partial/_preview_overtime_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "OVERTIME", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Overtime/Partial/_preview_overtime_detail.cshtml", _filename);                
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpGet]
         public ActionResult _PreviewApprovedOvertime(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Overtime/Partial/_preview_approved_overtime_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "OVERTIME", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Overtime/Partial/_preview_approved_overtime_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
+
 
         [HttpPost]
         public ActionResult _OvertimeAttachment(int _id, HttpPostedFileBase Overtime_Attachment)

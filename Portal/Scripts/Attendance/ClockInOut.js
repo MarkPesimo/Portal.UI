@@ -237,7 +237,7 @@
     function SetTableBGColor(_status) {
         var _font_color = 'white';
         var _color = 'white';
-        console.log(_status);
+        //console.log(_status);
         if (_status == 'Posted') { _color = '#5cb85c'; }
         else if (_status == "Filed Leave") { _color = '#0275d8'; }
         else if (_status == "With Correction") { _color = '#10a9e0'; }
@@ -246,7 +246,9 @@
         else if (_status == 'Virtual | Approved Leave') { _color = '#c94D3B'; }
         else if (_status == "Virtual") { _color = '#ec72df'; _font_color = 'white'; }             //VIRTUAL
         else { _color = '#aba7ae'; _font_color = 'white'; }
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
 
     //----------------------------------BEGIN ADD POST OVERTIME-----------------------------------
@@ -370,6 +372,16 @@
                 else {
                     $("#add_post_correction_modal").modal('hide');
 
+
+                    $file = $("#Correction_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully created.')
+                        return;
+                    }
+
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Attendance correction successfully Posted.');
 
@@ -380,6 +392,37 @@
             error: function (response) { LogError(response); }
         });
     });
+
+    function CorrectionAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Correction_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Correction_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Attendance/_CorrectionAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#correction-table');
+
+                    BindTable();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
     //----------------------------------END ADD POST ATTENDANCE CORRECTION-----------------------------------
 
     //----------------------------------BEGIN ADD POST LEAVE-----------------------------------

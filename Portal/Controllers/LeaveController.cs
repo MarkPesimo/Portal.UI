@@ -204,6 +204,8 @@ namespace Portal.Controllers
                 EmpId = _loginuserid,
                 UserId = 112,
                 Mode = 0,
+                FirstHalf = false,
+                SecondHalf = false,
             };
 
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
@@ -220,7 +222,7 @@ namespace Portal.Controllers
             _obj.UserId = 112;
 
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
-            return PartialView("~/Views/Leave/Partial/_leave_detail.cshtml", _obj);
+            return PartialView("~/Views/Leave/Partial/_edit_leave_detail.cshtml", _obj);
         }
         //---------------------------------------END EDIT LEAVE---------------------------------------
 
@@ -274,14 +276,15 @@ namespace Portal.Controllers
                 {
                     if (_model.FirstHalf) { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "AM"; }
                     else if (_model.SecondHalf) { _model.LeaveFromAMPM = "PM"; _model.LeaveToAMPM = "PM"; }
+                    else { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "PM"; _model.LeaveDays = 1; _model.IsHalfday = false; }
                 }
                 else
                 {
                     if (_model.FirstDay_SecondHalf) { _model.LeaveFromAMPM = "PM"; }
                     else { _model.LeaveFromAMPM = "AM"; }
 
-                    if (_model.LastDay_FirstHalf) { _model.LeaveFromAMPM = "AM"; }
-                    else { _model.LeaveFromAMPM = "PM"; }
+                    if (_model.LastDay_FirstHalf) { _model.LeaveToAMPM = "AM"; }
+                    else { _model.LeaveToAMPM = "PM"; }
                 }
 
                 DateTime _datetodate = DateTime.Now;
@@ -499,15 +502,23 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _PreviewLeave(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Leave/Partial/_preview_leave_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "LEAVE", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Leave/Partial/_preview_leave_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpGet]
         public ActionResult _PreviewApprovedLeave(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Leave/Partial/_preview_approved_leave_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "LEAVE", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Leave/Partial/_preview_approved_leave_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpPost]

@@ -177,7 +177,11 @@
                     {
                         title: 'Leave to',
                         class: "d-none d-sm-table-cell text-center",
-                        target: 3
+                        target: 3,
+                        "render": function (data, type, row, meta) {
+                            const date = new Date(row.DateTo);
+                            return date.toLocaleDateString('es-pa')
+                        }
                     },
                     {
                         title: 'Day(s)',
@@ -248,13 +252,15 @@
         var _color = 'white';
 
         if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Approved") { _color = '#0275d8'; }
         else if (_status == "Approved by Client") { _color = '#0275d8'; }
         else if (_status == "Approved by Payroll") { _color = '#10a9e0'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
         else if (_status == "Rejected") { _color = '#c94D3B'; }
         else { _color = '#959A97'; _font_color = 'white'; }
 
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
     //----------------------------------END TABLE---------------------------------------------
 
@@ -288,18 +294,20 @@
                 $('#add_leave_modal').find(".modal-body").html(response);
                 $("#add_leave_modal").modal('show');
 
+                var _modal = '#add_leave_modal';
                 var _form = '#leave-Form';
-                document.querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
 
-                document.querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
-                document.querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
 
-                document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
-                document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfAdd);
 
-                ComputeLeaveDays();
+                //ComputeLeaveDays();
+                ComputeLeaveDaysAPI();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -311,128 +319,213 @@
     };
 
     function ToggleFirstHalfAdd() {
+        var _modal = '#add_leave_modal';
         var _form = '#leave-Form';
 
-        if (document.querySelector(_form).querySelector("#FirstHalf").checked)
-        {
-            document.querySelector(_form).querySelector('#FirstHalf').value = true;
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = true;
 
-            document.querySelector(_form).querySelector('#SecondHalf').checked = false;
-            document.querySelector(_form).querySelector('#SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
         }
-        //else {
-        //    document.querySelector(_form).querySelector('#SecondHalf').checked = true;
-        //    document.querySelector(_form).querySelector('#SecondHalf').value = true;
-        //}
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+
+            //document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+            //document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
 
         ComputeLeaveDaysAPI();
     };
 
     function ToggleSecondHalfAdd() {
+        var _modal = '#add_leave_modal';
         var _form = '#leave-Form';
 
-        if (document.querySelector(_form).querySelector("#SecondHalf").checked) {
-            document.querySelector(_form).querySelector('#SecondHalf').value = true;
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = true;
 
-            document.querySelector(_form).querySelector('#FirstHalf').checked = false;
-            document.querySelector(_form).querySelector('#FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
         }
-        //else {
-        //    document.querySelector(_form).querySelector('#FirstHalf').checked = true;
-        //    document.querySelector(_form).querySelector('#FirstHalf').value = true;
-        //}
-
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
+ 
         ComputeLeaveDaysAPI();
     };
 
     function CheckIsNotHalfdayAdd() {
+        var _modal = '#add_leave_modal';
         var _form = '#leave-Form';
-        var _leavefrom = Date.parse( document.querySelector(_form).querySelector("#LeaveFrom").value);
-        var _leaveto = Date.parse( document.querySelector(_form).querySelector("#LeaveTo").value);
 
-        var div_sameday_halfday = document.querySelector(_form).querySelector('#div-sameday-halfday');
-        var div_not_sameday_halfday = document.querySelector(_form).querySelector('#div-not-sameday-halfday');
+        var _leavefrom = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value);
+        var _leaveto = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value);
 
-        document.querySelector(_form).querySelector('#IsHalfday').checked = false;
-        document.querySelector(_form).querySelector('#IsHalfday').value = false;
-        var div_sameday_halfday_details = document.querySelector(_form).querySelector('#div-sameday-halfday-details');
+        var div_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday');
+        var div_not_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-not-sameday-halfday');
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#IsHalfday').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#IsHalfday').value = false;
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+
+        var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
         div_sameday_halfday_details.classList.add('d-none');
 
         if (_leavefrom == _leaveto) {
             div_not_sameday_halfday.classList.add('d-none');
             div_sameday_halfday.classList.remove('d-none');
 
-            document.querySelector(_form).querySelector('#FirstHalf').checked = true;
-            document.querySelector(_form).querySelector('#FirstHalf').value = true;
-            document.querySelector(_form).querySelector('#SecondHalf').checked = false;
-            document.querySelector(_form).querySelector('#SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
         }
         else if (_leavefrom < _leaveto) {
             div_sameday_halfday.classList.add('d-none');
             div_not_sameday_halfday.classList.remove('d-none');
 
-            document.querySelector(_form).querySelector('#FirstDay_SecondHalf').checked = false;
-            document.querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
-            document.querySelector(_form).querySelector('#LastDay_FirstHalf').checked = false;
-            document.querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
         }
         else if (_leavefrom > _leaveto) {
             div_not_sameday_halfday.classList.add('d-none');
             div_sameday_halfday.classList.add('d-none');
         }
+
         ComputeLeaveDaysAPI()
       //   ComputeLeaveDaysAPI();
     };
 
     function CheckIsHalfdayAdd() {
+        var _modal = '#add_leave_modal';
         var _form = '#leave-Form';
 
        
         //console.log(is_halfday);
-        var div_sameday_halfday_details = document.querySelector(_form).querySelector('#div-sameday-halfday-details');
+        var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
         
-        if (document.querySelector(_form).querySelector("#IsHalfday").checked) {
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").checked) {
             //alert('checked')
-            document.querySelector(_form).querySelector("#IsHalfday").value = true;
+            document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").value = true;
             div_sameday_halfday_details.classList.add('d-block');
             div_sameday_halfday_details.classList.remove('d-none');
 
-            document.querySelector(_form).querySelector('#FirstHalf').checked = true;
-            document.querySelector(_form).querySelector('#FirstHalf').value  = true;
-            document.querySelector(_form).querySelector('#SecondHalf').checked = false
-            document.querySelector(_form).querySelector('#SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = true;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value  = true;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
         }
         else {
             //alert('not checked')
-            document.querySelector(_form).querySelector("#IsHalfday").value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").value = false;
             div_sameday_halfday_details.classList.add('d-none');
             div_sameday_halfday_details.classList.remove('d-block');
 
-            document.querySelector(_form).querySelector('#FirstHalf').checked = false;
-            document.querySelector(_form).querySelector('#FirstHalf').value = false;
-            document.querySelector(_form).querySelector('#SecondHalf').checked = false
-            document.querySelector(_form).querySelector('#SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
         }
+
         ComputeLeaveDaysAPI();
         //ComputeLeaveDays();
     };
 
     function ComputeLeaveDaysAPI() {
+        var _modal = '#add_leave_modal';
         var _form = '#leave-Form';
 
-        var leaveFrom = document.querySelector(_form).querySelector("#LeaveFrom").value;
-        var leaveTo = document.querySelector(_form).querySelector("#LeaveTo").value;
+        var leaveFrom = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value;
 
-        var isFirstDayHalf = document.querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
-        var isLastDayHalf = document.querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
-        
+        //var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        //var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked;
+        var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked;
+
+        //console.log(isFirstDayHalf)
+        //console.log(isLastDayHalf)
+
         var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
 
         fetch(url, { method: 'GET' })
             .then(response => response.json())
             .then(data => {
                 if (data && !data.error) {
-                    document.querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
+
+    function ToggleLastDayFirstHalfAdd() {
+        var _modal = '#add_leave_modal';
+        var _form = '#leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = true;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
+        }
+
+        ComputeLeaveDaysNotSameDayAPI();
+    };
+
+    function ToggleFirstDaySecondHalfAdd() {
+        var _modal = '#add_leave_modal';
+        var _form = '#leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = true;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+        }
+
+        ComputeLeaveDaysNotSameDayAPI();
+    };
+
+    function ComputeLeaveDaysNotSameDayAPI() {
+        var _modal = '#add_leave_modal';
+        var _form = '#leave-Form';
+
+        var leaveFrom = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value;
+
+        //var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        //var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        console.log(isFirstDayHalf)
+        console.log(isLastDayHalf)
+
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
                 } else {
                     console.error("Error:", data.error);
                 }
@@ -513,7 +606,7 @@
                     var $filepath = $.trim($file.val());
 
                     if ($filepath != "") {
-                        LeaveAttachment(result.LeaveId, 'Leave successfully created.')
+                        LeaveAttachmentAdd(result.LeaveId, 'Leave successfully created.')
                         return;
                     }
 
@@ -535,10 +628,10 @@
 
     //----------------------------------END ADD LEAVE--------------------------------------
 
-    function LeaveAttachment(_id, _msg) {
+    function LeaveAttachmentEdit(_id, _msg) {
  
         var formData = new FormData();
-        var _Attachement = $('#Leave_Attachment')[0].files[0];
+        var _Attachement = $('#Leave_Attachment_Edit')[0].files[0];
 
         formData.append('_id', _id);
         formData.append('Leave_Attachment', _Attachement);
@@ -565,6 +658,36 @@
     
     }
 
+    function LeaveAttachmentAdd(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Leave_Attachment_Add')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Leave_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Leave/_LeaveAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#leave-table');
+                    LoadDefault();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
+
     //----------------------------------BEGIN EDIT LEAVE--------------------------------------
     $('#leave-table').on('click', '.edit-leave', function () {
         var LeaveId = $(this).attr("Leaveid");
@@ -582,35 +705,36 @@
                 $('#edit_leave_modal').find(".modal-body").html(response);
                 $("#edit_leave_modal").modal('show');
 
-                var _form = '#leave-Form';
-                var is_halfday = document.querySelector(_form).querySelector("#IsHalfday").checked;
-                var div_sameday_halfday_details = document.querySelector(_form).querySelector('#div-sameday-halfday-details');
+                var _modal = '#edit_leave_modal';
+                var _form = '#edit-leave-Form';
+                var is_halfday = document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").checked;
+                var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
 
                 if (is_halfday == true) { div_sameday_halfday_details.classList.remove('d-none'); }
                 else { div_sameday_halfday_details.classList.add('d-none');}
 
-                var _leavefrom = Date.parse(document.querySelector(_form).querySelector("#LeaveFrom").value);
-                var _leaveto = Date.parse(document.querySelector(_form).querySelector("#LeaveTo").value);
+                var _leavefrom = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value);
+                var _leaveto = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value);
 
-                var div_sameday_halfday = document.querySelector(_form).querySelector('#div-sameday-halfday');
-                var div_not_sameday_halfday = document.querySelector(_form).querySelector('#div-not-sameday-halfday');
+                var div_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday');
+                var div_not_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-not-sameday-halfday');
 
                 if (_leavefrom < _leaveto) {
                     div_sameday_halfday.classList.add('d-none');
                     div_not_sameday_halfday.classList.remove('d-none');
                 }
                 
-                document.querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayEdit);
 
-                document.querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
-                document.querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfEdit);
 
-                document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
-                document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfEdit);
 
-                ComputeLeaveDaysAPI();
+                //ComputeLeaveDaysAPIEdit();
 
                 //----------------------SHOW/HIDE VIEW BUTTON-----------------------
                 //var _has_attachment = document.getElementById("HasAttachement").value;
@@ -626,24 +750,233 @@
             error: function (response) { LogError(response); }
         });
     });
+       
+    function ToggleNotSameDayEdit() {
+        ComputeLeaveDaysAPIEdit();
+    };
+
+    function ToggleFirstHalfEdit() {
+        //alert('ete');
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = true;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+        }
+
+        ComputeLeaveDaysAPIEdit();
+    };
+
+    function ToggleSecondHalfEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = true;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
+
+        ComputeLeaveDaysAPIEdit();
+    };
+
+    function CheckIsNotHalfdayEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        var _leavefrom = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value);
+        var _leaveto = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value);
+
+        var div_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday');
+        var div_not_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-not-sameday-halfday');
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#IsHalfday').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#IsHalfday').value = false;
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+
+        document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+        document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+
+        var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
+        div_sameday_halfday_details.classList.add('d-none');
+
+        if (_leavefrom == _leaveto) {
+            div_not_sameday_halfday.classList.add('d-none');
+            div_sameday_halfday.classList.remove('d-none');
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
+        }
+        else if (_leavefrom < _leaveto) {
+            div_sameday_halfday.classList.add('d-none');
+            div_not_sameday_halfday.classList.remove('d-none');
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
+        }
+        else if (_leavefrom > _leaveto) {
+            div_not_sameday_halfday.classList.add('d-none');
+            div_sameday_halfday.classList.add('d-none');
+        }
+
+        ComputeLeaveDaysAPIEdit()
+        //   ComputeLeaveDaysAPI();
+    };
+
+    function CheckIsHalfdayEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        //console.log(is_halfday);
+        var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").checked) {
+            //alert('checked')
+            document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").value = true;
+            div_sameday_halfday_details.classList.add('d-block');
+            div_sameday_halfday_details.classList.remove('d-none');
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = true;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = true;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
+        else {
+            //alert('not checked')
+            document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").value = false;
+            div_sameday_halfday_details.classList.add('d-none');
+            div_sameday_halfday_details.classList.remove('d-block');
+
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').value = false;
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked = false
+            document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').value = false;
+        }
+
+        ComputeLeaveDaysAPIEdit();
+        //ComputeLeaveDays();
+    };
+
+    function ComputeLeaveDaysAPIEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        var leaveFrom = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value;
+
+        var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstHalf').checked;
+        var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#SecondHalf').checked;
+
+        
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
+
+    function ToggleFirstDaySecondHalfEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = true;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').value = false;
+        }
+
+        ComputeLeaveDaysNotSameDayAPIEdit();
+    };
+
+    function ToggleLastDayFirstHalfEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        if (document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").checked) {
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = true;
+        }
+        else {
+            document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').value = false;
+        }
+
+        ComputeLeaveDaysNotSameDayAPIEdit();
+    };
+
+
+    function ComputeLeaveDaysNotSameDayAPIEdit() {
+        var _modal = '#edit_leave_modal';
+        var _form = '#edit-leave-Form';
+
+        var leaveFrom = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value;
+        
+        var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        console.log(isFirstDayHalf)
+        console.log(isLastDayHalf)
+
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
 
     $('#edit_leave_modal').on('click', '#update-leave-button', function (e) {
         ShowLoading('SHOW');
         $.ajax({
             url: '/Leave/_ManageLeave',
             type: "POST",
-            data: $('#leave-Form').serialize(),
+            data: $('#edit-leave-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
                 else {
                     $("#edit_leave_modal").modal('hide');
 
-                    $file = $("#Leave_Attachment");
+                    $file = $("#Leave_Attachment_Edit");
                     var $filepath = $.trim($file.val());
 
                     if ($filepath != "") {
-                        LeaveAttachment(result.LeaveId, 'Leave successfully updated.')
+                        LeaveAttachmentEdit(result.LeaveId, 'Leave successfully updated.')
                         return;
                     }
 
@@ -658,8 +991,8 @@
     });
 
     $('#edit_leave_modal').on('click', '#view_attached_btn', function () {
-        var _fileid = document.querySelector('#leave-Form').querySelector("#Id").value;
-        var _extension = document.querySelector('#leave-Form').querySelector("#FileExtension").value;
+        var _fileid = document.querySelector('#edit-leave-Form').querySelector("#Id").value;
+        var _extension = document.querySelector('#edit-leave-Form').querySelector("#FileExtension").value;
         //alert(_taskid);
         //alert(_extension);
 

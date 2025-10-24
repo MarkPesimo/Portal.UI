@@ -195,6 +195,7 @@ namespace Portal.Repository
             if (_mode == 4) { _endpoint = "Attendance/UnpostCorrection"; }
             if (_mode == 5) { _endpoint = "Attendance/ApprovCorrection"; }
             if (_mode == 6) { _endpoint = "Attendance/RejectCorrection"; }
+            if (_mode == 91) { _endpoint = "Attendance/AttachDocument"; }
             if (_model.Remarks == null) { _model.Remarks = ""; }
 
             var _content_prop = new Dictionary<string, string>

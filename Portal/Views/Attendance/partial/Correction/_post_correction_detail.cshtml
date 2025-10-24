@@ -1,5 +1,5 @@
 ﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
-    
+
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-attendance-correction-Form", id = "post-attendance-correction-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -7,6 +7,10 @@
     @Html.HiddenFor(m => m.EmpId)
     @Html.HiddenFor(m => m.Remarks)
 
+    @Html.HiddenFor(m => m.HasAttachement)
+    @Html.HiddenFor(m => m.FileExtension)
+
+  
     <div class="row" id="div-validation" style="display: none;">
         <div class="col-lg-6 mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
@@ -17,6 +21,18 @@
         <div class="col-6 mb-3">
             <label for="" class="form-label">Date Log</label>
             @Html.TextBoxFor(m => m.DateLog, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateLog.ToString("yyyy-MM-dd") })
+        </div>
+
+        <div class="col-6 mb-3">
+            <label for="" class="form-label">Work Location</label>
+            @Html.DropDownListFor(m => m.WorkLocation,
+                new List<SelectListItem> {
+                    new SelectListItem { Text = "Office", Value = "1" },
+                    new SelectListItem { Text = "Home", Value = "2" },
+                    new SelectListItem { Text = "Onsite Work", Value = "3" }
+                },
+                "Please Select",
+                new { @class = "form-select" })
         </div>
     </div>
 
@@ -51,6 +67,12 @@
         <div class="col">
             <label for="" class="form-label">Reason</label>
             @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter a Reason" })
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <input class="form-control" type="file" name="Correction_Attachment" id="Correction_Attachment">
         </div>
     </div>
 

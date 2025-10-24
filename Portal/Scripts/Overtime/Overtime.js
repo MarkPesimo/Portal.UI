@@ -217,7 +217,8 @@
         else if (_status == "Rejected") { _color = '#c94D3B'; }
         else { _color = '#959A97'; _font_color = 'white'; }
 
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
     //----------------------------------END TABLE---------------------------------------------
 
