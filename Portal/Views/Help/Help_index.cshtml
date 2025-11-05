@@ -1,5 +1,7 @@
-﻿@model List<APWModel.ViewModel.iSearch.HelpModel>
-
+﻿@*@model List<APWModel.ViewModel.iSearch.HelpModel>*@
+@model APWModel.ViewModel.iSearch.HelpList_Model
+    
+    
 @{
     ViewBag.Title = "Help";
 }
@@ -30,14 +32,151 @@
 
     <div class="main-content py-3">
         <div class="container-fluid">
-            <div class="widget widget-table">
+            <div class="accordion" id="faqs">
+                <!-- GENERAL -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-1">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-1" aria-expanded="false" aria-controls="faqs-1">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">General</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-1" class="accordion-collapse collapse widget p-0" aria-labelledby="header-1" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("./partial/Help_item_bytype", Model.PortalHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAYROLL -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-3">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-3" aria-expanded="false" aria-controls="faqs-3">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Payroll</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-3" class="accordion-collapse collapse widget p-0" aria-labelledby="header-3" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.PayrollHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCUMENT -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-2">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-2" aria-expanded="false" aria-controls="faqs-2">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Document</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-2" class="accordion-collapse collapse widget p-0" aria-labelledby="header-2" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.DocumentHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HELPDESK -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-4">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-4" aria-expanded="false" aria-controls="faqs-4">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Helpdesk</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-4" class="accordion-collapse collapse widget p-0" aria-labelledby="header-4" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.HelpdeskHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OVERTIME -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-5">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-5" aria-expanded="false" aria-controls="faqs-5">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Overtime</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-5" class="accordion-collapse collapse widget p-0" aria-labelledby="header-5" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.OvertimeHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LEAVE -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-6">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-6" aria-expanded="false" aria-controls="faqs-6">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Leave</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-6" class="accordion-collapse collapse widget p-0" aria-labelledby="header-6" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.LeaveHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTENDANCE -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-7">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-7" aria-expanded="false" aria-controls="faqs-7">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Attendance</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-7" class="accordion-collapse collapse widget p-0" aria-labelledby="header-7" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.AttendanceHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTENDANCE CORRECTION -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-8">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-8" aria-expanded="false" aria-controls="faqs-8">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Attendance Correction</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-8" class="accordion-collapse collapse widget p-0" aria-labelledby="header-8" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.AttendanceCorrectionHelp)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DTR -->
+                <div class="accordion-item border-0 mb-3">
+                    <h5 class="accordion-header" id="header-9">
+                        <a class="accordion-button collapsed widget fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#faqs-9" aria-expanded="false" aria-controls="faqs-9">
+                            <i class="fa-solid fa-info me-2 text-primary me-3 mb-1"></i>
+                            <span class="text-uppercase">Daily Time Record</span>
+                        </a>
+                    </h5>
+                    <div id="faqs-9" class="accordion-collapse collapse widget p-0" aria-labelledby="header-9" data-bs-parent="#faqs">
+                        <div class="accordion-body p-0">
+                            @Html.Partial("partial/Help_item_bytype", Model.DTRHelp)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+                @*<div class="widget widget-table">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle" id="help-table">
                         <thead>
                             <tr>
                                 <th class="bg-primary text-white">No.</th>
                                 <th class="bg-primary text-white">Title</th>
-                                <th class="bg-primary text-white text-center" >Menu</th>
+                                <th class="bg-primary text-white text-center">Menu</th>
                                 <th class="bg-primary text-white "></th>
                             </tr>
                         </thead>
@@ -52,9 +191,9 @@
                         </tbody>
                     </table>
                 </div>
+            </div>*@
             </div>
         </div>
-    </div>
 </section>
 
 

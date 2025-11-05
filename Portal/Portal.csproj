@@ -401,6 +401,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Filtering_model.cs" />
+    <Compile Include="Models\GeoLocation.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ReturnedMessageModel.cs" />
     <Compile Include="Models\VW_COE.cs" />
@@ -659,6 +660,9 @@
     <Content Include="Views\Attendance\partial\Correction\_view_attachment.cshtml" />
     <Content Include="Views\Attendance\modal\Correction\_open_correction_file_modal.cshtml" />
     <Content Include="Views\Leave\partial\_edit_leave_detail.cshtml" />
+    <Content Include="Views\Overtime\partial\_edit_overtime_detail.cshtml" />
+    <Content Include="Views\Attendance\partial\Correction\_edit_correction_detail.cshtml" />
+    <Content Include="Views\Help\partial\Help_Item_bytype.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -321,7 +321,10 @@ namespace Portal.Controllers
             Correction_model _obj = _attendancerepository.GetAttendanceCorrection(_id);
             
             ViewBag._ClientShift = _globalrepository.GetClientShift(_client_id).Select(t => new SelectListItem { Text = t.ShiftTypeDescription, Value = t.ShiftTypeId.ToString() }).ToList();
-            return PartialView("~/Views/Attendance/Partial/Correction/_correction_detail.cshtml", _obj);
+
+
+            //return PartialView("~/Views/Attendance/Partial/Correction/_correction_detail.cshtml", _obj);
+            return PartialView("~/Views/Attendance/Partial/Correction/_edit_correction_detail.cshtml", _obj);
         }
 
         [HttpPost]

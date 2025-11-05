@@ -4,7 +4,7 @@
         $("#nav-Overtime").addClass("active");
         $("#nav-Overtime").addClass("bg-primary");
 
-
+        
         ShowLoading('HIDE');
         LoadDefault();
         //GetLeaveBalance(1);
@@ -17,6 +17,8 @@
         var curr_date = date.getDate();
         var curr_month = date.getMonth() + 1; //Months are zero based
         var curr_year = date.getFullYear();
+
+        
 
         BindTable(curr_year + "-01-01", curr_year + "-12-31", "All");
     };
@@ -36,6 +38,14 @@
                 $('#filter_overtime_modal').find(".modal-body").html('');
                 $('#filter_overtime_modal').find(".modal-body").html(response);
                 $('#filter_overtime_modal').modal('show');
+
+                var date = new Date();
+
+                var curr_date = date.getDate();
+                var curr_month = date.getMonth() + 1; //Months are zero based
+                var curr_year = date.getFullYear();
+
+                document.querySelector('#filter_overtime_modal').querySelector("#OTTo").value = curr_year + "-12-31";
             },
             failure: function (response) { console.log(response); },
             error: function (response) { console.log(response); }
@@ -254,6 +264,7 @@
         var _form = '#overtime-Form';
 
         var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+        document.querySelector(_modal).querySelector(_form).querySelector("#OTTo").value = DateLog;
 
         var url = `/Overtime/GetShift?_datelog=${DateLog}`;
 
@@ -273,9 +284,11 @@
 
     function EditGetShiftOnSelectedDate() {
         var _modal = '#edit_overtime_modal';
-        var _form = '#overtime-Form';
+        var _form = '#edit-overtime-Form';
 
         var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+        document.querySelector(_modal).querySelector(_form).querySelector("#OTTo").value = DateLog;
+
 
         var url = `/Overtime/GetShift?_datelog=${DateLog}`;
 
@@ -355,7 +368,7 @@
                 //----------------------SHOW/HIDE VIEW BUTTON-----------------------
 
                 var _modal = '#edit_overtime_modal';
-                var _form = '#overtime-Form';
+                var _form = '#edit-overtime-Form';
                 document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", EditGetShiftOnSelectedDate);
                 EditGetShiftOnSelectedDate();
             },
@@ -370,7 +383,7 @@
         $.ajax({
             url: '/Overtime/_ManageOvertime',
             type: "POST",
-            data: $('#overtime-Form').serialize(),
+            data: $('#edit-overtime-Form').serialize(),
             //data: $('#edit_overtime_modal').find('#overtime-Form').serialize(),
             dataType: 'json',
             success: function (result) {
@@ -378,11 +391,11 @@
                 else {
                     $("#edit_overtime_modal").modal('hide');
 
-                    $file = $("#Overtime_Attachment");
+                    $file = $("#Edit_Overtime_Attachment");
                     var $filepath = $.trim($file.val());
 
                     if ($filepath != "") {
-                        OvertimeAttachment(result.OvertimeId, 'Overtime successfully updated.')
+                        OvertimeEditAttachment(result.OvertimeId, 'Overtime successfully updated.')
                         return;
                     }
 
@@ -397,8 +410,8 @@
     });
 
     $('#edit_overtime_modal').on('click', '#view_attached_btn', function () {
-        var _fileid = document.querySelector('#overtime-Form').querySelector("#Id").value;
-        var _extension = document.querySelector('#overtime-Form').querySelector("#FileExtension").value;
+        var _fileid = document.querySelector('#edit-overtime-Form').querySelector("#Id").value;
+        var _extension = document.querySelector('#edit-overtime-Form').querySelector("#FileExtension").value;
         //alert(_taskid);
         //alert(_extension);
 
@@ -588,6 +601,36 @@
 
         var formData = new FormData();
         var _Attachement = $('#Overtime_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Overtime_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Overtime/_OvertimeAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#overtime-table');
+                    LoadDefault();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
+
+    function OvertimeEditAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Edit_Overtime_Attachment')[0].files[0];
 
         formData.append('_id', _id);
         formData.append('Overtime_Attachment', _Attachement);

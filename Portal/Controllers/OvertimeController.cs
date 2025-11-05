@@ -189,7 +189,8 @@ namespace Portal.Controllers
             _obj.Mode = 1;
             _obj.UserId = 112;
 
-            return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _obj);
+            //return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _obj);
+            return PartialView("~/Views/Overtime/Partial/_edit_overtime_detail.cshtml", _obj);
         }
         //---------------------------------------END EDIT OVERTIME---------------------------------------
 

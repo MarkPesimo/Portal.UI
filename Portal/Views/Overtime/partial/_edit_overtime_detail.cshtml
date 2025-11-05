@@ -1,7 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
 
 
-@using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-overtime-Form", id = "post-overtime-Form" }))
+@using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "edit-overtime-Form", id = "edit-overtime-Form" }))
 {
 
     @Html.HiddenFor(m => m.Id)
@@ -23,7 +23,8 @@
         </div>
     </div>
 
-      <div class="row">
+
+    <div class="row">
         <label for="" class="form-label">Shift Schedule on the selected date</label>
         <div class="col">
             <input class="text-center form-control text-primary bg-secondary" id="ot-shift-in" name="ot-shift-in" readonly="true"/>            
@@ -36,31 +37,30 @@
     <div class="row">
         <label for="" class="form-label">Overtime start</label>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.OTFrom, new {@class = "form-control",@placeholder = "mm/dd/yyyy", @type = "date",  @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
         </div>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @placeholder = "OT Start", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime" })
+            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @placeholder = "OT Start", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime"})
         </div>
     </div>
 
     <div class="row">
         <label for="" class="form-label">Overtime End</label>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd"),@min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")})
         </div>
         <div class="col">
-            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @placeholder = "OT End", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime" })
+            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @placeholder = "OT End", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime"})
         </div>
     </div>
 
-
-    <div class="row" id="div-isContinuosOT">
+    <div class="row" id="div-isContinuosOT">         
         <div class="col-6">
             <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input" })
+                @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input"})
                 <label class="form-check-label" for="flexSwitchCheckChecked">Continuous Overtime</label>
             </div>
-        </div>
+        </div>          
     </div>
 
     @*<div class="row mt-4">
@@ -79,7 +79,7 @@
 
     <div class="row mt-2">
         <div class="col">
-            <input class="form-control" type="file" name="Overtime_Post_Attachment" id="Overtime_Post_Attachment">
+            <input class="form-control" type="file" name="Edit_Overtime_Attachment" id="Edit_Overtime_Attachment">
         </div>
     </div>
 }

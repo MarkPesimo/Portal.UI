@@ -267,11 +267,40 @@
                 $('#add_post_overtime_modal').find(".modal-body").innerHTML = '';
                 $('#add_post_overtime_modal').find(".modal-body").html(response);
                 $("#add_post_overtime_modal").modal('show');
+
+                var _modal = '#add_post_overtime_modal';
+                var _form = '#post-overtime-Form';
+                
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", GetShiftOnSelectedDate);
+                GetShiftOnSelectedDate();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+
+    function GetShiftOnSelectedDate() {
+        var _modal = '#add_post_overtime_modal';
+        var _form = '#post-overtime-Form';
+
+        var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+        document.querySelector(_modal).querySelector(_form).querySelector("#OTTo").value = DateLog;
+
+        var url = `/Overtime/GetShift?_datelog=${DateLog}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-in').value = data.ShiftIn;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-out').value = data.ShiftOut;
+                    //console.log(data);
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
 
     $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {
         ShowLoading('SHOW');

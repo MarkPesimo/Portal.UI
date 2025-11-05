@@ -302,7 +302,7 @@ namespace Portal.Controllers
                 }
                 else if (_model.LeaveTypeId == 1)
                 {
-                    if (_noofdays < 7)
+                    if (_noofdays < -7)
                     {
                         return Json(new { Result = "ERROR", Message = "You cannot file a sick leave request if the date is within the past seven (7) days..", ElementName = "LeaveFrom" });
                     }

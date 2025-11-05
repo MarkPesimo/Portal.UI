@@ -321,18 +321,18 @@
         $.ajax({
             url: '/Attendance/_EditCorrection',
             type: "POST",
-            data: $('#attendance-correction-Form').serialize(),
+            data: $('#edit-attendance-correction-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
                 else {
                     $("#edit_correction_modal").modal('hide');
 
-                    $file = $("#Correction_Attachment");
+                    $file = $("#Edit_Correction_Attachment");
                     var $filepath = $.trim($file.val());
 
                     if ($filepath != "") {
-                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully updated.')
+                        CorrectionEditAttachment(result.CorrectionId, 'Attendance correction successfully updated.')
                         return;
                     }
 
@@ -346,8 +346,8 @@
     });
 
     $('#edit_correction_modal').on('click', '#view_attached_btn', function () {
-        var _fileid = document.querySelector('#attendance-correction-Form').querySelector("#Id").value;
-        var _extension = document.querySelector('#attendance-correction-Form').querySelector("#FileExtension").value;
+        var _fileid = document.querySelector('#edit-attendance-correction-Form').querySelector("#Id").value;
+        var _extension = document.querySelector('#edit-attendance-correction-Form').querySelector("#FileExtension").value;
  
         ShowLoading('SHOW');
         $.ajax({
@@ -552,6 +552,38 @@
                     //ClearTable('#correction-table');
                     
                     BindTable();                    
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
+
+
+    function CorrectionEditAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Edit_Correction_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Correction_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Attendance/_CorrectionAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    //ClearTable('#correction-table');
+
+                    BindTable();
                     ShowSuccessMessage(_msg);
                     ShowLoading('HIDE');
                 }

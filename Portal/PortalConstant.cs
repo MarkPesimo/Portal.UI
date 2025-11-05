@@ -20,5 +20,14 @@ namespace Portal
         public static string dbpassword = ConfigurationManager.AppSettings["_Password"].ToString();
         public static string Username = ConfigurationManager.AppSettings["_Username"].ToString();
 
+
+        public static string GeoLocationKey = ConfigurationManager.AppSettings["_GeoLocationKey"].ToString();
+        public static string GeoLocationURL = ConfigurationManager.AppSettings["_GeoLocationURL"].ToString();
+
+        public static string HomeMobileCountryCode = ConfigurationManager.AppSettings["_HomeMobileCountryCode"].ToString();
+        public static string HomeMobileNetworkCode = ConfigurationManager.AppSettings["_HomeMobileNetworkCode"].ToString();
+        public static string RadioType = ConfigurationManager.AppSettings["_RadioType"].ToString();
+        public static string Carrier = ConfigurationManager.AppSettings["_Carrier"].ToString();
+        public static string ConsiderIP = ConfigurationManager.AppSettings["_ConsiderIP"].ToString();
     }
 }

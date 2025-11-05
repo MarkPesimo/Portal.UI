@@ -39,7 +39,8 @@ namespace Portal.Controllers
         // GET: Help
         public ActionResult Index()
         {
-            List<HelpModel> _model = _helprepository.GetHelpByApp(12);
+            //List<HelpModel> _model = _helprepository.GetHelpByApp(12);
+            HelpList_Model _model = _helprepository.GetHelpByApp2(12);
             return View(_Help_Index, _model);
         }
 

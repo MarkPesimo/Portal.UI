@@ -197,11 +197,85 @@
                 $('#add_dtr_modal').find(".modal-body").innerHTML = '';
                 $('#add_dtr_modal').find(".modal-body").html(response);
                 $('#add_dtr_modal').modal('show');
+
+                var _modal = '#add_dtr_modal';
+                var _form = '#dtr-Form';
+                document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").addEventListener("change", SetCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Month").addEventListener("change", SetCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Year").addEventListener("change", SetCutOffDate);
+                SetCutOffDate();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+
+
+    function SetCutOffDate() {
+        var _modal = '#add_dtr_modal';
+        var _form = '#dtr-Form';
+
+        var cutoff = document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").value;
+        var year = document.querySelector(_modal).querySelector(_form).querySelector("#Year").value;
+        var monthInput = document.querySelector(_modal).querySelector(_form).querySelector("#Month").value;
+        var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
+
+        if (cutoff && month > 0 && year) {
+            $.getJSON('/Attendance/GetClientCutoffDate',
+                { cutoff: cutoff, month: month, year: year },
+                function (data) {
+                    if (data.success) {
+                        $("#DateFrom").val(data.dateFrom);
+                        $("#DateTo").val(data.dateTo);
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                });
+        }
+    }
+
+    function SetEditCutOffDate() {
+        var _modal = '#edit_dtr_modal';
+        var _form = '#dtr-Form';
+
+        var cutoff = document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").value;
+        var year = document.querySelector(_modal).querySelector(_form).querySelector("#Year").value;
+        var monthInput = document.querySelector(_modal).querySelector(_form).querySelector("#Month").value;
+        var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
+
+        if (cutoff && month > 0 && year) {
+            $.getJSON('/Attendance/GetClientCutoffDate',
+                { cutoff: cutoff, month: month, year: year },
+                function (data) {
+                    if (data.success) {
+                        $("#DateFrom").val(data.dateFrom);
+                        $("#DateTo").val(data.dateTo);
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                });
+        }
+    }
+
+    //$("#Cutoff, #Month, #Year").change(function () {
+    //    var cutoff = $("#Cutoff").val();
+    //    var year = $("#Year").val();
+    //    var monthInput = $("#Month").val();
+    //    var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
+
+    //    if (cutoff && month > 0 && year) {
+    //        $.getJSON('/Attendance/GetClientCutoffDate',
+    //            { cutoff: cutoff, month: month, year: year },
+    //            function (data) {
+    //                if (data.success) {
+    //                    $("#DateFrom").val(data.dateFrom);
+    //                    $("#DateTo").val(data.dateTo);
+    //                } else {
+    //                    alert("Error: " + data.message);
+    //                }
+    //            });
+    //    }
+    //});
 
     $('#add_dtr_modal').on('click', '#submit_DTR', function (e) {
         //ShowLoading('SHOW');
@@ -243,6 +317,14 @@
                 ShowLoading('HIDE');
                 $('#edit_dtr_modal').find(".modal-body").html(response);
                 $("#edit_dtr_modal").modal('show');
+
+                var _modal = '#edit_dtr_modal';
+                var _form = '#dtr-Form';
+                document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").addEventListener("change", SetEditCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Month").addEventListener("change", SetEditCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Year").addEventListener("change", SetEditCutOffDate);
+
+                SetEditCutOffDate();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
