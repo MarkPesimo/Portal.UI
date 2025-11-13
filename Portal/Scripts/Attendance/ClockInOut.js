@@ -466,6 +466,12 @@
             contentType: "application/json; charset=utf-8",
             dataType: "html",
             success: function (response) {
+
+                if (isJsonString(response)) {
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+
                 ShowLoading('HIDE');
                 $('#add_post_leave_modal').find(".modal-body").innerHTML = '';
                 $('#add_post_leave_modal').find(".modal-body").html(response);

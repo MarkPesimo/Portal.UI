@@ -102,6 +102,8 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddPostLeave(DateTime _datelog)
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "FILE LEAVE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
+
             LeaveModel _model = new LeaveModel
             {
                 LeaveFrom = _datelog,
