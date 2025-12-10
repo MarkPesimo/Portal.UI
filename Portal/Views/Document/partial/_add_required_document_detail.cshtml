@@ -1,0 +1,32 @@
+﻿@model APWModel.ViewModel.Portal.PortalRequiredDocument_model
+
+
+@using (Html.BeginForm("_AddDocumentNote", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "add-document-note-Form", id = "add-document-note-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.PortalUserId)
+    @Html.HiddenFor(m => m.Empid)
+    @Html.HiddenFor(m => m.RequiredDocumentId)
+    @Html.HiddenFor(m => m.DocId)
+    @Html.HiddenFor(m => m.DocType)
+    @Html.HiddenFor(m => m.CandId)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col-lg-6 mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg mb-3">
+            <label class="form-label">Document Type</label>
+            @Html.TextBoxFor(m => m.DocType, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <input class="form-control" type="file" name="Document_Attachment" id="Document_Attachment">
+        </div>
+    </div>
+}

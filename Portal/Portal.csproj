@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="APWModel, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
+      <HintPath>..\..\ISearch-API\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\BundleTransformer.Core.1.10.0\lib\net40\BundleTransformer.Core.dll</HintPath>
@@ -510,6 +510,7 @@
     <Folder Include="Report\COE\" />
     <Folder Include="Report\Document\" />
     <Folder Include="Report\Payroll\" />
+    <Folder Include="RequiredDocument\" />
     <Folder Include="Views\Account\modal\" />
     <Folder Include="Views\Account\partial\" />
     <Folder Include="Views\Attendance\partial\ClockInOut\" />
@@ -655,6 +656,9 @@
     <Content Include="Views\Attendance\partial\Correction\_preview_approved_correction_detail.cshtml" />
     <Content Include="Views\Leave\partial\_preview_approved_leave_detail.cshtml" />
     <Content Include="Views\Attendance\partial\DTR\_preview_approved_dtr_detail.cshtml" />
+    <Content Include="Views\Document\partial\_submit_document_detail.cshtml" />
+    <Content Include="Views\Document\modal\_add_required_documents_modal.cshtml" />
+    <Content Include="Views\Document\partial\_add_required_document_detail.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

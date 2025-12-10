@@ -121,27 +121,73 @@
     };
 
     $('#required-document-table').on('click', '.submit-document-btn', function () {
-        var DocId = $(this).attr("docid");
         var RequiredDocumentId = $(this).attr("RequiredDocumentId");
+        var DocId = $(this).attr("docid");
+        var DocumentName = $(this).closest('tr').find('td:first').text().trim();
 
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
-            url: '/Leave/_EditLeave',
-            data: { '_id': LeaveId },
+            url: '/Document/AddRequiredDocument',
+            data: {
+                '_id': RequiredDocumentId,
+                '_docid': DocId,
+                '_documentname': DocumentName
+            },
             contentType: "application/json; charset=utf-8",
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
-                $('#edit_leave_modal').find(".modal-body").innerHTML = '';
-                $('#edit_leave_modal').find(".modal-body").html(response);
-                $("#edit_leave_modal").modal('show');
- 
+                $('#add_required_documents_modal').find(".modal-body").html(response);
+                $("#add_required_documents_modal").modal('show');
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+
+    $('#add_required_documents_modal').on('click', '#submit_required_document', function (e) {
+        e.preventDefault();
+        
+        var fileInput = $('#Document_Attachment')[0];
+        if (fileInput.files.length === 0) {
+            ShowLoading('HIDE');
+            ShowWarningMessage("Please attach a document before submitting.");
+            return;
+        }
+
+        ShowLoading('SHOW');
+
+        var form = $('#add-document-note-Form')[0];
+        var formData = new FormData(form);
+
+        $.ajax({
+            url: '/Document/_ManageRequiredDocument',
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (result) {
+
+                ShowLoading('HIDE');
+
+                if (result.Result === "ERROR") {
+                    ShowWarningMessage(result.Message);
+                    return;
+                }
+
+                $("#add_required_documents_modal").modal('hide');
+                ShowSuccessMessage('Required document successfully submitted.');
+                location.reload();
+            },
+            error: function (response) {
+                ShowLoading('HIDE');
+                ShowWarningMessage(response.responseText);
+            }
+        });
+    });
+
 
 
     function LogError(response) {
@@ -172,6 +218,14 @@
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
         const toaster = document.getElementById("toasterSuccess");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
+
+    function ShowWarningMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterWarning-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterWarning");
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
