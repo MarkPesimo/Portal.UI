@@ -1,4 +1,5 @@
 ﻿using APWModel.ViewModel.Global;
+using APWModel.ViewModel.Portal;
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using Portal.Models;
@@ -82,6 +83,19 @@ namespace Portal.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult GetRequiredDocumentsCmb()
+        {
+            try
+            {
+                List<PortalRequiredDocument_model> _obj = _documentrepository.GetRequiredDocumentsCmb();
+                return Json(_obj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
         //=======================================================================================================================================
 
@@ -276,5 +290,74 @@ namespace Portal.Controllers
                 throw ex;
             }
         }
+
+        [HttpGet]
+        public ActionResult AddRequiredDocument(int _id, int _docid, string _documentname)
+        {
+            try
+            {
+                PortalRequiredDocument_model _obj = new PortalRequiredDocument_model();
+
+                _obj.PortalUserId = _loginuserid;
+                _obj.CandId = _candidate_id;
+                _obj.Empid = 0;
+                _obj.RequiredDocumentId = _id;
+                _obj.DocId = _docid;
+                _obj.Status = false;
+                _obj.DocType = _documentname;
+
+                return PartialView("~/Views/Document/partial/_add_required_document_detail.cshtml", _obj);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "", ex = ex.Message.ToString() }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult _ManageRequiredDocument(PortalRequiredDocument_model model)
+        {
+            try
+            {
+                model.DateRequested = DateTime.Now;
+                model.CompletedBy = 2;
+                model.DateCompleted = DateTime.Now;
+
+                HttpPostedFileBase file = Request.Files["Document_Attachment"];
+
+                if (file != null && file.ContentLength > 0)
+                {
+                    string baseFolder = @"\\192.168.20.23\apw system\HRMS\Notes\Portal Document Submitted";
+
+                    if (!Directory.Exists(baseFolder))
+                    {
+                        Directory.CreateDirectory(baseFolder);
+                    }
+                    
+                    string originalExtension = Path.GetExtension(file.FileName);
+                    
+                    string fileName = $"{model.CandId}-{model.DocId}{originalExtension}";
+
+                    string finalPath = Path.Combine(baseFolder, fileName);
+
+                    file.SaveAs(finalPath);
+                    
+                    model.FilePath = $"/RequiredDocument/{fileName}";
+                }
+
+
+
+                int id = _documentrepository.ManagePortalRequiredDocument(model);
+
+                return Json(new { Result = "OK", Id = id, Message = "Required document successfully submitted." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+
+
     }
 }

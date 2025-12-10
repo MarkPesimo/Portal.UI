@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using APWModel.ViewModel.Portal;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,5 +111,50 @@ namespace Portal.Repository
             }            
         }
 
+        public List<PortalRequiredDocument_model> GetRequiredDocumentsCmb()
+        {
+            try
+            {
+                List<PortalRequiredDocument_model> _obj = new List<PortalRequiredDocument_model>();
+                string _endpoint = "RequiredDocument/GetRequiredDocuments/";
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<PortalRequiredDocument_model>>(_value);
+
+
+                }
+                return _obj;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public int ManagePortalRequiredDocument(PortalRequiredDocument_model _model)
+        {
+            int _id = 0;
+            string _endpoint = "RequiredDocument/ManagePortalRequiredDocument";
+
+            string _body_content = JsonConvert.SerializeObject(_model);
+           
+            HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result;
+                _id = int.Parse(_value);
+            }
+            else
+            {
+                var errorMessage = _response.Content.ReadAsStringAsync().Result;
+                throw new Exception(errorMessage);
+            }
+
+            return _id;
+        }
     }
 }

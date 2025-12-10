@@ -1,0 +1,21 @@
+﻿@model Portal.Models.VW_COE.COE_MODEL
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label for="DocumentType" class="form-label fw-bold">Document Type</label>
+            <select id="DocumentType" name="DocumentType" class="form-select" required>
+                <option value="">-- Select Document Type --</option>
+                <option value="COE">Certificate of Employment</option>
+                <option value="Payslip">Payslip</option>
+                <option value="Contract">Employment Contract</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Attachment" class="form-label fw-bold">Attach File</label>
+            <input type="file" id="Attachment" name="Attachment" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
+        </div>
+    </div>
+</div>

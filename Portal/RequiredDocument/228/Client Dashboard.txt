@@ -1,0 +1,422 @@
+@model APWModel.ViewModel.COOR.EmployeeList.CoorClient_model
+
+@{
+    ViewBag.Title = "Client Dashboard";
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/Client/Client.js")"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const monthLinks = document.querySelectorAll(".month-link");
+            const menu = document.getElementById("month-menu");
+
+            monthLinks.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    menu.style.top = e.pageY + "px";
+                    menu.style.left = e.pageX + "px";
+                    menu.style.display = "block";
+
+                    const selectedMonth = this.getAttribute("data-month");
+                    menu.setAttribute("data-month", selectedMonth);
+                });
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!menu.contains(e.target) && !e.target.classList.contains("month-link")) {
+                    menu.style.display = "none";
+                }
+            });
+
+            window.addEventListener("scroll", function () {
+                menu.style.display = "none";
+            });
+
+        });
+    </script>
+
+}
+<section class="main">
+    @Html.HiddenFor(m => m.ClientId, new { @Id = "ClientId" })
+
+    <div class="main-title py-3">
+        <div class="container-fluid" id="client-header-div">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-lg-start">
+                    <h1 class="h4 mb-4 mb-lg-0">@Model.ClientName</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                            <li class="breadcrumb-item"><a href=""> Client List</a></li>
+                            <li class="breadcrumb-item"><a href=""> Client Dashboard</a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-auto text-lg-end mt-3 mt-lg-0">
+                    <h3 class="fw-bold mb-0">Dashboard</h3>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    @{
+        var cards = new[] {
+        new { Title = "Beginning", Value = 0, Icon = "https://cdn-icons-png.flaticon.com/512/727/727245.png", Color = "darkred" },
+        new { Title = "New Hires", Value = 0, Icon = "https://cdn-icons-png.flaticon.com/512/747/747376.png", Color = "seagreen" },
+        new { Title = "Rehires", Value = 0, Icon = "https://cdn-icons-png.flaticon.com/512/3917/3917754.png", Color = "#0d47a1" },
+        new { Title = "Separated", Value = 0, Icon = "https://cdn-icons-png.flaticon.com/512/1828/1828490.png", Color = "#f9a825" },
+        new { Title = "Ending", Value = 0, Icon = "https://cdn-icons-png.flaticon.com/512/1828/1828961.png", Color = "#002171" }
+    };
+    }
+
+    <div class="container-fluid py-2">
+        <div class="dashboard-cards d-flex justify-content-center flex-wrap gap-3">
+            @foreach (var card in cards)
+            {
+                <div class="dashboard-card">
+                    <div class="card dash-card border text-center" style="border-color: @card.Color;">
+                        <div class="card-body d-flex justify-content-between align-items-center p-2">
+                            <div class="text-start">
+                                <h6 class="fw-semibold mb-1" style="font-size: 0.8rem;">@card.Title</h6>
+                                <p class="fw-bold m-0 card-value">@card.Value</p>
+                            </div>
+                            <img src="@card.Icon" alt="@card.Title icon" class="dash-icon" />
+                        </div>
+                        <div class="card-footer dash-footer text-white text-center" style="background-color: @card.Color;">
+                            <button class="btn btn-link text-white text-decoration-none p-0 more-info-btn" data-card="@card.Title"></button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="main-content py-2 px-3">
+            <div class="container-fluid">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0 mb-2 bg-white table-card-container">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Active Head Count Summary</h6>
+                            </div>
+                            @{
+                                var months = new Dictionary<string, string>
+                                    {
+                                        { "Jan", "January" }, { "Feb", "February" }, { "Mar", "March" },
+                                        { "Apr", "April" }, { "May", "May" }, { "Jun", "June" },
+                                        { "Jul", "July" }, { "Aug", "August" }, { "Sep", "September" },
+                                        { "Oct", "October" }, { "Nov", "November" }, { "Dec", "December" }
+                                    };
+                            }
+                            <div class="card-body p-0 table-container-wrapper">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0 table-hover text-center align-middle dashboard-table active-headcount-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Entry</th>
+                                                @foreach (var month in months)
+                                                {
+                                                    <th>
+                                                        <a href="#" class="month-link" data-month="@month.Key" data-fullmonth="@month.Value">@month.Key</a>
+                                                    </th>
+                                                }
+                                                <th><b>Total</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="active-headcount-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0 mb-2 bg-white table-card-container">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Tagged Resigned Summary</h6>
+                            </div>
+                            <div class="card-body p-0 table-container-wrapper">
+                                <div class="table-responsive">
+                                    <table id="tagged-resigned-table" class="table table-sm mb-0 table-hover text-center align-middle dashboard-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Entry</th>
+                                                <th>Jan</th>
+                                                <th>Feb</th>
+                                                <th>Mar</th>
+                                                <th>Apr</th>
+                                                <th>May</th>
+                                                <th>Jun</th>
+                                                <th>Jul</th>
+                                                <th>Aug</th>
+                                                <th>Sep</th>
+                                                <th>Oct</th>
+                                                <th>Nov</th>
+                                                <th>Dec</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tagged-resigned-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-sm-6 col-md-4 col-xl-2-4">
+                                <div class="card-redesigned h-100" data-color="#556ee6">
+                                    <div class="card-body">
+                                        <div class="icon-wrapper">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/554/554846.png" alt="Employees Icon" class="card-redesigned-icon">
+                                        </div>
+                                        <h5 class="card-title">View Employees</h5>
+                                        <p class="card-text text-muted">Manage employee records and view relevant details.</p>
+                                        <a href="#" id="employee-list-btn" class="btn action-btn">
+                                            Go to List
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4 col-xl-2-4">
+                                <div class="card-redesigned h-100" data-color="#34c38f">
+                                    <div class="card-body">
+                                        <div class="icon-wrapper">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/3688/3688609.png" alt="Job Order Icon" class="card-redesigned-icon">
+                                        </div>
+                                        <h5 class="card-title">View Open Job Orders</h5>
+                                        <p class="card-text text-muted">View open job orders and shortlist candidates.</p>
+                                        <a href="#" id="joborder-list-btn" class="btn action-btn">
+                                            Go to Orders
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4 col-xl-2-4">
+                                <div class="card-redesigned h-100" data-color="#f46a6a">
+                                    <div class="card-body">
+                                        <div class="icon-wrapper">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/3125/3125856.png"
+                                                 alt="Approvals Icon"
+                                                 class="card-redesigned-icon">
+                                        </div>
+                                        <h5 class="card-title">Approvals</h5>
+                                        <p class="card-text text-muted">View approvals and manage pending requests.</p>
+                                        <a href="#" id="approval-list-btn" class="btn action-btn">
+                                            Review Requests
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4 col-xl-2-4">
+                                <div class="card-redesigned h-100" data-color="#50a5f1">
+                                    <div class="card-body">
+                                        <div class="icon-wrapper">
+                                            <img src="~/Content/images/setup-dtr-approver-icon.png"
+                                                 alt="Setup DTR Approvers Icon"
+                                                 class="card-redesigned-icon">
+                                        </div>
+                                        <h5 class="card-title">Setup DTR Approvers</h5>
+                                        <p class="card-text text-muted">Setup your client DTR approvers.</p>
+                                        <a href="#" id="setup-dtr-approvers-btn" class="btn action-btn setup-dtr-approvers-btn">
+                                            Configure
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4 col-xl-2-4">
+                                <div class="card-redesigned h-100" data-color="#6f42c1">
+                                    <span class="soon-tag">SOON</span>
+                                    <div class="card-body">
+                                        <div class="icon-wrapper">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/681/681712.png"
+                                                 alt="Under Development Icon"
+                                                 class="card-redesigned-icon">
+                                        </div>
+                                        <h5 class="card-title">Under Development</h5>
+                                        <p class="card-text text-muted">This feature is currently under development.</p>
+                                        <a href="#" class="btn action-btn disabled">
+                                            Coming Soon
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="month-menu" style="display:none; position:absolute; z-index:1000;" class="card shadow-sm p-2 bg-white border rounded">
+            <button class="dropdown-item btn btn-link w-100 text-start" id="generate-btn">Generate this Month Report</button>
+            <button class="dropdown-item btn btn-link w-100 text-start" id="view-btn">View Details</button>
+        </div>
+    </div>
+
+</section>
+
+<style>
+    @@media (min-width: 1200px) {
+        .col-xl-2-4 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+    }
+
+    .soon-tag {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #f46a6a;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border-top-right-radius: 1rem;
+        border-bottom-left-radius: 0.5rem;
+        z-index: 10;
+        text-transform: uppercase;
+        transform: translate(0px, 0px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-redesigned .action-btn.disabled,
+    .card-redesigned .action-btn:disabled {
+        pointer-events: none;
+        opacity: 0.65;
+    }
+
+    .table-card-container {
+        border-radius: 1rem !important;
+        overflow: hidden;
+    }
+
+    .table-container-wrapper .table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-container-wrapper thead th:first-child {
+        border-top-left-radius: 1rem;
+    }
+
+    .table-container-wrapper thead th:last-child {
+        border-top-right-radius: 1rem;
+    }
+
+    .dashboard-table thead th {
+        color: #ffffff;
+        background-color: #000000;
+        border-color: #000000;
+        padding: 0.75rem 0.5rem;
+        font-weight: 600;
+        vertical-align: middle;
+    }
+
+    .dashboard-table .table-light th {
+        background-color: #000000 !important;
+        color: white !important;
+        border-color: #000000 !important;
+    }
+
+    .dashboard-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .dashboard-table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    .dashboard-table tbody td {
+        padding: 0.5rem;
+    }
+
+    .dashboard-table thead a.month-link {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .card-redesigned {
+        background: #fff;
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .card-redesigned:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1), 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-redesigned .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-redesigned .icon-wrapper {
+            margin-bottom: 1rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+    .card-redesigned-icon {
+        width: 60px;
+        height: 60px;
+        transition: transform 0.3s ease;
+    }
+
+    .card-redesigned:hover .card-redesigned-icon {
+        transform: scale(1.1);
+    }
+
+    .card-redesigned .card-title {
+        font-size: clamp(0.9rem, 1.8vw, 1.1rem); 
+        font-weight: 700;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-redesigned .card-text {
+        font-size: 0.9rem;
+        margin-bottom: auto;
+        min-height: 2.5rem;
+    }
+
+    .card-redesigned .action-btn {
+        margin-top: 1rem;
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #000000 !important;
+        padding: 0.375rem 0.75rem;
+        font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+        font-weight: 600;
+        transition: color 0.3s ease;
+        width: 100%;
+        border-radius: 0.75rem;
+        text-decoration: none;
+    }
+
+        .card-redesigned .action-btn:hover {
+            background-color: #000000 !important;
+            color: #f44336 !important;
+            border-color: #000000 !important;
+        }
+
+    .card-redesigned[data-color] {
+        --card-color: attr(data-color);
+    }
+</style>
+
+@Html.Partial("~/Views/Client/modal/_DashboardDetailPerClient_modal_v2.cshtml")

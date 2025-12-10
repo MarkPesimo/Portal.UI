@@ -1,0 +1,31 @@
+DONE -CONTINUOS OF COOR APPROVAL PART - 
+DONE -4 STEPS DOWN TO 2 STEPS (VIEW/DOWNLOAD) - 
+-Add Approver Name sa pag hugot ng DTR (Innerjoin ACAP SUBORDINATE) - DONE ( RE-DRAG SP )
+-Add Approver Group sa DTR Summary Header List - DONE ( RE-DRAG SP )
+DONE -DTR Summary Printing upon Submit - 
+DONE -Upon Submit to Client  - 
+DONE	-Generate excel/pdf DTR Summary (Do not include Pending) - 
+	-With Approvers
+DONE -Bug on DTR Summary computation - 
+DONE -DTR Summary - 
+DONE - Employee Picture - 
+DONE - Total Number of overtime- 
+DONE -Employee DTR - View Attachment(Approved) - 
+DONE -DTR Employee : Overtime | Leave = Total hrs - 
+DONE -Attendance Generation: Remove Table entries - 
+DONE -Attendance Generation: Confirmation upon saving
+DONE -Attendance Correction - Delete
+DONE -Open DTR Summary Print (Filing | Approved)
+DONE -HRMS: Employee Notes Monitoring: Uploading directly to Employee Profile 		Document once ES approved the Coor note document request.
+
+-Attendance Correction - Edit Shift 
+-Open attachments in Employee DTR (Filing | Approved)
+-View/Print DTR Summary (show Posted and approved)
+-Coor Portal Video Tutorial
+-Fix breadcrumbs
+-ZIPS: Checking of Ms Annie side approval
+	- Checking of Ms Reg approval
+-Portal: Required Document uploading
+-ExcelTemplate Harmonizer (5th, 6th, 7th Biometrics template)
+	DONE - Raw Punch File Type Template
+	     - Monthly Summarized Template
