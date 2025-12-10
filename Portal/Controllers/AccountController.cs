@@ -1,17 +1,21 @@
 ﻿using APWModel.ViewModel.Global;
 using APWModel.ViewModel.Global.Account;
+using Newtonsoft.Json;
 using Portal.Models;
 using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 //using System.Management;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Web.Security;
-
- 
+using static Portal.Models.GeoLocation;
 
 namespace Portal.Controllers
 {
@@ -19,11 +23,13 @@ namespace Portal.Controllers
     {
         private GlobalRepository _globalrepository { get; set; }
         private AccountRepository _accountrepository { get; set; }
+        private AttendanceRepository _attendancerepository { get; set; }
 
         public AccountController()
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_accountrepository == null) { _accountrepository = new AccountRepository(); }
+            if (_attendancerepository == null) { _attendancerepository = new AttendanceRepository(); }
         }
 
         public void GetDevinceInfo()
@@ -63,6 +69,63 @@ namespace Portal.Controllers
                 throw;
             }
         }
+
+     
+
+        [HttpPost]
+        public ActionResult GetLocation()
+        {
+            try
+            {                
+                GeolocationResponse _response = _attendancerepository.GetLocation();
+                //string _location = "";
+                //if (_response != null)
+                //{
+                //    _location = _response.location.lat.ToString();
+                //}
+                return Json(new { Status = "Success",
+                    Longitude = _response.location.lng.ToString(),
+                    Latitude = _response.location.lat.ToString(),
+                }, JsonRequestBehavior.AllowGet);                
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = "Error", Result = ex.ToString() }, JsonRequestBehavior.AllowGet);
+
+            }
+
+        }
+
+        //[HttpPost]
+        //public static async Task<GeolocationResponse> GetLocationAsync()
+        //{
+
+        //    using (var client = new HttpClient())
+        //    {
+        //        string ApiKey = "AIzaSyArxXXsshFVIlVCztlNFHXdtkZNKe1zv0Q";
+        //        string ApiUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + ApiKey;
+
+        //        var requestBody = new
+        //        {
+        //            considerIp = true // Use the IP address of the client making the request
+        //        };
+
+
+        //        var jsonContent = JsonConvert.SerializeObject(requestBody);
+        //        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        //        var response = await client.PostAsync(ApiUrl, content);
+        //        response.EnsureSuccessStatusCode(); // Throws an exception if the HTTP status code is an error
+
+        //        var responseString = await response.Content.ReadAsStringAsync();
+        //        var geolocationResponse = JsonConvert.DeserializeObject<GeolocationResponse>(responseString);
+
+        //        return geolocationResponse;
+
+        //        //return Json(new { Result = geolocationResponse }, JsonRequestBehavior.AllowGet);
+
+        //    }
+        //}
 
         [HttpGet]
         public ActionResult Login()

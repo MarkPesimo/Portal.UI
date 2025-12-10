@@ -23,6 +23,59 @@
         };
     }
 
+    // $("#location-btn").click(function (e) {
+    //    e.preventDefault();
+
+    //     $.get("http://ipinfo.io", function (response) {
+    //         alert(response.ip);
+    //     }, "jsonp");
+     
+    //});
+
+    $("#location-btn").click(function (e) {
+        e.preventDefault();
+
+        //callAsyncController();
+        $.ajax({
+            url: '/Account/GetLocation',
+            type: "POST",
+            dataType: 'json',
+            success: function (result) {
+                //console.log(result);
+                if (result.Status == "Success") {
+                    alert('Latitude : ' + result.Latitude);
+                    alert('Longitude : ' + result.Longitude);
+                    
+                //    //console.log(result.Result.location);
+                }
+                else { alert(result);}
+            }
+        });
+    });
+
+    //async function callAsyncController() {
+    //    try {
+    //        const response = await fetch('/Account/GetLocationAsync',
+    //        {
+    //            method: 'POST', // or 'POST', 'PUT', etc.
+    //            headers:
+    //            {
+    //                'Content-Type': 'application/json'
+    //            }
+    //            // body: JSON.stringify({ data: 'someValue' }) // for POST/PUT requests
+    //        });
+
+    //        if (!response.ok) {
+    //            throw new Error(`HTTP error! status: ${response.status}`);
+    //        }
+
+    //        const data = await response.json(); // or .text() if returning plain text
+    //        console.log(data);
+    //    } catch (error) {
+    //        console.error('Error calling async controller:', error);
+    //    }
+    //}
+
     $("#login-btn").click(function (e) {
         e.preventDefault();
 

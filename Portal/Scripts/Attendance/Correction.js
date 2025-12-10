@@ -198,7 +198,8 @@
         else if (_status == "Rejected") { _color = '#c94D3B'; }
         else { _font_color = 'black'; }
 
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
     //----------------------------------END TABLE----------------------------------------------
 
@@ -260,6 +261,17 @@
                 else {
                     $("#add_correction_modal").modal('hide');
 
+
+                    $file = $("#Correction_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully created.')
+                        return;
+                    }
+
+
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Attendance correction successfully created.');
 
@@ -309,18 +321,51 @@
         $.ajax({
             url: '/Attendance/_EditCorrection',
             type: "POST",
-            data: $('#attendance-correction-Form').serialize(),
+            data: $('#edit-attendance-correction-Form').serialize(),
             dataType: 'json',
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
                 else {
                     $("#edit_correction_modal").modal('hide');
 
+                    $file = $("#Edit_Correction_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        CorrectionEditAttachment(result.CorrectionId, 'Attendance correction successfully updated.')
+                        return;
+                    }
+
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Attendance Correction successfully updated.');
                     BindTable();
                 }
             }
+        });
+    });
+
+    $('#edit_correction_modal').on('click', '#view_attached_btn', function () {
+        var _fileid = document.querySelector('#edit-attendance-correction-Form').querySelector("#Id").value;
+        var _extension = document.querySelector('#edit-attendance-correction-Form').querySelector("#FileExtension").value;
+ 
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Attendance/_OpenCorrectionFile",
+            data: {
+                '_fileid': _fileid,
+                '_extension': _extension,
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $("#open_correction_file_modal").find(".modal-body").html(response);
+                $("#open_correction_file_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
         });
     });
     //----------------------------------END EDIT CORRECTION--------------------------------------
@@ -377,7 +422,7 @@
     //----------------------------------END POST CORRECTION--------------------------------------
 
     //----------------------------------END PRINT CORRECTION--------------------------------------
-    $('#overtime-table').on('click', '.print-overtime', function () {
+    $('#correction-table').on('click', '.print-correction', function () {
         var guid = $(this).attr("guid");
 
         ShowLoading('SHOW');
@@ -483,6 +528,69 @@
     //----------------------------------END CANCEL CORRECTION--------------------------------------
 
 
+
+    function CorrectionAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Correction_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Correction_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Attendance/_CorrectionAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    //ClearTable('#correction-table');
+                    
+                    BindTable();                    
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
+
+
+    function CorrectionEditAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Edit_Correction_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Correction_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Attendance/_CorrectionAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    //ClearTable('#correction-table');
+
+                    BindTable();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
 
     //==================================BEGIN MISC==================================
     function ShowSuccessMessage(_msg) {

@@ -1,0 +1,19 @@
+﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
+    
+<div class="row">
+    @if (@Model.FileExtension == ".pdf")
+    {
+        <iframe src="\AttendanceCorrectionAttachments\Filing\@Model.Id@Model.FileExtension" width="800" height="700" frameborder="0"></iframe>
+    }
+    else if (@Model.FileExtension == ".doc" || @Model.FileExtension == ".docx")
+    {
+        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=https://Zips.wardhowell.com.ph/AttendanceCorrectionAttachments/Filing/@Model.Id@Model.FileExtension" width="500" height="800" frameborder="0"></iframe>
+    }
+    else
+    {
+        <img src="\AttendanceCorrectionAttachments\Filing\@Model.Id@Model.FileExtension" alt="" class="img-fluid" />
+    }
+</div>
+
+
+

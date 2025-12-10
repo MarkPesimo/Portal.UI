@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-lg-auto col-6">
                             <button type="button" class="btn btn-sm ms-lg-1 btn-primary rounded" id="add_correction_btn">
-                                <i class="fa-solid fa-plus"></i> Add Correction
+                                <i class="fa-solid fa-plus"></i> File Correction
                             </button>
                         </div>
 
@@ -70,12 +70,15 @@
 
 
 @Html.Partial("~/Views/Attendance/Modal/Correction/_filter_correction_modal.cshtml")
-@Html.Partial("~/Views/Attendance/Modal/Correction/_add_correction_modal.cshtml")
+@Html.Partial("~/Views/Attendance/Modal/Correction/_open_correction_file_modal.cshtml")
 
+@Html.Partial("~/Views/Attendance/Modal/Correction/_add_correction_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/Correction/_edit_correction_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/Correction/_post_correction_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/Correction/_unpost_correction_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/Correction/_cancel_correction_modal.cshtml")
+
+@Html.Partial("~/Views/Attendance/Modal/Correction/_preview_correction_modal.cshtml")
 @*
     @Html.Partial("~/Views/File/Industry/modal/_industryedit_modal.cshtml")
 

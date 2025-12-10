@@ -255,7 +255,7 @@ namespace Portal.Controllers
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
                     _model.Id = _id;
                     _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
-                    return Json(new { Result = "Success" });
+                    return Json(new { Result = "Success", CorrectionId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -301,7 +301,7 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
-                    return Json(new { Result = "Success" });
+                    return Json(new { Result = "Success", CorrectionId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -321,7 +321,10 @@ namespace Portal.Controllers
             Correction_model _obj = _attendancerepository.GetAttendanceCorrection(_id);
             
             ViewBag._ClientShift = _globalrepository.GetClientShift(_client_id).Select(t => new SelectListItem { Text = t.ShiftTypeDescription, Value = t.ShiftTypeId.ToString() }).ToList();
-            return PartialView("~/Views/Attendance/Partial/Correction/_correction_detail.cshtml", _obj);
+
+
+            //return PartialView("~/Views/Attendance/Partial/Correction/_correction_detail.cshtml", _obj);
+            return PartialView("~/Views/Attendance/Partial/Correction/_edit_correction_detail.cshtml", _obj);
         }
 
         [HttpPost]
@@ -332,7 +335,7 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 1);
-                    return Json(new { Result = "Success" });
+                    return Json(new { Result = "Success", CorrectionId = _id });
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);
@@ -486,15 +489,23 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _PreviewCorrection(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Attendance/Partial/Correction/_preview_correction_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "ATTENDANCE CORRECTION", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Attendance/Partial/Correction/_preview_correction_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpGet]
         public ActionResult _PreviewApprovedCorrection(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Attendance/Partial/Correction/_preview_approved_correction_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "ATTENDANCE CORRECTION", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Attendance/Partial/Correction/_preview_approved_correction_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         //---------------------------------------BEGIN UNPOST ATTENDANCE CORRECTION---------------------------------------
@@ -902,6 +913,28 @@ namespace Portal.Controllers
         //=======================================END DTR==============================
 
         [HttpGet]
+        public ActionResult _PreviewDTRSummary(string _guid)
+        {
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "DTR", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Attendance/Partial/DTR/_preview_dtrsummary_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
+        }
+
+        [HttpGet]
+        public ActionResult _PreviewApprovedDTRSummary(string _guid)
+        {
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "DTR", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Attendance/Partial/DTR/_preview_approved_dtrsummary_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
+        }
+
+        [HttpGet]
         public ActionResult _PreviewPostedAttendanceCorrection(string _guid)
         {
             string approvedBaseFolder = Server.MapPath($"~/AttendanceCorrectionAttachments/AttendanceCorrectionFormsGenerated/Posted/{_guid}/{_guid}.pdf");
@@ -935,5 +968,72 @@ namespace Portal.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult _CorrectionAttachment(int _id, HttpPostedFileBase Correction_Attachment)
+        {
+            try
+            {
+                string _fileextension = _globalrepository.GetExtension(Correction_Attachment);
+                int _mode = 91;
+
+                Correction_model _model = new Correction_model();
+                _model.Id = _id;
+
+                
+                _model.DateLog= DateTime.Now;
+                _model.DateFiled = DateTime.Now;
+
+                _model.WorkLocation = 0;
+                _model.EmpId = _loginuserid;
+                _model.EmpName = "";
+                _model.ClientName = "";
+                _model.ShiftId = 0;
+                _model.TimeInDate = DateTime.Now;
+                _model.TimeInTime = DateTime.Now;
+                _model.TimeOutDate = DateTime.Now;
+                _model.TimeOutTime = DateTime.Now;
+
+                _model.Reason = "";
+                _model.Remarks = _fileextension;
+
+                _model.mode = _mode;
+                _model.UserId = 112;
+                _model.guid = "";
+
+                _id = _attendancerepository.ManageAttendanceCorrection(_model, _mode);
+
+                //update table for the file extension 
+
+                //check if candidate id folder already exist, if not create a folder
+                //string _check_foloder = Path.Combine(Server.MapPath("~/LeaveAttachments/Filing/" + _id.ToString()), "");
+                //if (Directory.Exists(_check_foloder) == false) { Directory.CreateDirectory(_check_foloder); }
+
+
+                var path = Path.Combine(Server.MapPath("~/AttendanceCorrectionAttachments/Filing/" + _id.ToString() + _fileextension));
+
+                if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
+
+                Correction_Attachment.SaveAs(path);
+                //attached procedure ends here------------------------------------------------------------------------------
+
+                return Json(new { Result = "Success" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult _OpenCorrectionFile(int _fileid, string _extension)
+        {
+            Correction_model _model = new Correction_model
+            {
+                Id = _fileid,
+                FileExtension = _extension
+            };
+
+            return PartialView("~/Views/Attendance/partial/Correction/_view_attachment.cshtml", _model);
+        }
     }
 }

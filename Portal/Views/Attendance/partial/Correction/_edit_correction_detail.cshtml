@@ -1,6 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Attendance_model.Correction_model
 
-@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-attendance-correction-Form", id = "post-attendance-correction-Form" }))
+
+@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "edit-attendance-correction-Form", id = "edit-attendance-correction-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.UserId)
@@ -10,7 +11,6 @@
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
-  
     <div class="row" id="div-validation" style="display: none;">
         <div class="col-lg-6 mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
@@ -20,7 +20,12 @@
     <div class="row">
         <div class="col-6 mb-3">
             <label for="" class="form-label">Date Log</label>
-            @Html.TextBoxFor(m => m.DateLog, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.DateLog.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(m => m.DateLog, new {
+                @class = "form-control",
+                @placeholder = "mm/dd/yyyy",
+                @type = "date",
+                @Value = Model.DateLog.ToString("yyyy-MM-dd")
+            })
         </div>
 
         <div class="col-6 mb-3">
@@ -35,6 +40,7 @@
                 new { @class = "form-select" })
         </div>
     </div>
+
 
     <div class="row">
         <div class="col mb-3">
@@ -70,12 +76,12 @@
         </div>
     </div>
 
+
     <div class="row mt-2">
         <div class="col">
-            <input class="form-control" type="file" name="Correction_Attachment" id="Correction_Attachment">
+            <input class="form-control" type="file" name="Edit_Correction_Attachment" id="Edit_Correction_Attachment">
         </div>
     </div>
-
 }
 
 

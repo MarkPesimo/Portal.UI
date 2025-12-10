@@ -237,7 +237,7 @@
     function SetTableBGColor(_status) {
         var _font_color = 'white';
         var _color = 'white';
-        console.log(_status);
+        //console.log(_status);
         if (_status == 'Posted') { _color = '#5cb85c'; }
         else if (_status == "Filed Leave") { _color = '#0275d8'; }
         else if (_status == "With Correction") { _color = '#10a9e0'; }
@@ -246,7 +246,9 @@
         else if (_status == 'Virtual | Approved Leave') { _color = '#c94D3B'; }
         else if (_status == "Virtual") { _color = '#ec72df'; _font_color = 'white'; }             //VIRTUAL
         else { _color = '#aba7ae'; _font_color = 'white'; }
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
 
     //----------------------------------BEGIN ADD POST OVERTIME-----------------------------------
@@ -265,11 +267,40 @@
                 $('#add_post_overtime_modal').find(".modal-body").innerHTML = '';
                 $('#add_post_overtime_modal').find(".modal-body").html(response);
                 $("#add_post_overtime_modal").modal('show');
+
+                var _modal = '#add_post_overtime_modal';
+                var _form = '#post-overtime-Form';
+                
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", GetShiftOnSelectedDate);
+                GetShiftOnSelectedDate();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+
+    function GetShiftOnSelectedDate() {
+        var _modal = '#add_post_overtime_modal';
+        var _form = '#post-overtime-Form';
+
+        var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+        document.querySelector(_modal).querySelector(_form).querySelector("#OTTo").value = DateLog;
+
+        var url = `/Overtime/GetShift?_datelog=${DateLog}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-in').value = data.ShiftIn;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-out').value = data.ShiftOut;
+                    //console.log(data);
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
 
     $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {
         ShowLoading('SHOW');
@@ -370,6 +401,16 @@
                 else {
                     $("#add_post_correction_modal").modal('hide');
 
+
+                    $file = $("#Correction_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully created.')
+                        return;
+                    }
+
+
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Attendance correction successfully Posted.');
 
@@ -380,6 +421,37 @@
             error: function (response) { LogError(response); }
         });
     });
+
+    function CorrectionAttachment(_id, _msg) {
+
+        var formData = new FormData();
+        var _Attachement = $('#Correction_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Correction_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Attendance/_CorrectionAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#correction-table');
+
+                    BindTable();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+
+    }
     //----------------------------------END ADD POST ATTENDANCE CORRECTION-----------------------------------
 
     //----------------------------------BEGIN ADD POST LEAVE-----------------------------------
@@ -394,6 +466,12 @@
             contentType: "application/json; charset=utf-8",
             dataType: "html",
             success: function (response) {
+
+                if (isJsonString(response)) {
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+
                 ShowLoading('HIDE');
                 $('#add_post_leave_modal').find(".modal-body").innerHTML = '';
                 $('#add_post_leave_modal').find(".modal-body").html(response);

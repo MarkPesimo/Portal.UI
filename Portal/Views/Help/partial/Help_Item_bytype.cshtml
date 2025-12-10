@@ -1,0 +1,18 @@
+﻿
+@model List<APWModel.ViewModel.iSearch.HelpModel>
+
+<ol class="list-group list-group-numbered">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item py-3 px-5 bg-white">
+            <a href="#" 
+               class="ms-3 preview-button" 
+               _modulename="@item.ModuleName"
+               _description="@item.Description"
+               _filename="@item.Filename" 
+                _id="@item.Id">
+                @item.Description
+            </a>
+        </li>
+    }
+</ol>

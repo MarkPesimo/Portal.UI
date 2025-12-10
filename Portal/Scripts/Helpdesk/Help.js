@@ -6,43 +6,56 @@
 
         ShowLoading('HIDE');
 
-        $("#help-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                order: [[0, "asc"]],
-                //columns: [
-                //    { 'data': 'SortNo' },
-                //    { 'data': 'Description' },
-                //    { 'data': 'ModuleName' }, 
-                //],
-                //coldecolumnDefs: [
-                //    {
-                //        target: 1,
-                //        visible : false,
-                //    },
-                //    //{
-                //    //    title: 'MOD NAME',
-                //    //    target: 1,
-                //    //    //class: "d-none d-sm-table-cell text-center",
-                //    //    visible: false
-                        
-                //    //},
-                //],
-            }
-        );
+        //$("#help-table").DataTable(
+        //    {
+        //        autoWidth: false,
+        //        bLengthChange: true,
+        //        order: [[0, "asc"]],
+              
+        //    }
+        //);
         
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
+        //$('.dataTables_length').addClass('bs-select ms-2 mt-2');
+        //$('.dataTables_filter').addClass('me-2 mb-1 mt-2');
+        //$('.dataTables_paginate').addClass('mt-2 mb-2');
+        //$('.dataTables_info').addClass('ms-2 mt-2 mb-2');
+        //$('.sorting').addClass('bg-primary text-white');
 
-        var dt = $('#help-table').DataTable();
-        //hide the first column
-        //dt.column(0).visible(false);
-        dt.column(2).visible(false);
+        //var dt = $('#help-table').DataTable();
+        ////hide the first column
+        ////dt.column(0).visible(false);
+        //dt.column(2).visible(false);
     });
+
+    $("#faqs").on("click", ".preview-button", function (e) {
+        var _id = $(this).attr("_id");
+        var _description = $(this).attr("_description");
+        var _filename = $(this).attr("_filename");
+        var _modulename = $(this).attr("_modulename");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Help/Preview',
+            data: {
+                '_id': _id,
+                '_description': _description,
+                '_filename': _filename,
+                '_modulename': _modulename
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_help_modal').find(".modal-body").html(response);
+                $("#preview_help_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+
+    })
+
 
     $('#help-table').on('click', '.preview-button', function (e) {
         e.preventDefault();

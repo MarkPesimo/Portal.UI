@@ -131,10 +131,10 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    //int _id = _overtimerepository.ManageOvertime(_model);
-                    //_model.Id = _id;
+                    int _id = _overtimerepository.ManageOvertime(_model);
+                    _model.Id = _id;
 
-                    int _id = 0; // _overtimerepository.ManageOvertime(_model);
+                    
                     _model.Mode = 3;
                     _id = _overtimerepository.ManageOvertime(_model);
 
@@ -189,7 +189,8 @@ namespace Portal.Controllers
             _obj.Mode = 1;
             _obj.UserId = 112;
 
-            return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _obj);
+            //return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _obj);
+            return PartialView("~/Views/Overtime/Partial/_edit_overtime_detail.cshtml", _obj);
         }
         //---------------------------------------END EDIT OVERTIME---------------------------------------
 
@@ -255,13 +256,20 @@ namespace Portal.Controllers
                 if (_model.Remarks == null) { _model.Remarks = ""; }
                 if (_model.Message == null) { _model.Message = ""; }
 
-  
+               
 
                 if (_model.Mode == 0 || _model.Mode == 1)
                 {
                     if (_model.OTFrom.Date > _model.OTTo.Date)
                     {
                         return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
+                    }
+
+                    DateTime _datetodate = DateTime.Now;
+                    double _noofdays = (_datetodate - DateTime.Parse(_model.OTFrom.ToString())).TotalDays;
+                    if (_noofdays > 2)
+                    {
+                        return Json(new { Result = "ERROR", Message = "You cannot submit an overtime request for work performed more than two days ago.", ElementName = "OTFrom" });
                     }
 
                     DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());
@@ -278,7 +286,7 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     string _gen_result = "";
-                    if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
+                    //if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
 
                     
@@ -427,16 +435,25 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _PreviewOvertime(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Overtime/Partial/_preview_overtime_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "OVERTIME", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Overtime/Partial/_preview_overtime_detail.cshtml", _filename);                
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpGet]
         public ActionResult _PreviewApprovedOvertime(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Overtime/Partial/_preview_approved_overtime_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "OVERTIME", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Overtime/Partial/_preview_approved_overtime_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
+
 
         [HttpPost]
         public ActionResult _OvertimeAttachment(int _id, HttpPostedFileBase Overtime_Attachment)

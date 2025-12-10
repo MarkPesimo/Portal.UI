@@ -51,5 +51,26 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
+
+        public HelpList_Model GetHelpByApp2(int _appid)
+        {
+            try
+            {
+                HelpList_Model _obj = new HelpList_Model();
+
+                string _endpoint = "Help/App2/" +
+                    _appid.ToString() + "/" +
+                    _client_id.ToString();
+                HttpResponseMessage _response = _globalrepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<HelpList_Model>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
     }
 }

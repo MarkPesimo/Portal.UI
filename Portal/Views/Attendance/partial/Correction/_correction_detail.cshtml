@@ -8,6 +8,9 @@
     @Html.HiddenFor(m => m.EmpId)
     @Html.HiddenFor(m => m.Remarks)
 
+    @Html.HiddenFor(m => m.HasAttachement)
+    @Html.HiddenFor(m => m.FileExtension)
+
     <div class="row" id="div-validation" style="display: none;">
         <div class="col-lg-6 mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
@@ -27,7 +30,7 @@
 
         <div class="col-6 mb-3">
             <label for="" class="form-label">Work Location</label>
-            @Html.DropDownListFor(m => m.WorkLocation, 
+            @Html.DropDownListFor(m => m.WorkLocation,
                 new List<SelectListItem> {
                     new SelectListItem { Text = "Office", Value = "1" },
                     new SelectListItem { Text = "Home", Value = "2" },
@@ -73,6 +76,12 @@
         </div>
     </div>
 
+
+    <div class="row mt-2">
+        <div class="col">
+            <input class="form-control" type="file" name="Correction_Attachment" id="Correction_Attachment">
+        </div>
+    </div>
 }
 
 

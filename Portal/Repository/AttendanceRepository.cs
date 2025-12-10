@@ -9,6 +9,7 @@ using System.Web;
 using static APWModel.ViewModel.Portal.Attendance_model;
 using static APWModel.ViewModel.Portal.DTR_model;
 using static APWModel.ViewModel.Portal.DTR_model.DTRmodel;
+using static Portal.Models.GeoLocation;
 
 namespace Portal.Repository
 {
@@ -80,6 +81,14 @@ namespace Portal.Repository
             if (_model.Latitude == null) { _model.Latitude = "0"; }
             if (_model.Longitude == null) { _model.Longitude = "0"; }
 
+            //GeolocationResponse _location = GetLocation();
+            //if (_location != null)
+            //{
+            //    _model.Latitude = _location.location.lat.ToString();
+            //    _model.Longitude = _location.location.lng.ToString();
+            //}
+            
+
             var _content_prop = new Dictionary<string, string>
             {
                 {"Id",                      _model.Id.ToString() },
@@ -102,6 +111,57 @@ namespace Portal.Repository
 
             return _result;
         }
+
+        public GeolocationResponse GetLocation()
+        {
+            try
+            {
+                //string ApiKey = "AIzaSyArxXXsshFVIlVCztlNFHXdtkZNKe1zv0Q";
+                string ApiUrl = PortalConstant.GeoLocationURL + PortalConstant.GeoLocationKey;
+
+                var _content_prop = new Dictionary<string, string>
+                {
+                    {"homeMobileCountryCode",   PortalConstant.HomeMobileCountryCode },
+                    {"homeMobileNetworkCode",   PortalConstant.HomeMobileNetworkCode },
+                    {"radioType ",              PortalConstant.RadioType },
+                    {"carrier",                 PortalConstant.Carrier },
+                    {"considerIp",              PortalConstant.ConsiderIP },
+                };
+
+                var jsonContent = JsonConvert.SerializeObject(_content_prop);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = _globalRepository.GeneratePostRequest(ApiUrl, content);
+                response.EnsureSuccessStatusCode(); // Throws an exception if the HTTP status code is an error
+
+                GeolocationResponse _response = new GeolocationResponse();
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = response.Content.ReadAsStringAsync().Result.ToString();
+                    _response = JsonConvert.DeserializeObject<GeolocationResponse>(responseString.ToString());
+
+                }
+
+                return _response;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        //public class GeolocationResponse
+        //{
+        //    public Location location { get; set; }
+        //    public double accuracy { get; set; }
+        //}
+
+        //public class Location
+        //{
+        //    public double lat { get; set; }
+        //    public double lng { get; set; }
+        //}
 
         public List<ClockInOutList_model> GetClockInOut(DateTime _datefrom, DateTime _dateto)
         {
@@ -195,6 +255,7 @@ namespace Portal.Repository
             if (_mode == 4) { _endpoint = "Attendance/UnpostCorrection"; }
             if (_mode == 5) { _endpoint = "Attendance/ApprovCorrection"; }
             if (_mode == 6) { _endpoint = "Attendance/RejectCorrection"; }
+            if (_mode == 91) { _endpoint = "Attendance/AttachDocument"; }
             if (_model.Remarks == null) { _model.Remarks = ""; }
 
             var _content_prop = new Dictionary<string, string>

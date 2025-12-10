@@ -102,6 +102,8 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddPostLeave(DateTime _datelog)
         {
+            if (!_globalrepository.HasClientAccess(_client_id, "FILE LEAVE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
+
             LeaveModel _model = new LeaveModel
             {
                 LeaveFrom = _datelog,
@@ -204,6 +206,8 @@ namespace Portal.Controllers
                 EmpId = _loginuserid,
                 UserId = 112,
                 Mode = 0,
+                FirstHalf = false,
+                SecondHalf = false,
             };
 
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
@@ -220,7 +224,7 @@ namespace Portal.Controllers
             _obj.UserId = 112;
 
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
-            return PartialView("~/Views/Leave/Partial/_leave_detail.cshtml", _obj);
+            return PartialView("~/Views/Leave/Partial/_edit_leave_detail.cshtml", _obj);
         }
         //---------------------------------------END EDIT LEAVE---------------------------------------
 
@@ -274,15 +278,38 @@ namespace Portal.Controllers
                 {
                     if (_model.FirstHalf) { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "AM"; }
                     else if (_model.SecondHalf) { _model.LeaveFromAMPM = "PM"; _model.LeaveToAMPM = "PM"; }
+                    else { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "PM"; _model.LeaveDays = 1; _model.IsHalfday = false; }
                 }
                 else
                 {
                     if (_model.FirstDay_SecondHalf) { _model.LeaveFromAMPM = "PM"; }
                     else { _model.LeaveFromAMPM = "AM"; }
 
-                    if (_model.LastDay_FirstHalf) { _model.LeaveFromAMPM = "AM"; }
-                    else { _model.LeaveFromAMPM = "PM"; }
+                    if (_model.LastDay_FirstHalf) { _model.LeaveToAMPM = "AM"; }
+                    else { _model.LeaveToAMPM = "PM"; }
                 }
+
+                DateTime _datetodate = DateTime.Now;
+                double _noofdays = (DateTime.Parse(_model.LeaveFrom.ToString()) - _datetodate).TotalDays;
+                if (_model.LeaveTypeId == 2)        //vacation leave
+                {
+                    if (_noofdays < 3)
+                    {
+                        if (!_model.EmergencyLeave)
+                        {
+                            return Json(new { Result = "ERROR", Message = "Vacation leave must be filed at least 3 days before the actual leave date.", ElementName = "LeaveFrom" });
+                        }
+
+                    }
+                }
+                else if (_model.LeaveTypeId == 1)
+                {
+                    if (_noofdays < -7)
+                    {
+                        return Json(new { Result = "ERROR", Message = "You cannot file a sick leave request if the date is within the past seven (7) days..", ElementName = "LeaveFrom" });
+                    }
+                }
+                
 
                 if (_model.Mode == 0 || _model.Mode == 1)
                 {
@@ -477,15 +504,23 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _PreviewLeave(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Leave/Partial/_preview_leave_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "LEAVE", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Leave/Partial/_preview_leave_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpGet]
         public ActionResult _PreviewApprovedLeave(string _guid)
         {
-            string _filename = _guid;
-            return PartialView("~/Views/Leave/Partial/_preview_approved_leave_detail.cshtml", _filename);
+            if (_globalrepository.HasAccessToViewGeneratedForm(_loginuserid, "LEAVE", _guid))
+            {
+                string _filename = _guid;
+                return PartialView("~/Views/Leave/Partial/_preview_approved_leave_detail.cshtml", _filename);
+            }
+            else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
 
         [HttpPost]

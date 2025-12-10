@@ -1,7 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
 
 
-@using (Html.BeginForm("Add", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "leave-Form", id = "leave-Form" }))
+@using (Html.BeginForm("Edit", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "edit-leave-Form", id = "edit-leave-Form" }))
 {
 
     @Html.HiddenFor(m => m.Id)
@@ -63,8 +63,7 @@
             <div class="row">
                 <div class="col">
                     <div class="form-check form-switch mt-2">
-                        @*@Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input", @name = @Model.FirstHalf, @value = @Model.FirstHalf })*@
-                        @Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input"  })
+                        @Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input", @name = @Model.FirstHalf, @value = @Model.FirstHalf })
                         <label class="form-check-label" for="flexSwitchCheckChecked">First Half</label>
                     </div>
                 </div>
@@ -118,7 +117,7 @@
 
     <div class="row mt-2">
         <div class="col">
-            <input class="form-control" type="file" name="Leave_Attachment" id="Leave_Attachment_Add">
+            <input class="form-control" type="file" name="Leave_Attachment" id="Leave_Attachment_Edit">
         </div>
     </div>
 }
