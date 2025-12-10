@@ -1,5 +1,5 @@
 ﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
-     
+
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "cancel-overtime-Form", id = "cancel-overtime-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -16,6 +16,13 @@
     @Html.HiddenFor(m => m.Remarks)
     @Html.HiddenFor(m => m.Mode)
     @Html.HiddenFor(m => m.UserId)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
 }
 
 Are you sure you want to mark this Overtime request as <strong><span class="text-danger">Cancelled</span></strong>?

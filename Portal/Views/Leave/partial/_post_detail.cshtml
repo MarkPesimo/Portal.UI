@@ -15,10 +15,18 @@
     @Html.HiddenFor(m => m.SecondHalf)
     @Html.HiddenFor(m => m.FirstDay_SecondHalf)
     @Html.HiddenFor(m => m.LastDay_FirstHalf)
+    @Html.HiddenFor(m => m.EmergencyLeave)
     @Html.HiddenFor(m => m.Reason)
     @Html.HiddenFor(m => m.Remarks)
     @Html.HiddenFor(m => m.Mode)
     @Html.HiddenFor(m => m.UserId)
+
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
 }
 
 

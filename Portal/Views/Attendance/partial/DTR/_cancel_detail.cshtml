@@ -10,6 +10,13 @@
     @Html.HiddenFor(m => m.Dateto)
     @Html.HiddenFor(m => m.Mode)
     @Html.HiddenFor(m => m.Remarks)
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
 }
 
 Are you sure you want to mark this DTR as <strong><span class="text-danger">Cancelled</span></strong>?

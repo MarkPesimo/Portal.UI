@@ -10,9 +10,10 @@
 
     .uniform-table .reason-col {
         width: 25% !important;
-        white-space: normal; 
-        word-break: break-word; 
-        text-align: left;     }
+        white-space: normal;
+        word-break: break-word;
+        text-align: left;
+    }
 </style>
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-dtr-Form", id = "post-dtr-Form" }))
@@ -25,6 +26,13 @@
     @Html.HiddenFor(m => m.DTR.Dateto, new { Name = "Dateto" })
     @Html.HiddenFor(m => m.DTR.Remarks, new { Name = "Remarks" })
     @Html.HiddenFor(m => m.DTR.Mode, new { Name = "Mode" })
+
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
 }
 
 <p>
@@ -50,8 +58,8 @@
             <thead>
                 <tr class="text-center">
                     <th class="bg-primary text-white">Date</th>
-                    <th class="bg-primary text-white">Date Log</th> 
-                    <th class="bg-primary text-white">Schedule</th> 
+                    <th class="bg-primary text-white">Date Log</th>
+                    <th class="bg-primary text-white">Schedule</th>
                     <th class="bg-primary text-white">Time In</th>
                     <th class="bg-primary text-white">Time Out</th>
                     <th class="bg-primary text-white">With Correction</th>
@@ -66,7 +74,7 @@
                         <tr class="text-center">
                             <td>@a.Date</td>
                             <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
-                            <td style="color: @a.LateColor"class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
+                            <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
                             <td style="color: @a.LateColor">@a.TimeIn</td>
                             <td style="color: @a.UndertimeColor">@a.TimeOut</td>
                             <td>@a.HasCorrection</td>
