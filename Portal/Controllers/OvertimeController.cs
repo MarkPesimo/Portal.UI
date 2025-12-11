@@ -248,6 +248,12 @@ namespace Portal.Controllers
         }
         //---------------------------------------END CANCEL OVERTIME---------------------------------------
 
+        public double ComputeOTHours(DateTime startTime, DateTime endTime)
+        {
+            TimeSpan span = endTime.Subtract(startTime);
+            return span.TotalMinutes;
+        }
+
         [HttpPost]
         public ActionResult _ManageOvertime(OvertimeModel _model)
         {
@@ -280,7 +286,18 @@ namespace Portal.Controllers
                         return Json(new { Result = "ERROR", Message = "The Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
                     }
 
-                
+                    if (ComputeOTHours(DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString()), DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString())) <= 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The value of Overtime [from] must be greater than the value of Overtime [to].", ElementName = "OTFrom" });
+                    }
+                }
+
+                if (_model.Mode == 3)           //psoting
+                {
+                    if (ComputeOTHours(DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString()), DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString())) <= 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "The value of Overtime [from] must be greater than the value of Overtime [to].", ElementName = "OTFrom" });
+                    }                    
                 }
 
                 if (ModelState.IsValid)
@@ -289,6 +306,12 @@ namespace Portal.Controllers
                     //if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
 
+                    if (_model.Mode == 0 || _model.Mode == 1)
+                    {
+                        _model.Mode = 3;
+                        _model.Id = _id;
+                        _id = _overtimerepository.ManageOvertime(_model);
+                    }
                     
                     return Json(new { Result = "Success", MemoryResult = _gen_result, OvertimeId = _id });
                 }

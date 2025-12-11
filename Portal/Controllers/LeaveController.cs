@@ -291,24 +291,29 @@ namespace Portal.Controllers
 
                 DateTime _datetodate = DateTime.Now;
                 double _noofdays = (DateTime.Parse(_model.LeaveFrom.ToString()) - _datetodate).TotalDays;
-                if (_model.LeaveTypeId == 2)        //vacation leave
-                {
-                    if (_noofdays < 3)
-                    {
-                        if (!_model.EmergencyLeave)
-                        {
-                            return Json(new { Result = "ERROR", Message = "Vacation leave must be filed at least 3 days before the actual leave date.", ElementName = "LeaveFrom" });
-                        }
 
-                    }
-                }
-                else if (_model.LeaveTypeId == 1)
+                if (_model.Mode != 4)
                 {
-                    if (_noofdays < -7)
+                    if (_model.LeaveTypeId == 2)        //vacation leave
                     {
-                        return Json(new { Result = "ERROR", Message = "You cannot file a sick leave request if the date is within the past seven (7) days..", ElementName = "LeaveFrom" });
+                        if (_noofdays < 3)
+                        {
+                            if (!_model.EmergencyLeave)
+                            {
+                                return Json(new { Result = "ERROR", Message = "Vacation leave must be filed at least 3 days before the actual leave date.", ElementName = "LeaveFrom" });
+                            }
+
+                        }
+                    }
+                    else if (_model.LeaveTypeId == 1)
+                    {
+                        if (_noofdays < -7)
+                        {
+                            return Json(new { Result = "ERROR", Message = "You cannot file a sick leave request if the date is within the past seven (7) days..", ElementName = "LeaveFrom" });
+                        }
                     }
                 }
+                
                 
 
                 if (_model.Mode == 0 || _model.Mode == 1)

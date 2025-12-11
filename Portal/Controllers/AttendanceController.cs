@@ -301,6 +301,10 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
+
+                    _model.Id = _id;
+                    _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
+
                     return Json(new { Result = "Success", CorrectionId = _id });
                 }
 
@@ -335,6 +339,8 @@ namespace Portal.Controllers
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 1);
+
+                    _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
                     return Json(new { Result = "Success", CorrectionId = _id });
                 }
 
@@ -709,8 +715,15 @@ namespace Portal.Controllers
 
                     //if (_model.Mode == 3) { GenerateDTRForm(_model.Id); }
                     int _id = _attendancerepository.ManageDTR(_model);
-                    
-                    return Json(new { Result = "Success" });
+
+                    if (_id == 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "An error occured, please contact system administrator." });
+                    }
+                    else
+                    { 
+                        return Json(new { Result = "Success" });
+                    }
                 }
 
                 List<string> _errors = _globalrepository.GetModelErrors(ModelState);

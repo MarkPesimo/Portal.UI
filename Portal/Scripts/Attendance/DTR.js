@@ -618,11 +618,14 @@
             success: function (result) {
                 if (result.Result == "ERROR") { ValidationError(result); }
                 else {
+                    if (result.Result == "ERROR") { ValidationError(result); }
+                    else {
                     $(modal_name).modal('hide');
 
                     ShowLoading('HIDE');
                     ShowSuccessMessage(msg);
-                    BindTable();
+                        BindTable();
+                    }
                 }
             }
         });
