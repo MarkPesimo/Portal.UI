@@ -23,14 +23,21 @@
                 document.getElementById('clock-out-button').setAttribute('attendance_id', response.Id)
                 document.getElementById('clock-out-button').setAttribute('shift_id', response.ShiftId)
 
-                if (response.ClockIn == '') { document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock In'; }
+                document.getElementById('clock-in-button').setAttribute('data-clockin-value', response.ClockIn)
+                document.getElementById('clock-out-button').setAttribute('data-clockout-value', response.ClockOut)
+
+                if (response.ClockIn == '') {                    
+                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock In';
+                }
                 else {
-                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockIn;                   
+                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockIn;
                 }
 
-                if (response.ClockOut == '') { document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock Out';                 }
+                if (response.ClockOut == '') {
+                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock Out';
+                }
                 else {
-                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockOut;                  
+                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockOut;
                 }
 
             },
@@ -55,7 +62,14 @@
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
 
- 
+        var _clockin_btn = document.getElementById('clock-in-button').getAttribute("data-clockin-value");
+        
+
+        if (_clockin_btn != '') {
+            ShowDangerMessage('The system has detected that you have already clocked in. Please verify your time entry.');
+            return;
+        }
+        
         ShowLoading('SHOW');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -421,6 +435,13 @@
         toasterFunction.show();
     }
 
+    function ShowDangerMessage(_msg) {
+        ShowLoading('HIDE');
+        document.getElementById("toasterDanger-body").innerHTML = _msg;
+        const toaster = document.getElementById("toasterDanger");
+        const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
+        toasterFunction.show();
+    }
     function ShowAccessDenied(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterAccess-body").innerHTML = _msg;

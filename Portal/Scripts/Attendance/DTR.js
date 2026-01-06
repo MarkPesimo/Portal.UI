@@ -369,7 +369,7 @@
                 $('#post_dtr_modal').find(".modal-body").html(response);
                 $("#post_dtr_modal").modal('show');
 
-                DisplayDtrDetails(DTRId);
+                //DisplayDtrDetails(DTRId);
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
@@ -397,7 +397,8 @@
         ManageDTR('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.')
     });
 
-    function DisplayDtrDetails(DTRId) {      
+    function DisplayDtrDetails(DTRId) {
+        alert('dsdsd');
         $.ajax({
             type: "GET",
             url: "/Attendance/GetDTRDetails",

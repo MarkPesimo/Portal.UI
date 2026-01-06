@@ -194,6 +194,7 @@
         var _color = '#6C757D';
         if (_status == 'Posted') { _color = '#5cb85c'; }
         else if (_status == "Approved") { _color = '#0275d8'; }
+        else if (_status == "Attached to DTR") { _color = '#0275d8'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
         else if (_status == "Rejected") { _color = '#c94D3B'; }
         else { _font_color = 'black'; }

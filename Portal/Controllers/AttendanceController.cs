@@ -560,6 +560,11 @@ namespace Portal.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    if (_model.DTRId != 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Attendance correction has already been submitted in the DTR; cancellation will not be processed." });
+                    }
+
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 2);
                     return Json(new { Result = "Success" });
                 }

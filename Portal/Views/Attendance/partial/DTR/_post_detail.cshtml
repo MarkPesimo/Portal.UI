@@ -35,12 +35,9 @@
 
 }
 
-<p>
-    Please review your DTR carefully before submitting. Attendance Correction, Overtime and leave must be approved before they can be included in the submission.
-
-    @*Are you sure you want to mark this DTR as
-        <strong><span class="text-success">Posted</span></strong>?*@
-</p>
+    <p>
+        Please review your DTR carefully before submitting. Attendance corrections, overtime, and leave must be <strong><span class="badge rounded-pill" style="background:#2c6dd3">Approved</span> </strong> in order to be included in your DTR submission.        
+    </p>
 
 <div class="mb-3 text-l">
     <h6 class="fw-bold">
@@ -51,123 +48,184 @@
 </div>
 
 
-<div class="widget widget-table mt-3">
-    <h6 class="fw-bold mb-2">Attendance</h6>
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover align-middle">
-            <thead>
-                <tr class="text-center">
-                    <th class="bg-primary text-white">Date</th>
-                    <th class="bg-primary text-white">Date Log</th>
-                    <th class="bg-primary text-white">Schedule</th>
-                    <th class="bg-primary text-white">Time In</th>
-                    <th class="bg-primary text-white">Time Out</th>
-                    <th class="bg-primary text-white">With Correction</th>
-                    <th class="bg-primary text-white">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Attendance != null && Model.Attendance.Any())
-                {
-                    foreach (var a in Model.Attendance)
-                    {
-                        <tr class="text-center">
-                            <td>@a.Date</td>
-                            <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
-                            <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
-                            <td style="color: @a.LateColor">@a.TimeIn</td>
-                            <td style="color: @a.UndertimeColor">@a.TimeOut</td>
-                            <td>@a.HasCorrection</td>
-                            <td>@a.Status</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            @* Increased colspan from 6 to 7 *@@* Adjusted *@
-                            No attendance records available
-                        </td>
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h6 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2"></i>Attendance</h6>
+    </div>
+
+    <div class="card-body table-card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover align-middle">
+                <thead>
+                    <tr class="text-center">
+                        @*<th class="bg-primary text-white">Date</th>*@
+                        <th class="bg-primary text-white">Date Log</th>
+                        <th class="bg-primary text-white">Schedule</th>
+                        <th class="bg-primary text-white">Time In</th>
+                        <th class="bg-primary text-white">Time Out</th>
+                        <th class="bg-primary text-white">With Correction</th>
+                        <th class="bg-primary text-white">Status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (Model.Attendance != null && Model.Attendance.Any())
+                    {
+                        foreach (var a in Model.Attendance)
+                        {
+                            string _status_color = "#ffffff";
+
+                            if (a.Status == "Posted") { _status_color = "#33cc70"; }
+                            else if (a.Status == "Approved") { _status_color = "#2c6dd3"; }
+                            else if (a.Status == "Unposted") { _status_color = "#959A97"; }
+                            <tr class="text-center">
+                                @*<td>@a.Date</td>*@
+                                <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
+                                <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
+                                <td style="color: @a.LateColor">@a.TimeIn</td>
+                                <td style="color: @a.UndertimeColor">@a.TimeOut</td>
+                                <td>@a.HasCorrection</td>
+                                <td>
+                                    <span class="badge rounded-pill" style="background:@_status_color">
+                                        @a.Status
+                                    </span>                                    
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                @* Increased colspan from 6 to 7 *@@* Adjusted *@
+                                No attendance records available
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div class="widget widget-table mt-4">
-    <h6 class="fw-bold mb-2">Overtime</h6>
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover align-middle uniform-table">
-            <thead>
-                <tr>
-                    <th class="bg-primary text-white">Date</th>
-                    <th class="bg-primary text-white">Start</th>
-                    <th class="bg-primary text-white">End</th>
-                    <th class="bg-primary text-white">No. of Hours</th>
-                    <th class="bg-primary text-white reason-col">Reason</th>
-                    <th class="bg-primary text-white">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Overtime != null && Model.Overtime.Any())
-                {
-                    foreach (var ot in Model.Overtime)
-                    {
-                        <tr>
-                            <td>@ot.Date</td>
-                            <td>@ot.Start</td>
-                            <td>@ot.End</td>
-                            <td>@ot.TotalHours</td>
-                            <td class="reason-col">@ot.Reason</td>
-                            <td>@ot.Status</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr><td colspan="6" class="text-center text-muted">No overtime records available</td></tr>
-                }
-            </tbody>
-        </table>
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Overtime</h6>
     </div>
+    <div class="card-body table-card-body">
+        <div class="table-responsive">
+            @{ decimal _total_othour = 0; }
+            <table class="table table-sm table-striped table-hover align-middle uniform-table">
+                <thead>
+                    <tr>
+                        <th class="bg-primary text-white">Date</th>
+                        <th class="bg-primary text-white">Start</th>
+                        <th class="bg-primary text-white">End</th>
+                        <th class="bg-primary text-white">No. of Hours</th>
+                        <th class="bg-primary text-white reason-col">Reason</th>
+                        <th class="bg-primary text-white">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Overtime != null && Model.Overtime.Any())
+                    {
+                        foreach (var ot in Model.Overtime)
+                        {
+                            _total_othour = _total_othour + ot.TotalHours;
+
+                            string _status_color = "#ffffff";
+
+                            if (ot.Status == "Posted") { _status_color = "#33cc70"; }
+                            else if (ot.Status == "Approved") { _status_color = "#2c6dd3"; }
+                            else if (ot.Status == "Unposted") { _status_color = "#959A97"; }
+
+                            <tr>
+                                <td>@ot.Date</td>
+                                <td>@ot.Start</td>
+                                <td>@ot.End</td>
+                                <td>@ot.TotalHours</td>
+                                <td class="reason-col">@ot.Reason</td>
+                                <td>
+                                    <span class="badge rounded-pill" style="background:@_status_color">
+                                        @ot.Status
+                                    </span>                                    
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center text-muted">No overtime records available</td></tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-3 me-2 mb-1 text-end fw-bold">
+                <span class="text-primary me-2">Total OT Hours:</span>
+                <span class="text-dark">@_total_othour</span>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<div class="widget widget-table mt-4">
-    <h6 class="fw-bold mb-2">Leave</h6>
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover align-middle uniform-table">
-            <thead>
-                <tr>
-                    <th class="bg-primary text-white">Date</th>
-                    <th class="bg-primary text-white">Leave From</th>
-                    <th class="bg-primary text-white">Leave To</th>
-                    <th class="bg-primary text-white">No. of Days</th>
-                    <th class="bg-primary text-white reason-col">Reason</th>
-                    <th class="bg-primary text-white">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Leave != null && Model.Leave.Any())
-                {
-                    foreach (var l in Model.Leave)
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h6 class="fw-bold mb-0"><i class="bi bi-calendar-event me-2"></i>Leave</h6>
+    </div>
+
+    <div class="card-body table-card-body">
+        <div class="table-responsive">
+            @{ decimal _total_leavedays = 0; }
+
+            <table class="table table-sm table-striped table-hover align-middle uniform-table">
+                <thead>
+                    <tr>
+                        <th class="bg-primary text-white">Date</th>
+                        <th class="bg-primary text-white">Leave From</th>
+                        <th class="bg-primary text-white">Leave To</th>
+                        <th class="bg-primary text-white">No. of Days</th>
+                        <th class="bg-primary text-white reason-col">Reason</th>
+                        <th class="bg-primary text-white">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Leave != null && Model.Leave.Any())
                     {
-                        <tr>
-                            <td>@l.Date</td>
-                            <td>@l.LeaveFrom</td>
-                            <td>@l.LeaveTo</td>
-                            <td>@l.NoOfDays</td>
-                            <td class="reason-col">@l.Reason</td>
-                            <td>@l.Status</td>
-                        </tr>
+                        foreach (var l in Model.Leave)
+                        {
+                            _total_leavedays = _total_leavedays + l.NoOfDays;
+
+                            string _status_color = "#ffffff";
+
+                            if (l.Status == "Posted") { _status_color = "#33cc70"; }
+                            else if (l.Status == "Approved") { _status_color = "#2c6dd3"; }
+                            else if (l.Status == "Unposted") { _status_color = "#959A97"; }
+
+                            <tr>
+                                <td>@l.Date</td>
+                                <td>@l.LeaveFrom</td>
+                                <td>@l.LeaveTo</td>
+                                <td>@l.NoOfDays</td>
+                                <td class="reason-col">@l.Reason</td>
+                                <td >
+                                    <span class="badge rounded-pill" style="background:@_status_color">
+                                        @l.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-                else
-                {
-                    <tr><td colspan="6" class="text-center text-muted">No leave records available</td></tr>
-                }
-            </tbody>
-        </table>
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center text-muted">No leave records available</td></tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-3 me-2 mb-1 text-end fw-bold">
+                <span class="text-primary me-2">Total Leave days:</span>
+                <span class="text-dark">@_total_leavedays</span>
+            </div>
+        </div>
     </div>
 </div>

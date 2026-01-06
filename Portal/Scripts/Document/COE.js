@@ -58,7 +58,7 @@
                             data: {
                                 _compensationtype: _CompensationType,
                                 _salarytype: _SalaryType,
-                                reason: reason,
+                                _reason: reason,
                             },
                             contentType: "application/json; charset=utf-8",
                             dataType: "html",

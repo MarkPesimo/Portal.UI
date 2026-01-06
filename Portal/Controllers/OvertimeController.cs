@@ -262,7 +262,13 @@ namespace Portal.Controllers
                 if (_model.Remarks == null) { _model.Remarks = ""; }
                 if (_model.Message == null) { _model.Message = ""; }
 
-               
+                if (_model.Mode == 2)           //cancel
+                {
+                    if (_model.DTRId != 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Overtime has already been submitted in the DTR; cancellation will not be processed." });
+                    }
+                }
 
                 if (_model.Mode == 0 || _model.Mode == 1)
                 {

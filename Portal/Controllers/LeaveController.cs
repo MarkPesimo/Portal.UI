@@ -274,6 +274,14 @@ namespace Portal.Controllers
                 if (_model.Remarks == null) { _model.Remarks = ""; }
                 if (_model.Message == null) { _model.Message = ""; }
 
+                if (_model.Mode == 2)
+                {
+                    if (_model.DTRId != 0)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Leave has already been submitted in the DTR; cancellation will not be processed." });
+                    }
+                }
+
                 if (_model.IsHalfday)
                 {
                     if (_model.FirstHalf) { _model.LeaveFromAMPM = "AM"; _model.LeaveToAMPM = "AM"; }

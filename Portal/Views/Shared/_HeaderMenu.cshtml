@@ -60,8 +60,8 @@
                     <li class="nav-item mt-1" @((User as ContextLoginUser_model).AttendanceMenuVisibility)>
                         <div>
                             <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="my-shift" current-date="" disabled> </button>
-                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="clock-in-button" shift_id="0" attendance_id="0" type="submit"><i class="fa-regular fa-clock"></i> </button>
-                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="clock-out-button" shift_id="0" attendance_id="0" type="submit"><i class="fa-regular fa-clock"></i> </button>
+                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="clock-in-button" data-clockin-value="" shift_id="0" attendance_id="0" type="submit"><i class="fa-regular fa-clock" id="clockin_img"></i> </button>
+                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0" id="clock-out-button" data-clockout-value="" shift_id="0" attendance_id="0" type="submit"><i class="fa-regular fa-clock" id="clockout_img"></i> </button>
                         </div>
 
                     </li>
