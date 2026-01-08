@@ -14,6 +14,22 @@
         word-break: break-word;
         text-align: left;
     }
+
+    .table thead th {
+        background-color: #8b0000 !important; 
+        color: white !important;
+        border: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .alert-instruction {
+        background-color: #fff8eb;
+        border-left: 5px solid #f39c12;
+        color: #856404;
+    }
 </style>
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-dtr-Form", id = "post-dtr-Form" }))
@@ -32,39 +48,50 @@
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
         </div>
     </div>
-
 }
 
-    <p>
-        Please review your DTR carefully before submitting. Attendance corrections, overtime, and leave must be <strong><span class="badge rounded-pill" style="background:#2c6dd3">Approved</span> </strong> in order to be included in your DTR submission.        
-    </p>
-
-<div class="mb-3 text-l">
-    <h6 class="fw-bold">
-        Date Range:
-        @Model.DTR.DateFrom.ToString("MMMM dd, yyyy") - @Model.DTR.Dateto.ToString("MMMM dd, yyyy")
-    </h6>
-    @*<h6 class="text-muted">Title: @Model.DTR.Description</h6>*@
-</div>
-
-
-<div class="card shadow-sm mb-4">
-    <div class="card-header">
-        <h6 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2"></i>Attendance</h6>
+    <div class="alert alert-instruction shadow-sm mb-4">
+        <div class="d-flex">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+            <div>
+                <h6 class="fw-bold mb-1">Important Review Guidelines</h6>
+                <ul class="mb-0 small ps-3">
+                    <li>
+                        <strong>Approval Status:</strong> Ensure all Attendance Corrections, OT, and Leaves are marked as
+                        <span class="badge rounded-pill bg-success">Approved</span>.
+                        Items marked as <span class="badge rounded-pill bg-warning text-dark">Posted</span>
+                        are pending review and <strong>will not be counted</strong> in this submission.
+                    </li>
+                    <li class="mt-1">
+                        <strong>Late/Undertime Alert:</strong> Double-check entries with <span class="text-danger fw-bold">Red Font</span> in the Time In/Out columns. This indicates a late or undertime record that may require a correction to avoid salary deductions.
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 
-    <div class="card-body table-card-body">
+<div class="mb-3">
+    <h6 class="fw-bold mb-1 text-muted small">SELECTED PERIOD:</h6>
+    <h5 class="fw-bold">
+        @Model.DTR.DateFrom.ToString("MMMM dd, yyyy") - @Model.DTR.Dateto.ToString("MMMM dd, yyyy")
+    </h5>
+</div>
+
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-white py-3">
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-check me-2"></i>Attendance Logs</h6>
+    </div>
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-sm table-striped table-hover align-middle">
+            <table class="table table-sm table-striped table-hover align-middle mb-0">
                 <thead>
                     <tr class="text-center">
-                        @*<th class="bg-primary text-white">Date</th>*@
-                        <th class="bg-primary text-white">Date Log</th>
-                        <th class="bg-primary text-white">Schedule</th>
-                        <th class="bg-primary text-white">Time In</th>
-                        <th class="bg-primary text-white">Time Out</th>
-                        <th class="bg-primary text-white">With Correction</th>
-                        <th class="bg-primary text-white">Status</th>
+                        <th>Date Log</th>
+                        <th>Schedule</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                        <th>Correction</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,34 +99,23 @@
                     {
                         foreach (var a in Model.Attendance)
                         {
-                            string _status_color = "#ffffff";
+                            string _status_color = "#959A97";
+                            string _text_color = "white";
 
-                            if (a.Status == "Posted") { _status_color = "#33cc70"; }
-                            else if (a.Status == "Approved") { _status_color = "#2c6dd3"; }
-                            else if (a.Status == "Unposted") { _status_color = "#959A97"; }
+                            if (a.Status == "Posted") { _status_color = "#ffc107"; _text_color = "black"; }
+                            else if (a.Status == "Approved") { _status_color = "#198754"; }
+
                             <tr class="text-center">
-                                @*<td>@a.Date</td>*@
-                                <td>@a.DateLog</td> @* Displaying DateLog *@@* Adjusted *@
+                                <td>@a.DateLog</td>
                                 <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
                                 <td style="color: @a.LateColor">@a.TimeIn</td>
                                 <td style="color: @a.UndertimeColor">@a.TimeOut</td>
                                 <td>@a.HasCorrection</td>
                                 <td>
-                                    <span class="badge rounded-pill" style="background:@_status_color">
-                                        @a.Status
-                                    </span>                                    
+                                    <span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@a.Status</span>
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">
-                                @* Increased colspan from 6 to 7 *@@* Adjusted *@
-                                No attendance records available
-                            </td>
-                        </tr>
                     }
                 </tbody>
             </table>
@@ -107,22 +123,22 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header">
-        <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Overtime</h6>
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-white py-3">
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history me-2"></i>Overtime Details</h6>
     </div>
-    <div class="card-body table-card-body">
+    <div class="card-body p-0">
         <div class="table-responsive">
             @{ decimal _total_othour = 0; }
-            <table class="table table-sm table-striped table-hover align-middle uniform-table">
+            <table class="table table-sm table-striped table-hover align-middle mb-0 uniform-table">
                 <thead>
                     <tr>
-                        <th class="bg-primary text-white">Date</th>
-                        <th class="bg-primary text-white">Start</th>
-                        <th class="bg-primary text-white">End</th>
-                        <th class="bg-primary text-white">No. of Hours</th>
-                        <th class="bg-primary text-white reason-col">Reason</th>
-                        <th class="bg-primary text-white">Status</th>
+                        <th>Date</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Hours</th>
+                        <th class="reason-col">Reason</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,62 +146,48 @@
                     {
                         foreach (var ot in Model.Overtime)
                         {
-                            _total_othour = _total_othour + ot.TotalHours;
+                            _total_othour += ot.TotalHours;
+                            string _status_color = "#959A97";
+                            string _text_color = "white";
 
-                            string _status_color = "#ffffff";
-
-                            if (ot.Status == "Posted") { _status_color = "#33cc70"; }
-                            else if (ot.Status == "Approved") { _status_color = "#2c6dd3"; }
-                            else if (ot.Status == "Unposted") { _status_color = "#959A97"; }
+                            if (ot.Status == "Posted") { _status_color = "#ffc107"; _text_color = "black"; }
+                            else if (ot.Status == "Approved") { _status_color = "#198754"; }
 
                             <tr>
                                 <td>@ot.Date</td>
                                 <td>@ot.Start</td>
                                 <td>@ot.End</td>
-                                <td>@ot.TotalHours</td>
-                                <td class="reason-col">@ot.Reason</td>
-                                <td>
-                                    <span class="badge rounded-pill" style="background:@_status_color">
-                                        @ot.Status
-                                    </span>                                    
-                                </td>
+                                <td class="fw-bold">@ot.TotalHours</td>
+                                <td class="reason-col small text-muted">@ot.Reason</td>
+                                <td><span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@ot.Status</span></td>
                             </tr>
                         }
                     }
-                    else
-                    {
-                        <tr><td colspan="6" class="text-center text-muted">No overtime records available</td></tr>
-                    }
                 </tbody>
             </table>
-
-            <div class="mt-3 me-2 mb-1 text-end fw-bold">
-                <span class="text-primary me-2">Total OT Hours:</span>
-                <span class="text-dark">@_total_othour</span>
-            </div>
         </div>
     </div>
-
+    <div class="card-footer bg-light border-0 py-2 text-end">
+        <span class="text-muted small me-2">Total OT Hours:</span> <span class="fw-bold text-dark">@_total_othour</span>
+    </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h6 class="fw-bold mb-0"><i class="bi bi-calendar-event me-2"></i>Leave</h6>
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-event me-2"></i>Leave Summary</h6>
     </div>
-
-    <div class="card-body table-card-body">
+    <div class="card-body p-0">
         <div class="table-responsive">
             @{ decimal _total_leavedays = 0; }
-
-            <table class="table table-sm table-striped table-hover align-middle uniform-table">
+            <table class="table table-sm table-striped table-hover align-middle mb-0 uniform-table">
                 <thead>
                     <tr>
-                        <th class="bg-primary text-white">Date</th>
-                        <th class="bg-primary text-white">Leave From</th>
-                        <th class="bg-primary text-white">Leave To</th>
-                        <th class="bg-primary text-white">No. of Days</th>
-                        <th class="bg-primary text-white reason-col">Reason</th>
-                        <th class="bg-primary text-white">Status</th>
+                        <th>Date</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Days</th>
+                        <th class="reason-col">Reason</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -193,39 +195,28 @@
                     {
                         foreach (var l in Model.Leave)
                         {
-                            _total_leavedays = _total_leavedays + l.NoOfDays;
+                            _total_leavedays += l.NoOfDays;
+                            string _status_color = "#959A97";
+                            string _text_color = "white";
 
-                            string _status_color = "#ffffff";
-
-                            if (l.Status == "Posted") { _status_color = "#33cc70"; }
-                            else if (l.Status == "Approved") { _status_color = "#2c6dd3"; }
-                            else if (l.Status == "Unposted") { _status_color = "#959A97"; }
+                            if (l.Status == "Posted") { _status_color = "#ffc107"; _text_color = "black"; }
+                            else if (l.Status == "Approved") { _status_color = "#198754"; }
 
                             <tr>
                                 <td>@l.Date</td>
                                 <td>@l.LeaveFrom</td>
                                 <td>@l.LeaveTo</td>
-                                <td>@l.NoOfDays</td>
-                                <td class="reason-col">@l.Reason</td>
-                                <td >
-                                    <span class="badge rounded-pill" style="background:@_status_color">
-                                        @l.Status
-                                    </span>
-                                </td>
+                                <td class="fw-bold">@l.NoOfDays</td>
+                                <td class="reason-col small text-muted">@l.Reason</td>
+                                <td><span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@l.Status</span></td>
                             </tr>
                         }
                     }
-                    else
-                    {
-                        <tr><td colspan="6" class="text-center text-muted">No leave records available</td></tr>
-                    }
                 </tbody>
             </table>
-
-            <div class="mt-3 me-2 mb-1 text-end fw-bold">
-                <span class="text-primary me-2">Total Leave days:</span>
-                <span class="text-dark">@_total_leavedays</span>
-            </div>
         </div>
+    </div>
+    <div class="card-footer bg-light border-0 py-2 text-end">
+        <span class="text-muted small me-2">Total Leave Days:</span> <span class="fw-bold text-dark">@_total_leavedays</span>
     </div>
 </div>
