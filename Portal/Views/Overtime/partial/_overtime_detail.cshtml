@@ -1,5 +1,27 @@
 ﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
 
+<style>
+    .instruction-box {
+        background-color: #fff8eb;
+        border-left: 5px solid #f39c12;
+        color: #856404;
+    }
+
+    .form-label-custom {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .helper-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        line-height: 1.2;
+    }
+</style>
+
 @using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "overtime-Form", id = "overtime-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -14,16 +36,15 @@
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
-    <div class="alert alert-info border-0 shadow-sm mb-4">
-        <div class="d-flex">
-            <div class="me-3">
-                <i class="bi bi-info-circle-fill fs-4 text-info"></i>
-            </div>
+    <div class="alert instruction-box shadow-sm mb-4">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
             <div>
-                <h6 class="fw-bold mb-1">Filing Guidelines</h6>
+                <h6 class="fw-bold mb-1">Overtime Filing Rules</h6>
                 <ul class="mb-0 small">
                     <li><strong>Continuous Overtime:</strong> Enable this for "Straight Duty" where no breaks were taken. If disabled, the system automatically deducts a 1-hour break for any overtime exceeding 4 hours.</li>
                     <li><strong>Filing Deadline:</strong> Overtime must be filed within 48 hours (2 days) of the rendered date.</li>
+                    <li><strong>Holiday OT:</strong> Ensure you have both Time In and Time Out recorded when filing overtime on a holiday..</li>
                 </ul>
             </div>
         </div>
@@ -31,27 +52,25 @@
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
-            <div class="p-2 border border-danger rounded bg-light">
-                <label for="html" id="error-message-label" class="form-label text-danger mb-0 small"></label>
-            </div>
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
         </div>
     </div>
 
     <div class="row mb-3">
         <div class="col-12">
-            <label class="form-label fw-bold small text-uppercase text-muted">Shift Schedule (Selected Date)</label>
+            <label class="form-label-custom">Shift Schedule (Selected Date)</label>
         </div>
         <div class="col-6">
-            <input class="text-center form-control bg-light" id="ot-shift-in" name="ot-shift-in" readonly="true" placeholder="Shift In" />
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-in" name="ot-shift-in" readonly placeholder="Shift In" />
         </div>
         <div class="col-6">
-            <input class="text-center form-control bg-light" id="ot-shift-out" name="ot-shift-out" readonly="true" placeholder="Shift Out" />
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-out" name="ot-shift-out" readonly placeholder="Shift Out" />
         </div>
     </div>
 
     <div class="row mb-3">
         <div class="col-12">
-            <label class="form-label fw-bold small text-uppercase text-muted">Overtime Start</label>
+            <label class="form-label-custom">Overtime Start</label>
         </div>
         <div class="col-6">
             @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
@@ -63,7 +82,7 @@
 
     <div class="row mb-3">
         <div class="col-12">
-            <label class="form-label fw-bold small text-uppercase text-muted">Overtime End</label>
+            <label class="form-label-custom">Overtime End</label>
         </div>
         <div class="col-6">
             @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
@@ -75,11 +94,11 @@
 
     <div class="row mb-3" id="div-isContinuosOT">
         <div class="col-12">
-            <div class="form-check form-switch card p-3 border-0 shadow-sm bg-light">
+            <div class="form-check form-switch card p-3 border-0 bg-light shadow-sm">
                 <div class="ms-4">
-                    @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input" })
+                    @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input", @id = "ContinuousOt" })
                     <label class="form-check-label fw-bold" for="ContinuousOt">Continuous Overtime</label>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem;">Enable for straight duties to prevent the automatic 1-hour break deduction.</p>
+                    <p class="helper-text mb-0">Enable this for straight duties to prevent the automatic 60-minute break deduction for shifts over 4 hours.</p>
                 </div>
             </div>
         </div>
@@ -87,14 +106,14 @@
 
     <div class="row mb-3">
         <div class="col">
-            <label class="form-label fw-bold small text-uppercase text-muted">Reason for Overtime</label>
-            @Html.TextAreaFor(m => m.Reason, 3, 40, new { @class = "form-control", @placeholder = "Briefly explain the nature of the work..." })
+            <label class="form-label-custom">Reason for Overtime</label>
+            @Html.TextAreaFor(m => m.Reason, 3, 40, new { @class = "form-control", @placeholder = "Briefly explain the task rendered..." })
         </div>
     </div>
 
     <div class="row">
         <div class="col">
-            <label class="form-label fw-bold small text-uppercase text-muted">Attachment (Optional)</label>
+            <label class="form-label-custom">Attachment (Optional)</label>
             <input class="form-control" type="file" name="Overtime_Attachment" id="Overtime_Attachment">
         </div>
     </div>
