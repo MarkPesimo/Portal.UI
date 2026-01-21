@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="APWModel, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ISearch-API\APWModel\bin\Debug\APWModel.dll</HintPath>
+      <HintPath>..\..\APWAPI\APWModel\bin\Debug\APWModel.dll</HintPath>
     </Reference>
     <Reference Include="BundleTransformer.Core">
       <HintPath>..\..\..\Isearch_Web\iSearch\packages\BundleTransformer.Core.1.10.0\lib\net40\BundleTransformer.Core.dll</HintPath>
@@ -667,6 +667,9 @@
     <Content Include="Views\Document\partial\_submit_document_detail.cshtml" />
     <Content Include="Views\Document\modal\_add_required_documents_modal.cshtml" />
     <Content Include="Views\Document\partial\_add_required_document_detail.cshtml" />
+    <Content Include="Views\Shared\_overtime_instruction.cshtml" />
+    <Content Include="Views\Shared\_atdcorrection_instruction.cshtml" />
+    <Content Include="Views\Shared\_dtr_instruction.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -684,9 +687,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>61123</DevelopmentServerPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:61123/</IISUrl>
+          <IISUrl>http://localhost:60420/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

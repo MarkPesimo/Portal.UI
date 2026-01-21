@@ -1,36 +1,5 @@
 ﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel.DTRPostDetailResult
 
-<style>
-    .uniform-table th,
-    .uniform-table td {
-        width: 15%;
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    .uniform-table .reason-col {
-        width: 25% !important;
-        white-space: normal;
-        word-break: break-word;
-        text-align: left;
-    }
-
-    .table thead th {
-        background-color: #8b0000 !important; 
-        color: white !important;
-        border: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-    }
-
-    .alert-instruction {
-        background-color: #fff8eb;
-        border-left: 5px solid #f39c12;
-        color: #856404;
-    }
-</style>
 
 @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-dtr-Form", id = "post-dtr-Form" }))
 {
@@ -50,25 +19,10 @@
     </div>
 }
 
-    <div class="alert alert-instruction shadow-sm mb-4">
-        <div class="d-flex">
-            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
-            <div>
-                <h6 class="fw-bold mb-1">Important Review Guidelines</h6>
-                <ul class="mb-0 small ps-3">
-                    <li>
-                        <strong>Approval Status:</strong> Ensure all Attendance Corrections, OT, and Leaves are marked as
-                        <span class="badge rounded-pill bg-success">Approved</span>.
-                        Items marked as <span class="badge rounded-pill bg-warning text-dark">Posted</span>
-                        are pending review and <strong>will not be counted</strong> in this submission.
-                    </li>
-                    <li class="mt-1">
-                        <strong>Late/Undertime Alert:</strong> Double-check entries with <span class="text-danger fw-bold">Red Font</span> in the Time In/Out columns. This indicates a late or undertime record that may require a correction to avoid salary deductions.
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+
+@Html.Partial("~/Views/Shared/_dtr_instruction.cshtml")
+
+ 
 
 <div class="mb-3">
     <h6 class="fw-bold mb-1 text-muted small">SELECTED PERIOD:</h6>
@@ -92,6 +46,7 @@
                         <th>Time Out</th>
                         <th>Correction</th>
                         <th>Status</th>
+                        <th>Log Entry</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,9 +69,13 @@
                                 <td>
                                     <span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@a.Status</span>
                                 </td>
-                            </tr>
-                        }
+                                <td>
+                                    @a.AttendanceLogType
+                            </td>
+
+                        </tr>
                     }
+                }
                 </tbody>
             </table>
         </div>

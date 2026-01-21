@@ -250,6 +250,23 @@ namespace Portal.Controllers
         {
             try
             {
+                if (_model.DateLog.Date != _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "Invalid entry: the time-in date must match the attendance log date.", ElementName = "TimeInDate" });
+                }
+
+                if (_model.TimeOutDate.Date < _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "The timeout you entered is earlier than the time in. Please enter a valid time out.", ElementName = "TimeInDate" });
+                }
+
+                //DateTime _datetodate = DateTime.Now;
+                //double _noofdays = (_datetodate - DateTime.Parse(_model.TimeInDate.ToString())).TotalDays;
+                //if (_noofdays > 2)
+                //{
+                //    return Json(new { Result = "ERROR", Message = "You cannot submit an Attendance correction request for work performed more than two days ago.", ElementName = "TimeInDate" });
+                //}
+
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
@@ -298,6 +315,23 @@ namespace Portal.Controllers
         {
             try
             {
+                if (_model.DateLog.Date != _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "Invalid entry: the time-in date must match the attendance log date.", ElementName = "TimeInDate" });
+                }
+
+                if (_model.TimeOutDate.Date < _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "The timeout you entered is earlier than the time in. Please enter a valid time out.", ElementName = "TimeInDate" });
+                }
+
+                //DateTime _datetodate = DateTime.Now;
+                //double _noofdays = (_datetodate - DateTime.Parse(_model.TimeInDate.ToString())).TotalDays;
+                //if (_noofdays > 2)
+                //{
+                //    return Json(new { Result = "ERROR", Message = "You cannot submit an Attendance correction request for work performed more than two days ago.", ElementName = "TimeInDate" });
+                //}
+
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
@@ -336,6 +370,23 @@ namespace Portal.Controllers
         {
             try
             {
+                if (_model.DateLog.Date != _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "Invalid entry: the time-in date must match the attendance log date.", ElementName = "TimeInDate" });
+                }
+
+                if (_model.TimeOutDate.Date < _model.TimeInDate.Date)
+                {
+                    return Json(new { Result = "ERROR", Message = "The timeout you entered is earlier than the time in. Please enter a valid time out.", ElementName = "TimeInDate" });
+                }
+
+                //DateTime _datetodate = DateTime.Now;
+                //double _noofdays = (_datetodate - DateTime.Parse(_model.TimeInDate.ToString())).TotalDays;
+                //if (_noofdays > 2)
+                //{
+                //    return Json(new { Result = "ERROR", Message = "You cannot submit an Attendance correction request for work performed more than two days ago.", ElementName = "TimeInDate" });
+                //}
+
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 1);

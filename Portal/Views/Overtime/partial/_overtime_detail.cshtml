@@ -1,5 +1,7 @@
 ﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
 
+ 
+
 @using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "overtime-Form", id = "overtime-Form" }))
 {
     @Html.HiddenFor(m => m.Id)
@@ -14,20 +16,9 @@
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
-    <div class="alert alert-info border-0 shadow-sm mb-4">
-        <div class="d-flex">
-            <div class="me-3">
-                <i class="bi bi-info-circle-fill fs-4 text-info"></i>
-            </div>
-            <div>
-                <h6 class="fw-bold mb-1">Filing Guidelines</h6>
-                <ul class="mb-0 small">
-                    <li><strong>Continuous Overtime:</strong> Enable this for "Straight Duty" where no breaks were taken. If disabled, the system automatically deducts a 1-hour break for any overtime exceeding 4 hours.</li>
-                    <li><strong>Filing Deadline:</strong> Overtime must be filed within 48 hours (2 days) of the rendered date.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    @Html.Partial("~/Views/Shared/_overtime_instruction.cshtml")
+
+ 
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
@@ -37,15 +28,13 @@
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-12">
-            <label class="form-label fw-bold small text-uppercase text-muted">Shift Schedule (Selected Date)</label>
+  <div class="row">
+        <label for="" class="form-label">Shift Schedule on the selected date</label>
+        <div class="col-6">
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-in" name="ot-shift-in" readonly placeholder="Shift In" />
         </div>
         <div class="col-6">
-            <input class="text-center form-control bg-light" id="ot-shift-in" name="ot-shift-in" readonly="true" placeholder="Shift In" />
-        </div>
-        <div class="col-6">
-            <input class="text-center form-control bg-light" id="ot-shift-out" name="ot-shift-out" readonly="true" placeholder="Shift Out" />
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-out" name="ot-shift-out" readonly placeholder="Shift Out" />
         </div>
     </div>
 

@@ -11,8 +11,10 @@
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
+    @Html.Partial("~/Views/Shared/_atdcorrection_instruction.cshtml")
+
     <div class="row" id="div-validation" style="display: none;">
-        <div class="col-lg-6 mb-3">
+        <div class="col mb-3">
             <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
         </div>
     </div>
@@ -71,14 +73,15 @@
 
     <div class="row mt-2 ">
         <div class="col">
-            <label for="" class="form-label">Reason</label>
-            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter a Reason" })
+            <label class="form-label-custom">Reason for Attendance correction</label>
+            @Html.TextAreaFor(m => m.Reason, 3, 40, new { @class = "form-control", @placeholder = "Briefly explain the reason for applying an Attendance correction..." })
         </div>
     </div>
 
 
     <div class="row mt-2">
         <div class="col">
+            <label class="form-label-custom">Update Attachment (Optional)</label>
             <input class="form-control" type="file" name="Edit_Correction_Attachment" id="Edit_Correction_Attachment">
         </div>
     </div>
