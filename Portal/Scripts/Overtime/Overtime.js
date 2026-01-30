@@ -281,6 +281,19 @@
                 }
             })
             .catch(error => console.error("Request failed:", error));
+
+
+        url = `/Overtime/_isSetIfContinuousOT?_datelog=${DateLog}`;
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ContinuousOt').checked = data.result;                    
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
     }
 
     function EditGetShiftOnSelectedDate() {
@@ -305,7 +318,21 @@
                 }
             })
             .catch(error => console.error("Request failed:", error));
+
+
+        url = `/Overtime/_isSetIfContinuousOT?_datelog=${DateLog}`;
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ContinuousOt').checked = data.result;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
     }
+
 
     $('#add_overtime_modal').on('click', '#submit-overtime-button', function (e) {
         ShowLoading('SHOW');

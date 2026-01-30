@@ -98,6 +98,7 @@ namespace Portal.Controllers
                 UserId = 112,
                 ClientId = _client_id,
                 Mode = 0,
+                ContinuousOt = _overtimerepository.SetIfContinuousOT(_datelog)
             };
 
             return PartialView("~/Views/Attendance/Partial/Overtime/_post_overtime_detail.cshtml", _model);
@@ -118,6 +119,13 @@ namespace Portal.Controllers
                     if (_model.OTFrom.Date > _model.OTTo.Date)
                     {
                         return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
+                    }
+
+                    DateTime _datetodate = DateTime.Now;
+                    double _noofdays = (_datetodate - DateTime.Parse(_model.OTFrom.ToString())).TotalDays;
+                    if (_noofdays > 2)
+                    {
+                        return Json(new { Result = "ERROR", Message = "You cannot submit an overtime request for work performed more than two days ago.", ElementName = "OTFrom" });
                     }
 
                     DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());
@@ -151,6 +159,21 @@ namespace Portal.Controllers
         }
         //---------------------------------------END ADD POST OVERTIME---------------------------------------
 
+        [HttpGet]
+        public ActionResult _isSetIfContinuousOT(DateTime _datelog)
+        {
+            try
+            {
+                bool _iscontinuousOT = _overtimerepository.SetIfContinuousOT(_datelog);
+                return Json(new { Status = "SUCCESS", result = _iscontinuousOT }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {                
+                return Json(new { Status = "ERROR", error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+            
+        }
+
         //---------------------------------------BEGIN ADD OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _AddOvertime()
@@ -159,8 +182,9 @@ namespace Portal.Controllers
             {
                 EmpId = _loginuserid,
                 UserId = 112,
-                ClientId = _client_id,
+                ClientId = _client_id,                
                 Mode = 0,
+                ContinuousOt = _overtimerepository.SetIfContinuousOT(DateTime.Now)
             };
 
             return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _model);

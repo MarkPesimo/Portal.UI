@@ -50,6 +50,26 @@ namespace Portal.Repository
         }
 
 
+        public bool SetIfContinuousOT(DateTime _datelog)
+        {
+            try
+            {
+                bool _obj = true;
+                string _endpoint = "Overtime/SetIfContinuousOT/" + _loginuserid.ToString() + "/" +
+                    _datelog.ToShortDateString().Replace("/", "-") ;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<bool>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { return false; }
+        }
+
         public List<FiledOvertimeMonitoring_model> GetOvertimeMonitoring(FiledOvertimeMonitoringFilter_model _filter)
         {
             try
