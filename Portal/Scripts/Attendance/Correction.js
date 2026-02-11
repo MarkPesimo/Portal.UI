@@ -96,12 +96,12 @@
                 order: [[1, "desc"]],
                 columnDefs: [
                     {
-                        title: 'Date of Correction',
+                        title: 'Date Filed',
                         target: 0,
                         class: "d-none d-sm-table-cell text-center",
                     },
                     {
-                        title: 'Date Log',
+                        title: 'Correction Date',
                         target: 1,
                         class: "d-none d-sm-table-cell",
                         "render": function (data, type, row, meta) {
