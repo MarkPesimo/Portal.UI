@@ -774,11 +774,11 @@ namespace Portal.Controllers
 
                     if (_id == 0)
                     {
-                        return Json(new { Result = "ERROR", Message = "An error occured, please contact system administrator." });
+                        return Json(new { Result = "ERROR", DTRId = 0,  Message = "An error occured, please contact system administrator." });
                     }
                     else
-                    { 
-                        return Json(new { Result = "Success" });
+                    {
+                        return Json(new { Result = "Success", DTRId = _id, Message= "" });
                     }
                 }
 

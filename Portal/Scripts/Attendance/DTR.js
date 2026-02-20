@@ -278,27 +278,27 @@
     //});
 
     $('#add_dtr_modal').on('click', '#submit_DTR', function (e) {
-        //ShowLoading('SHOW');
-        //$.ajax({
-        //    url: '/Attendance/_ManageDTR',
-        //    type: "POST",
-        //    data: $('#dtr-Form').serialize(),
-        //    dataType: 'json',
-        //    success: function (result) {
-        //        if (result.Result == "ERROR") { ValidationError(result); }
-        //        else {
-        //            $("#add_dtr_modal").modal('hide');
-
-        //            ShowLoading('HIDE');
-        //            ShowSuccessMessage('DTR successfully created.');
-        //            BindTable();
-        //        }
-        //    },
-        //    failure: function (response) { LogError(response); },
-        //    error: function (response) { LogError(response); }
-        //});
         ManageDTR('#dtr-Form', '#add_dtr_modal', 'DTR successfully created.')
     });
+
+    function ShowPostDTR(DTRId)
+    {        
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_PostDTR',
+            data: { '_id': DTRId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#post_dtr_modal').find(".modal-body").html(response);
+                $("#post_dtr_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    }
     //----------------------------------END ADD DTR-----------------------------------
 
     //----------------------------------BEGIN EDIT DTR--------------------------------------
@@ -332,24 +332,7 @@
     });
  
     $('#edit_dtr_modal').on('click', '#update_dtr', function (e) {
-        //ShowLoading('SHOW');
-        //$.ajax({
-        //    url: '/Attendance/_ManageDTR',
-        //    type: "POST",
-        //    data: $('#dtr-Form').serialize(),
-        //    dataType: 'json',
-        //    success: function (result) {
-        //        if (result.Result == "ERROR") { ValidationError(result); }
-        //        else {
-        //            $("#edit_dtr_modal").modal('hide');
-
-        //            ShowLoading('HIDE');
-        //            ShowSuccessMessage('DTR successfully updated.');
-        //            BindTable();
-        //        }
-        //    }
-        //});
-        ManageDTR('#dtr-Form', '#edit_dtr_modal', 'DTR successfully updated.')
+          ManageDTR('#dtr-Form', '#edit_dtr_modal', 'DTR successfully updated.')
     });
     //----------------------------------END EDIT DTR--------------------------------------
 
@@ -377,23 +360,6 @@
     });
 
     $('#post_dtr_modal').on('click', '#post_dtr', function (e) {
-        //ShowLoading('SHOW');
-        //$.ajax({
-        //    url: '/Attendance/_ManageDTR',
-        //    type: "POST",
-        //    data: $('#post-dtr-Form').serialize(),
-        //    dataType: 'json',
-        //    success: function (result) {
-        //        if (result.Result == "ERROR") { ValidationError(result); }
-        //        else {
-        //            $("#post_dtr_modal").modal('hide');
-
-        //            ShowLoading('HIDE');
-        //            ShowSuccessMessage('DTR successfully Posted.');
-        //            BindTable();
-        //        }
-        //    }
-        //});
         ManageDTR('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.')
     });
 
@@ -546,23 +512,6 @@
     });
 
     $('#unpost_dtr_modal').on('click', '#unpost_dtr', function (e) {
-        //ShowLoading('SHOW');
-        //$.ajax({
-        //    url: '/Attendance/_ManageDTR',
-        //    type: "POST",
-        //    data: $('#unpost-dtr-Form').serialize(),
-        //    dataType: 'json',
-        //    success: function (result) {
-        //        if (result.Result == "ERROR") { ValidationError(result); }
-        //        else {
-        //            $("#unpost_dtr_modal").modal('hide');
-
-        //            ShowLoading('HIDE');
-        //            ShowSuccessMessage('DTR successfully Unposted.');
-        //            BindTable();
-        //        }
-        //    }
-        //});
         ManageDTR('#unpost-dtr-Form', '#unpost_dtr_modal', 'DTR successfully Unposted.')
     });
     //----------------------------------END UNPOST CORRECTION--------------------------------------
@@ -589,24 +538,7 @@
     });
 
     $('#cancel_dtr_modal').on('click', '#cancel_dtr', function (e) {
-        //ShowLoading('SHOW');
-        //$.ajax({
-        //    url: '/Attendance/_ManageDTR',
-        //    type: "POST",
-        //    data: $('#cancel-dtr-Form').serialize(),
-        //    dataType: 'json',
-        //    success: function (result) {
-        //        if (result.Result == "ERROR") { ValidationError(result); }
-        //        else {
-        //            $("#cancel_dtr_modal").modal('hide');
-
-        //            ShowLoading('HIDE');
-        //            ShowSuccessMessage('DTR successfully Cancelled.');
-        //            BindTable();
-        //        }
-        //    }
-        //});
-        ManageDTR('#cancel-dtr-Form', '#cancel_dtr_modal', 'DTR successfully Cancelled.')
+         ManageDTR('#cancel-dtr-Form', '#cancel_dtr_modal', 'DTR successfully Cancelled.')
     });
 
     function ManageDTR(form_name, modal_name, msg) {
@@ -621,11 +553,14 @@
                 else {
                     if (result.Result == "ERROR") { ValidationError(result); }
                     else {
-                    $(modal_name).modal('hide');
+                        $(modal_name).modal('hide');
 
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage(msg);
+                        ShowLoading('HIDE');
+                        ShowSuccessMessage(msg);
                         BindTable();
+
+                        console.log(result);
+                        if (modal_name == '#add_dtr_modal') { ShowPostDTR(result.DTRId);}
                     }
                 }
             }

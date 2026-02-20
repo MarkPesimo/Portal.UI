@@ -89,11 +89,15 @@ namespace Portal.Controllers
                 _rptfile.SetDatabaseLogon(PortalConstant.Username, PortalConstant.dbpassword, PortalConstant.ServerName, PortalConstant.DatabaseName);
                 _rptfile.ExportToHttpResponse(ExportFormatType.PortableDocFormat, System.Web.HttpContext.Current.Response, false, "PAYSLIP");
 
+                _rptfile.Database.Dispose();
                 _rptfile.Close();
                 _rptfile.Dispose();
             }
             catch (Exception ex)
             {
+                _rptfile.Database.Dispose();
+                _rptfile.Close();
+                _rptfile.Dispose();
                 throw ex;
             }
         }
