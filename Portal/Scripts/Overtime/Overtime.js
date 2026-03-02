@@ -198,10 +198,12 @@
                                 ' <li> <a class="dropdown-item edit-overtime"' + row.EditVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
                                 ' <li> <a class="dropdown-item post-overtime"' + row.PostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
                                 ' <li> <a class="dropdown-item unpost-overtime"' + row.UnpostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item print-overtime"' + row.PrintVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item print-overtime"' + row.PrintVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
+                                ' <li> <a class="dropdown-item edit-approved-overtime"' + row.EditApprovedVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"><i class="fa-solid fa-circle-check"></i> Edit Approved</a></li> ' +
+                                ' <li><hr></li> ' +
                                 ' <li> <a class="dropdown-item cancel-overtime"' + row.CancelVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-                                '</ul>' +
-                                '</div> '
+                                ' </ul>' +
+                                ' </div> '
                         }
                     }
                 ]
@@ -287,8 +289,25 @@
         fetch(url, { method: 'GET' })
             .then(response => response.json())
             .then(data => {
+              
                 if (data && !data.error) {
-                    document.querySelector(_modal).querySelector(_form).querySelector('#ContinuousOt').checked = data.result;                    
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ContinuousOt').checked = data.result;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+
+
+        url = `/Overtime/_GetSelectedDateValue?_datelog=${DateLog}`;
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data);
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-day-type').value = data.DayType;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTFromTime').value = data.ShiftOut;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTToTime').value = data.ShiftOut;
                 } else {
                     console.error("Error:", data.error);
                 }
@@ -331,6 +350,21 @@
                 }
             })
             .catch(error => console.error("Request failed:", error));
+
+        url = `/Overtime/_GetSelectedDateValue?_datelog=${DateLog}`;
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data);
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-day-type').value = data.DayType;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTFromTime').value = data.ShiftOut;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTToTime').value = data.ShiftOut;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
     }
 
 
@@ -366,6 +400,93 @@
         });
     });
     //----------------------------------END ADD OVERTIME--------------------------------------
+
+    //----------------------------------BEGIN EDIT APPROVED OVERTIME--------------------------------------
+    $('#overtime-table').on('click', '.edit-approved-overtime', function () {
+        var OvertimeId = $(this).attr("Overtimeid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Overtime/_EditApprovedOvertime',
+            data: { '_id': OvertimeId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#edit_approved_overtime_modal').find(".modal-body").innerHTML = '';
+                $('#edit_approved_overtime_modal').find(".modal-body").html(response);
+                $("#edit_approved_overtime_modal").modal('show');
+
+
+                var _modal = '#edit_approved_overtime_modal';
+                var _form = '#edit-approved-overtime-Form';
+
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+                var _has_attachment = document.querySelector(_modal).querySelector(_form).querySelector("#HasAttachement").value;
+                console.log(_has_attachment);
+                var _view_button = document.querySelector(_modal).querySelector('#view_attached_btn');
+                _view_button.style.visibility = _has_attachment;
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+
+                
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", EditGetShiftOnSelectedDate);
+                //EditGetShiftOnSelectedDate();
+
+                var DateLog = document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").value;
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTTo").value = DateLog;
+
+                var url = `/Overtime/GetShift?_datelog=${DateLog}`;
+
+                fetch(url, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && !data.error) {
+                            document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-in').value = data.ShiftIn;
+                            document.querySelector(_modal).querySelector(_form).querySelector('#ot-shift-out').value = data.ShiftOut;
+                            //console.log(data);
+                        } else {
+                            console.error("Error:", data.error);
+                        }
+                    })
+                    .catch(error => console.error("Request failed:", error));
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#edit_approved_overtime_modal').on('click', '#update-approved-overtime-button', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Overtime/_ManageOvertime',
+            type: "POST",
+            data: $('#edit-approved-overtime-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#edit_approved_overtime_modal").modal('hide');
+
+                    $file = $("#Edit_approved_Overtime_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        OvertimeEditApprovedAttachment(result.OvertimeId, 'Overtime successfully updated.')
+                        return;
+                    }
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Overtime successfully updated.');
+
+                    ClearTable('#overtime-table');
+                    LoadDefault();
+                }
+            }
+        });
+    });
+
+    //----------------------------------END EDIT APPROVED OVERTIME--------------------------------------
 
     //----------------------------------BEGIN EDIT OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.edit-overtime', function () {
@@ -682,9 +803,35 @@
                 }
             }
         });
-
     }
 
+    function OvertimeEditApprovedAttachment(_id, _msg) {
+        var formData = new FormData();
+        var _Attachement = $('#Edit_approved_Overtime_Attachment')[0].files[0];
+
+        formData.append('_id', _id);
+        formData.append('Overtime_Attachment', _Attachement);
+
+        $.ajax({
+            url: '/Overtime/_OvertimeAttachment',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result == "ERROR") {
+                    ShowLoading('HIDE');
+                    alert('Error in attaching the ' + $file + ' file!')
+                }
+                else {
+                    ClearTable('#overtime-table');
+                    LoadDefault();
+                    ShowSuccessMessage(_msg);
+                    ShowLoading('HIDE');
+                }
+            }
+        });
+    }
     //==================================BEGIN MISC==================================
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');

@@ -313,6 +313,21 @@
                 }
             })
             .catch(error => console.error("Request failed:", error));
+
+        url = `/Overtime/_GetSelectedDateValue?_datelog=${DateLog}`;
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data);
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#ot-day-type').value = data.DayType;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTFromTime').value = data.ShiftOut;
+                    document.querySelector(_modal).querySelector(_form).querySelector('#OTToTime').value = data.ShiftOut;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
     }
 
     $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {

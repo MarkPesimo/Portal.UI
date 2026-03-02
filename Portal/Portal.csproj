@@ -670,6 +670,8 @@
     <Content Include="Views\Shared\_overtime_instruction.cshtml" />
     <Content Include="Views\Shared\_atdcorrection_instruction.cshtml" />
     <Content Include="Views\Shared\_dtr_instruction.cshtml" />
+    <Content Include="Views\Overtime\partial\_edit_approved_overtime_detail.cshtml" />
+    <Content Include="Views\Overtime\modal\_edit_approved_overtime_modal.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -174,6 +174,35 @@ namespace Portal.Controllers
             
         }
 
+
+        [HttpGet]
+        public ActionResult _GetSelectedDateValue(DateTime _datelog)
+        {
+            try
+            {
+                SelectedOvertimeDateValue _dayValue = _overtimerepository.GetSelectedDateValue(_datelog);
+                return Json(new { Status = "SUCCESS", DayType = _dayValue.DayType, ShiftOut = _dayValue.ShiftOut.ToString("HH:mm") }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = "ERROR", error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        //---------------------------------------BEGIN EDIT OVERTIME---------------------------------------
+        [HttpGet]
+        public ActionResult _EditApprovedOvertime(int _id)
+        {
+            OvertimeModel _obj = _overtimerepository.GetOvertime(_id);
+            _obj.Mode = 1;
+            _obj.UserId = 112;
+            _obj.Mode = 81;
+
+            return PartialView("~/Views/Overtime/Partial/_edit_approved_overtime_detail.cshtml", _obj);
+        }
+        //---------------------------------------END EDIT OVERTIME---------------------------------------
+
+
         //---------------------------------------BEGIN ADD OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _AddOvertime()

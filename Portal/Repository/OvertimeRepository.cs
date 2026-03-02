@@ -70,6 +70,27 @@ namespace Portal.Repository
             catch (Exception) { return false; }
         }
 
+
+        public SelectedOvertimeDateValue GetSelectedDateValue(DateTime _datelog)
+        {
+            try
+            {
+                SelectedOvertimeDateValue _obj = new SelectedOvertimeDateValue();
+                string _endpoint = "Overtime/GetSelectedDateValue/" + _loginuserid.ToString() + "/" +
+                    _datelog.ToShortDateString().Replace("/", "-");
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<SelectedOvertimeDateValue>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
         public List<FiledOvertimeMonitoring_model> GetOvertimeMonitoring(FiledOvertimeMonitoringFilter_model _filter)
         {
             try

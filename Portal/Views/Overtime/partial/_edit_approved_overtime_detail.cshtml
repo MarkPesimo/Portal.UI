@@ -1,0 +1,89 @@
+﻿@model APWModel.ViewModel.Portal.Overtime_model.OvertimeModel
+
+ 
+
+@using (Html.BeginForm("Add", "Overtime", FormMethod.Post, new { enctype = "multipart/form-data", name = "edit-approved-overtime-Form", id = "edit-approved-overtime-Form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.ClientId)
+    @Html.HiddenFor(m => m.EmpId)
+    @Html.HiddenFor(m => m.DateFiled)
+    @Html.HiddenFor(m => m.OTHours)
+    @Html.HiddenFor(m => m.Remarks)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.Mode)
+    @Html.HiddenFor(m => m.Message)
+    @Html.HiddenFor(m => m.HasAttachement)
+    @Html.HiddenFor(m => m.FileExtension)
+
+    
+  
+ 
+    <div class="row" id="div-validation" style="display: none;">
+        <div class="col mb-3">
+            <label for="html" id="error-message-label" class="form-label text-danger"></label><br>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <label class="form-label-custom">Shift Schedule (Selected Date)</label>
+        </div>
+        <div class="col-6">
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-in" name="ot-shift-in" readonly="true" placeholder="Shift In" />
+        </div>
+        <div class="col-6">
+            <input class="text-center form-control bg-light text-primary fw-bold" id="ot-shift-out" name="ot-shift-out" readonly="true" placeholder="Shift Out" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <label class="form-label-custom">Overtime Start</label>
+        </div>
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control", @type = "date", @readonly= "true", @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime" })
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <label class="form-label-custom">Overtime End</label>
+        </div>
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime" })
+        </div>
+    </div>
+
+    <div class="row mb-3" id="div-isContinuosOT">
+        <div class="col-12">
+            <div class="form-check form-switch card p-3 border-0 bg-light shadow-sm">
+                <div class="ms-4">
+                    @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input", @id = "ContinuousOt" })
+                    <label class="form-check-label fw-bold" for="ContinuousOt">Continuous Overtime</label>
+                    <p class="helper-text mb-0">Enable this for straight duties to prevent the automatic 60-minute break deduction for shifts over 4 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label class="form-label-custom">Reason for Overtime</label>
+            @Html.TextAreaFor(m => m.Reason, 3, 40, new { @class = "form-control", @placeholder = "Briefly explain the task rendered..." })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label class="form-label-custom">Update Attachment (Optional)</label>
+            <input class="form-control" type="file" name="Edit_approved_Overtime_Attachment" id="Edit_approved_Overtime_Attachment">
+        </div>
+    </div>
+}
