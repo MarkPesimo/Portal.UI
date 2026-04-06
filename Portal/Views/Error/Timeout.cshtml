@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewBag.Title = "NotFound";
+
+    Layout = "~/Views/Shared/Layouts/_LoginLayout.cshtml";
+}
+
+
+<style>
+  @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .content-wrapper {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px; 
+    margin-top: -5vh; 
+  }
+
+  h1.big-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #000;
+    letter-spacing: -0.01em;
+  }
+
+  p.description {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #000;
+    color: #fff;
+    padding: 0.8rem 1.6rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-back:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+  }
+
+  .huge-footer {
+    position: fixed;
+    bottom: 5%; 
+    width: 100%;
+    z-index: 1;
+    pointer-events: none;
+    text-align: center;
+  }
+
+  .huge-text {
+    font-size: clamp(12rem, 30vw, 30rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    color: #000000;
+    opacity: 0.03; 
+  }
+
+  @@media (max-width: 500px) {
+    h1.big-title { font-size: 1.6rem; }
+    p.description { font-size: 0.9rem; }
+  }
+</style>
+
+<div class="content-wrapper">
+    <h1 class="big-title">Timeout</h1>
+    <p class="description">
+        The page you are looking for doesn't exist or has been moved.
+        Please head back to the previous page to continue.
+    </p>
+
+    <button class="btn-back" onclick="history.back()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Go Back
+    </button>
+</div>
+
+<div class="huge-footer">
+    <span class="huge-text">408</span>
+</div>

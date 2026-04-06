@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Web;
+using static APWModel.ViewModel.ACAP.Employee_model;
 using static APWModel.ViewModel.HRMS.Employee.EmployeeDocument_model;
 
 namespace Portal.Repository
@@ -155,6 +156,54 @@ namespace Portal.Repository
             }
 
             return _id;
+        }
+
+        public List<Employee2316File> GetEmployee2316Files(int _empId)
+        {
+            try
+            {
+                List<Employee2316File> _obj = new List<Employee2316File>();
+                
+                string _endpoint = "Employee/GetEmployee2316/" + _empId;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<List<Employee2316File>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public List<EmployeeAnnouncement> GetAnnouncements(int _empId)
+        {
+            try
+            {
+                List<EmployeeAnnouncement> _obj = new List<EmployeeAnnouncement>();
+                
+                string _endpoint = "Employee/GetAnnouncements/" + _empId;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<List<EmployeeAnnouncement>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

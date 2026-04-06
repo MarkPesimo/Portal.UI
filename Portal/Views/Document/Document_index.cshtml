@@ -8,50 +8,80 @@
 }
 
 
-<section class="main">
-    <div class="main-title py-3">
-        <div class="container-fluid">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">Documents</h1>
+    <section class="main">
+        <div class="main-title py-3">
+            <div class="container-fluid">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                        <h1 class="h4 mt-2 mb-lg-0">Documents</h1>
 
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Dcoument</li>
-                        </ol>
-                    </nav>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Document</li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
-    <div class="main-content py-3">
-        <div class="container-fluid">
-            <div class="row">
+        <div class="main-content py-3">
+            <div class="container-fluid">
+                <div class="row">
 
-                <div class="col-lg-4 mb-3">
-                    <a href="@Url.Action("COE", "Document")" class="d-block w-100 widget text-center">
-                        <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                            <i class="fa-solid fa-file-pdf"></i>
-                        </span>
-                        <h3 class="text-primary">Cetificate of Employment</h3>
-                        <p class="text-muted mb-0">Generate COE</p>
-                    </a>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="@Url.Action("COE", "Document")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </span>
+                            <h3 class="text-primary h5 fw-bold">Certificate of Employment</h3>
+                            <p class="text-muted mb-0 small">Generate COE</p>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="@Url.Action("Requirements", "Document")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </span>
+                            <h3 class="text-primary h5 fw-bold">Required Documents</h3>
+                            <p class="text-muted mb-0 small">List of Required Documents</p>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="@Url.Action("Report2316", "Document")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </span>
+                            <h3 class="text-primary h5 fw-bold">2316 Report</h3>
+                            <p class="text-muted mb-0 small">Generate BIR Form 2316</p>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="@Url.Action("Announcements", "Document")" class="d-block w-100 widget text-center">
+                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3 text-warning">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </span>
+                            <h3 class="text-primary h5 fw-bold">Announcements</h3>
+                            <p class="text-muted mb-0 small">View Latest Updates</p>
+                        </a>
+                    </div>
+
                 </div>
-
-                <div class="col-lg-4 mb-3">
-                    <a href="@Url.Action("Requirements", "Document")" class="d-block w-100 widget text-center">
-                        <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                        </span>
-                        <h3 class="text-primary">Required Documents</h3>
-                        <p class="text-muted mb-0">List of Required Documents</p>
-                    </a>
-                </div>
-
             </div>
         </div>
-    </div>
-</section>
+
+        <footer class="footer py-3 bg-light border-top fixed-bottom">
+            <div class="container-fluid text-center">
+                <span class="text-muted small">
+                    Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a> |
+                    <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
+                    <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
+                </span>
+            </div>
+        </footer>
+    </section>

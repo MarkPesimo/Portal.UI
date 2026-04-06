@@ -44,6 +44,12 @@ namespace Portal.Controllers
             return View(_Help_Index, _model);
         }
 
+        public ActionResult ViewInfographics()
+        {
+            string filePath = Server.MapPath("~/HelpFiles/APW Employee Portal - Infographics.pdf");
+            return File(filePath, "application/pdf");
+        }
+
         [HttpGet]
         public ActionResult Preview(int _id, string _description, string _filename, string _modulename)
         {

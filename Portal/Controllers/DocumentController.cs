@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using static APWModel.ViewModel.ACAP.Employee_model;
 using static APWModel.ViewModel.HRMS.Employee.EmployeeDocument_model;
 using static Portal.Models.VW_COE;
 
@@ -29,6 +30,8 @@ namespace Portal.Controllers
         private string _Document_Index = "~/Views/Document/Document_index.cshtml";
         private string _COE_Index = "~/Views/Document/COE.cshtml";
         private string _DocumentRequirement_Index = "~/Views/Document/RequiredDocs.cshtml";
+        private string _2316Report = "~/Views/Document/Employee2316.cshtml";
+        private string _announcements = "~/Views/Document/AnnouncementsIndex.cshtml";
 
         public DocumentController()
         {
@@ -357,7 +360,26 @@ namespace Portal.Controllers
             }
         }
 
+        public ActionResult Report2316()
+        {
+            var model = _documentrepository.GetEmployee2316Files(_loginuserid);
 
+            return View(_2316Report, model);
+        }
 
+        public ActionResult Announcements()
+        {
+            try
+            {
+                List<EmployeeAnnouncement> model = _documentrepository.GetAnnouncements(_loginuserid);
+                
+                return View(_announcements, model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Unable to load announcements. Please try again later.";
+                return View(_announcements, new List<EmployeeAnnouncement>());
+            }
+        }
     }
 }

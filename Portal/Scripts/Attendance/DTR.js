@@ -27,9 +27,7 @@
         ShowLoading('HIDE');
         BindTable();
     });
-
-
-    //----------------------------------BEGIN TABLE----------------------------------------------
+   
     function ClearTable(tablename) {
         var table = $(tablename).DataTable();
         table.destroy();
@@ -78,111 +76,68 @@
     };
 
     function DisplayRecords(response) {
-        $("#dtr-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[-1], ["All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'DateFiled' },
-                    { 'data': 'Description' },
-                    //{ 'data': 'DateFrom' },                   
-                    { 'data': 'Status' },
-                    { 'data': 'Status' },
-                ],
-                order: [[1, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'Date Filed',
-                        target: 0,
-                        class: "d-none d-sm-table-cell text-center",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateFiled);
-                            return ' <strong class="text-primary">' + date.toLocaleDateString('es-pa') + ' </strong> '
-                        }
-                    },                    
-                    {
-                        title: 'Description',
-                        class: "d-none d-sm-table-cell",
-                        target: 1,
-                    },
-                    {
-                        title: 'Status',
-                        target: 2,
-                        class: "d-none d-sm-table-cell text-center",
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        title: 'Details',
-                        target: 3,
-                        class: "d-xs-block d-sm-none d-m-none d-lg-none",
-                        "render": function (data, type, row, meta) {
-                            return 'Date Filed : ' + row.DateFiled  + ' ' +
-                            '<small class="d-block">Description : ' + row.Description + '</small> ' +
-                                '<small class="d-block">Date from : ' + row.DateFrom + '</small> ' +
-                                '<small class="d-block">Date to : ' + row.DateTo + '</small> ' +
-                                SetTableBGColor(row.Status)
+        if ($.fn.DataTable.isDataTable('#dtr-table')) {
+            $('#dtr-table').DataTable().destroy();
+        }
+        
+        var mobileLabels = ["DATE FILED", "DESCRIPTION", "STATUS", "ACTIONS"];
 
-                        }
-                    },
-                    {
-                        target: 4,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                
-                                ' <li> <a class="dropdown-item edit-dtr"' + row.EditVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-dtr"' + row.PostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-dtr"' + row.UnpostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item print-dtr"' + row.PrintVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-dtr"' + row.CancelVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-                                '</ul>' +
-                                '</div> '
-                        }
+        $("#dtr-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[0, "desc"]],
+            dom: "<'row'<'col-6'l><'col-6'f>>" + "<'row'<'col-12'tr>>" + "<'row mt-3'<'col-12 col-md-6'i><'col-12 col-md-6'p>>",
+            columns: [
+                { 'data': 'DateFiled', 'title': 'Date Filed' }, 
+                { 'data': 'Description', 'title': 'Description' },
+                { 'data': 'Status', 'title': 'Status' },
+                { 'data': null, 'title': 'Actions' }
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
                     }
-                ]
-            });
-
-        //SetTableBGColor();
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
+                },
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        const date = new Date(row.DateFiled);
+                        return '<strong>' + date.toLocaleDateString('es-pa') + '</strong>';
+                    }
+                },
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        var displayStatus = (row.Status === 'Posted') ? 'Pending' : row.Status;
+                        return SetTableBGColor(displayStatus);
+                    }
+                },
+                {
+                    targets: 3, 
+                    orderable: false,
+                    className: 'dt-body-right',
+                    render: function (data, type, row) {
+                        return '<div class="btn-group">' +
+                            '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">' +
+                            '<i class="fa-solid fa-ellipsis-vertical me-2"></i> Options' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end shadow border-0">' +
+                            '<li><a class="dropdown-item post-dtr"' + row.PostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-thumbtack text-success me-2"></i>Post</a></li>' +
+                            '<li><a class="dropdown-item unpost-dtr"' + row.UnpostVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-rotate-left text-warning me-2"></i>Unpost</a></li>' +
+                            '<li><a class="dropdown-item print-dtr"' + row.PrintVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-print text-info me-2"></i>Print</a></li>' +
+                            '<li><hr class="dropdown-divider"></li>' +
+                            '<li><a class="dropdown-item cancel-dtr"' + row.CancelVisible + ' DTRid="' + row.Id + '" guid="' + row.PortalGuid + '"><i class="fa-solid fa-ban text-danger me-2"></i>Cancel</a></li>' +
+                            '</ul></div>';
+                    }
+                }
+            ]
+        });
 
         ShowLoading('HIDE');
-        
-    };
+    }
 
-
-    function SetTableBGColor(_status) {
-        var _font_color = 'white';
-        var _color = '#6C757D';
-        if (_status == 'Posted') { _color = '#5cb85c'; }
-        else if (_status == "Approved") { _color = '#0275d8'; }
-        else if (_status == "Cancelled") { _color = '#d9534f'; }
-        else if (_status == "Rejected") { _color = '#c94D3B';}
-        else { _font_color = 'black'; }
-
-        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
-        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
-    };
-
-  
-    //----------------------------------END TABLE----------------------------------------------
-
-    //----------------------------------BEGIN ADD DTR-----------------------------------
     $("#add_dtr_btn").click(function (e) {
         e.preventDefault();
 
@@ -210,6 +165,151 @@
         });
     });
 
+    $('#add_dtr_modal').on('click', '#submit_DTR', function (e) {
+        ManageDTR('#dtr-Form', '#add_dtr_modal', 'DTR successfully created.')
+    });
+
+    $('#dtr-table').on('click', '.edit-dtr', function () {
+
+        var DTRId = $(this).attr("DTRid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_EditDTR',
+            data: { '_id': DTRId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#edit_dtr_modal').find(".modal-body").html(response);
+                $("#edit_dtr_modal").modal('show');
+
+                var _modal = '#edit_dtr_modal';
+                var _form = '#dtr-Form';
+                document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").addEventListener("change", SetEditCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Month").addEventListener("change", SetEditCutOffDate);
+                document.querySelector(_modal).querySelector(_form).querySelector("#Year").addEventListener("change", SetEditCutOffDate);
+
+                SetEditCutOffDate();
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+ 
+    $('#edit_dtr_modal').on('click', '#update_dtr', function (e) {
+          ManageDTR('#dtr-Form', '#edit_dtr_modal', 'DTR successfully updated.')
+    });
+
+    $('#dtr-table').on('click', '.post-dtr', function () {
+        var DTRId = $(this).attr("DTRid");
+    
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_PostDTR',
+            data: { '_id': DTRId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#post_dtr_modal').find(".modal-body").html(response);
+                $("#post_dtr_modal").modal('show');
+
+                //DisplayDtrDetails(DTRId);
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#post_dtr_modal').on('click', '#post_dtr', function (e) {
+        ManageDTR('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.')
+    });
+
+    $('#dtr-table').on('click', '.print-dtr', function () {
+        var guid = $(this).attr("guid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_PreviewDTR',
+            data: { '_guid': guid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#preview_dtr_modal').find(".modal-body").html(response);
+                $("#preview_dtr_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#dtr-table').on('click', '.unpost-dtr', function () {
+        var DTRId = $(this).attr("DTRid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_UnpostDTR',
+            data: { '_id': DTRId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#unpost_dtr_modal').find(".modal-body").html(response);
+                $("#unpost_dtr_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#unpost_dtr_modal').on('click', '#unpost_dtr', function (e) {
+        ManageDTR('#unpost-dtr-Form', '#unpost_dtr_modal', 'DTR successfully Unposted.')
+    });
+
+    $('#dtr-table').on('click', '.cancel-dtr', function () {
+        var DTRId = $(this).attr("DTRid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_CancelDTR',
+            data: { '_id': DTRId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#cancel_dtr_modal').find(".modal-body").html(response);
+                $("#cancel_dtr_modal").modal('show');
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#cancel_dtr_modal').on('click', '#cancel_dtr', function (e) {
+         ManageDTR('#cancel-dtr-Form', '#cancel_dtr_modal', 'DTR successfully Cancelled.')
+    });
+
+    function SetTableBGColor(_status) {
+        var _font_color = 'white';
+        var _color = '#6C757D';
+
+        if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Pending") { _color = '#ffc107'; _font_color = 'black'; } 
+        else if (_status == "Approved") { _color = '#5cb85c'; } 
+        else if (_status == "Attached to DTR") { _color = '#5cb85c'; }
+        else if (_status == "Cancelled") { _color = '#d9534f'; }
+        else if (_status == "Rejected") { _color = '#c94D3B'; }
+        else { _font_color = 'black'; }
+        
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '; color: ' + _font_color + '">' + _status + '</span>'
+    };
 
     function SetCutOffDate() {
         var _modal = '#add_dtr_modal';
@@ -257,32 +357,7 @@
         }
     }
 
-    //$("#Cutoff, #Month, #Year").change(function () {
-    //    var cutoff = $("#Cutoff").val();
-    //    var year = $("#Year").val();
-    //    var monthInput = $("#Month").val();
-    //    var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
-
-    //    if (cutoff && month > 0 && year) {
-    //        $.getJSON('/Attendance/GetClientCutoffDate',
-    //            { cutoff: cutoff, month: month, year: year },
-    //            function (data) {
-    //                if (data.success) {
-    //                    $("#DateFrom").val(data.dateFrom);
-    //                    $("#DateTo").val(data.dateTo);
-    //                } else {
-    //                    alert("Error: " + data.message);
-    //                }
-    //            });
-    //    }
-    //});
-
-    $('#add_dtr_modal').on('click', '#submit_DTR', function (e) {
-        ManageDTR('#dtr-Form', '#add_dtr_modal', 'DTR successfully created.')
-    });
-
-    function ShowPostDTR(DTRId)
-    {        
+    function ShowPostDTR(DTRId) {
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
@@ -299,69 +374,6 @@
             error: function (response) { LogError(response); }
         });
     }
-    //----------------------------------END ADD DTR-----------------------------------
-
-    //----------------------------------BEGIN EDIT DTR--------------------------------------
-    $('#dtr-table').on('click', '.edit-dtr', function () {
-
-        var DTRId = $(this).attr("DTRid");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_EditDTR',
-            data: { '_id': DTRId },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#edit_dtr_modal').find(".modal-body").html(response);
-                $("#edit_dtr_modal").modal('show');
-
-                var _modal = '#edit_dtr_modal';
-                var _form = '#dtr-Form';
-                document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").addEventListener("change", SetEditCutOffDate);
-                document.querySelector(_modal).querySelector(_form).querySelector("#Month").addEventListener("change", SetEditCutOffDate);
-                document.querySelector(_modal).querySelector(_form).querySelector("#Year").addEventListener("change", SetEditCutOffDate);
-
-                SetEditCutOffDate();
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
- 
-    $('#edit_dtr_modal').on('click', '#update_dtr', function (e) {
-          ManageDTR('#dtr-Form', '#edit_dtr_modal', 'DTR successfully updated.')
-    });
-    //----------------------------------END EDIT DTR--------------------------------------
-
-    //----------------------------------BEGIN POST CORRECTION--------------------------------------
-    $('#dtr-table').on('click', '.post-dtr', function () {
-        var DTRId = $(this).attr("DTRid");
-    
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_PostDTR',
-            data: { '_id': DTRId },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#post_dtr_modal').find(".modal-body").html(response);
-                $("#post_dtr_modal").modal('show');
-
-                //DisplayDtrDetails(DTRId);
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
-    $('#post_dtr_modal').on('click', '#post_dtr', function (e) {
-        ManageDTR('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.')
-    });
 
     function DisplayDtrDetails(DTRId) {
         alert('dsdsd');
@@ -369,7 +381,7 @@
             type: "GET",
             url: "/Attendance/GetDTRDetails",
             data: {
-                '_id': DTRId 
+                '_id': DTRId
             },
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -420,23 +432,23 @@
                     {
                         title: 'Shift Schedule',
                         target: 2,
-                        class: "d-none d-sm-table-cell", 
+                        class: "d-none d-sm-table-cell",
                     },
                     {
                         title: 'Time In',
                         target: 3,
-                        class: "d-none d-sm-table-cell text-center", 
+                        class: "d-none d-sm-table-cell text-center",
                         //}
                     },
                     {
                         title: 'Time Out',
                         target: 4,
-                        class: "d-none d-sm-table-cell text-center", 
+                        class: "d-none d-sm-table-cell text-center",
                     },
                     {
                         title: 'Time Out',
                         target: 5,
-                        class: "d-none d-sm-table-cell text-center", 
+                        class: "d-none d-sm-table-cell text-center",
                     },
                     {
                         title: 'Details',
@@ -450,7 +462,7 @@
                                 '<small class="d-block">Remarks : ' + row.Remarks + '</small> '
                         }
                     },
-                    
+
                 ]
             });
 
@@ -465,81 +477,6 @@
         ShowLoading('HIDE');
 
     };
-
-    //----------------------------------END POST CORRECTION--------------------------------------
-
-    //----------------------------------END PRINT DTR--------------------------------------
-    $('#dtr-table').on('click', '.print-dtr', function () {
-        var guid = $(this).attr("guid");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_PreviewDTR',
-            data: { '_guid': guid },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#preview_dtr_modal').find(".modal-body").html(response);
-                $("#preview_dtr_modal").modal('show');
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-    //----------------------------------END PRINT DTR--------------------------------------
-
-    //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------
-    $('#dtr-table').on('click', '.unpost-dtr', function () {
-        var DTRId = $(this).attr("DTRid");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_UnpostDTR',
-            data: { '_id': DTRId },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#unpost_dtr_modal').find(".modal-body").html(response);
-                $("#unpost_dtr_modal").modal('show');
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
-    $('#unpost_dtr_modal').on('click', '#unpost_dtr', function (e) {
-        ManageDTR('#unpost-dtr-Form', '#unpost_dtr_modal', 'DTR successfully Unposted.')
-    });
-    //----------------------------------END UNPOST CORRECTION--------------------------------------
-
-    //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------
-    $('#dtr-table').on('click', '.cancel-dtr', function () {
-        var DTRId = $(this).attr("DTRid");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_CancelDTR',
-            data: { '_id': DTRId },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#cancel_dtr_modal').find(".modal-body").html(response);
-                $("#cancel_dtr_modal").modal('show');
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
-    $('#cancel_dtr_modal').on('click', '#cancel_dtr', function (e) {
-         ManageDTR('#cancel-dtr-Form', '#cancel_dtr_modal', 'DTR successfully Cancelled.')
-    });
 
     function ManageDTR(form_name, modal_name, msg) {
         ShowLoading('SHOW');
@@ -566,9 +503,7 @@
             }
         });
     }
-    //----------------------------------END UNPOST CORRECTION--------------------------------------
 
-    //==================================BEGIN MISC==================================
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
@@ -601,7 +536,6 @@
         else { x.style.visibility = 'hidden'; }
     }
 
-
     function ShowInfoMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterInfo-body").innerHTML = _msg;
@@ -625,5 +559,4 @@
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
-    //==================================END MISC==================================
 });

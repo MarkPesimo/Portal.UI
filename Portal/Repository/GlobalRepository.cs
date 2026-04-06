@@ -12,6 +12,7 @@ using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Security;
+using static APWModel.ViewModel.COOR.AdminTools.SystemAdministration.SystemAdministration_model;
 
 namespace Portal.Repository
 {
@@ -244,7 +245,6 @@ namespace Portal.Repository
                 };
         }
 
-
         public IEnumerable<FixedDropdown_model.COEReasonlist> GetCOEReasons()
         {
             try
@@ -297,7 +297,6 @@ namespace Portal.Repository
                 }
             };
         }
-
 
         public IEnumerable<Filtering_model.ConcernStatus> GetConcernStatus()
         {
@@ -373,5 +372,7 @@ namespace Portal.Repository
                 throw;
             }
         }
+
+ 
     }
 }

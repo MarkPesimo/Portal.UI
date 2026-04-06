@@ -15,29 +15,6 @@
         window.open("" + url + "", 'Attachment', 'top=100, status=no, toolbar=no, resizable=yes, scrollbars=yes, width=800, height=600');
     });
 
-    //function getLocation() {
-    //    if (navigator.geolocation) {
-    //        navigator.geolocation.getCurrentPosition(showPosition);
-    //    } else {
-    //        x.innerHTML = "Geolocation is not supported by this browser.";
-    //    }
-    //}
-
-    function showPosition(position) {
-        return "Latitude: " + position.coords.latitude +
-            "<br>Longitude: " + position.coords.longitude;
-    }
-
-  
-    function success(position) {
-        alert( "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
-    }
-
-    function error() {
-        alert("Sorry, no position available.");
-    }
-
-
     $("#get_location").click(function (e) {
         e.preventDefault();
 
@@ -58,166 +35,7 @@
         ClearTable('#helpdesk-table');
         BindTable();
     });
-       
-    function ClearTable(tablename) {
-        var table = $(tablename).DataTable();
-        table.destroy();
-        $(tablename).empty();
-    };
-
-    function BindTable() {
-        var FromDate = document.getElementById("From").value;
-        var ToDate = document.getElementById("To").value;
-
-        var e_concerntype = document.getElementById("ConcernType");
-        var ConcenTypeId = e_concerntype.value;
-        
-        if (ConcenTypeId == "") { ConcenTypeId = 0; }
-
-        var e_status = document.getElementById("Status");
-        var Status = e_status.value;
-
-        if (Status == "") { Status = "All"; }
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: "/Helpdesk/_GetPortalHelpdesk",
-            data: {
-                '_concerntypeid': ConcenTypeId,
-                '_status': Status,
-                '_fromdate' :  FromDate,
-                '_todate' : ToDate
-            },
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                ShowLoading('HIDE');
-                DisplayConcerns(response);
-                $('#filter_helpdesk_modal').modal('hide');
-            },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
-        });
-    };
-
-    function DisplayConcerns(response) {
-        $("#helpdesk-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[10, -1], [10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'ConcernDate' },
-                    { 'data': 'ConcernType' },
-                    { 'data': 'Remarks' },
-                    { 'data': 'FileStatus' },
-                    { 'data': 'ConcernStatus' },
-                    { 'data': 'ConcernStatus' },
-                ],
-                order: [[0, "desc"]],
-                columnDefs: [
-
-                    {
-                        title: 'Date filed',
-                        target: 0,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.ConcernDate);
-                            return date.toLocaleDateString('es-pa') 
-                        }
-                    },
-                    {
-                        title: 'Type',
-                        target: 1,
-                        class: "d-none d-sm-table-cell text-center",
-                        "render": function (data, type, row, meta) {
-                            return ' <strong class="text-primary">' + row.ConcernType + ' </strong> '
-                        }
-                    },                    
-                    {
-                        title: 'Concern',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 2
-                    },
-                    {
-                        title: 'File Status',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 3,
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.FileStatus)
-                        }
-                    },
-                    {
-                        title: 'Concern Status',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 4
-                    },
-                    {
-                        title: 'Details',
-                        class: "d-xs-block d-sm-none d-m-none d-lg-none ",
-                        target: 5,
-                        "render": function (data, type, row, meta) {
-                            return 'Date Filed : ' + row.ConcernDate + ' ' +
-                                '<small class="d-block">Type : ' + row.ConcernType + '</small> ' +
-                                '<small class="d-block">Concern : ' + row.Remarks + '</small> ' +
-                                '<small class="d-block">File Status : ' + SetTableBGColor(row.FileStatus) + '</small> ' +
-                                '<small class="d-block">Concern Status : ' + row.ConcernStatus + '</small> '
-                                //+
-                                //SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        target: 6,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item view-concern"' + row.ViewVisible + ' Concernid="' + row.Id + '"> <i class="fa-regular fa-eye"></i> Follow up</a></li> ' +
-                                ' <li> <a class="dropdown-item edit-concern"' + row.EditVisible + ' Concernid="' + row.Id + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-concern"' + row.PostVisible + ' Concernid="' + row.Id + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-concern"' + row.UnpostVisible + ' Concernid="' + row.Id + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-concern"' + row.CancelVisible + ' Concernid="' + row.Id + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-                                ' <li> <a class="dropdown-item delete-concern"' + row.DeleteVisible + ' Concernid="' + row.Id + '"> <i class="fa-solid fa-trash"></i> Delete</a></li> ' +
-                                
-                                '</ul>' +
-                                '</div> '
-                        }
-                    }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
-
-        ShowLoading('HIDE');
-    };
-
-    function SetTableBGColor(_status) {
-        var _font_color = 'white';
-        var _color = 'white';
-
-        if (_status == 'Posted') { _color = '#5cb85c'; }
-        else if (_status == "Approved") { _color = '#0275d8'; }
-        else if (_status == "Cancelled") { _color = '#d9534f'; }
-        else if (_status == "Rejected") { _color = '#c94D3B'; }
-        else { _color = '#959A97'; _font_color = 'white'; }
-
-        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
-    };
-
-    //----------------------------------BEGIN ADD CONCERN--------------------------------------
+    
     $('#helpdesk-main-div').on('click', '#add_concern_btn', function (e) {
         e.preventDefault();
 
@@ -258,13 +76,7 @@
             }
         });
     });
-    //----------------------------------END ADD CONCERN--------------------------------------
 
-
-    /////////////========================================TABLE EVENTS==============================================================
-
-    
-    //----------------------------------BEGIN EDIT CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.edit-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -305,10 +117,7 @@
             }
         });
     });
-    //----------------------------------END EDIT CONCERN--------------------------------------
 
-
-    //----------------------------------BEGIN POST CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.post-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -350,9 +159,7 @@
             }
         });
     });
-    //----------------------------------END POST CONCERN--------------------------------------
 
-    //----------------------------------BEGIN UNPOST CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.unpost-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -396,9 +203,7 @@
         });
 
     });
-    //----------------------------------END UNPOST CONCERN--------------------------------------
 
-    //----------------------------------BEGIN CANCEL CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.cancel-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -445,9 +250,7 @@
         });
 
     });
-    //----------------------------------END CANCEL CONCERN--------------------------------------
-      
-    //----------------------------------BEGIN DELETE CONCERN--------------------------------------
+
     $('#helpdesk-table').on('click', '.delete-concern', function () {
         var ConcernId = $(this).attr("Concernid");
 
@@ -491,9 +294,7 @@
         });
 
     });
-    //----------------------------------END DELETE CONCERN--------------------------------------
 
-    //----------------------------------BEGIN VIEW CONCERN--------------------------------------
     $('#helpdesk-table').on('click', '.view-concern', function () {
         var ConcernId = $(this).attr("Concernid");
         document.querySelector('#comment_modal').querySelector("#write_comment_button").setAttribute("concernid", ConcernId);
@@ -501,108 +302,8 @@
         ClearTable('#comments-table');
         $("#comment_modal").modal('show');
         GetComments(ConcernId);           
-    });
+    }); 
 
-    function GetComments(concernid) {
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Helpdesk/_GetComments',
-            data: { '_concernid': concernid },
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                console.log(response);
-                document.querySelector('#comment_modal').querySelector("#write_comment_button").removeAttribute("Hidden");
-                if (response.status == "Hidden") { document.querySelector('#comment_modal').querySelector("#write_comment_button").setAttribute("Hidden", "Hidden");}
-
-                DisplayComments(response.result, concernid);
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    }
-
-    function DisplayComments(response, concernid) {
-        $("#comments-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[10, -1], [10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'Id' },
-                    { 'data': 'DateCreated' },
-                    { 'data': 'CreatedBy' },
-                    { 'data': 'Comment' },
-                ],
-                order: [[0, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'Id',
-                        target: 0,
-                        visible: false,
-                        searchable: false                         
-                    },
-                    {
-                        title: 'Date Created',
-                        target: 1,
-                        "render": function (data, type, row, meta) {
-                            return ' <p>' + row.DateCreated + ' </p> '
-                        } 
-                    },
-                    {
-                        title: 'Written by',
-                        target: 2,
-                        class: "d-none d-sm-table-cell text-center",
-                        "render": function (data, type, row, meta) {
-                            return ' <p>' + row.CreatedBy + ' </p> '
-                        }
-                    },
-                    {
-                        title: 'Comments',
-                        target: 3,
-                        "render": function (data, type, row, meta) {
-                            return ' <p>' + row.Comment + ' </p> '
-                        }
-                    },
-                    {
-                        target: 4,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item comment-view"' + row.ViewVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-regular fa-eye"></i> View attachment</a></li> ' +
-                                ' <li> <a class="dropdown-item comment-attach"' + row.AttachVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-paperclip"></i> </i> Upload/Update Attachment</a></li> ' +
-                                ' <li> <a class="dropdown-item comment-delete"' + row.DeleteVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-trash"></i> </i> Delete</a></li> ' +
-                                
-                                '</ul>' +
-                                '</div> '
-                        }
-                    }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-        
-        ShowLoading('HIDE');
-    };
-    //----------------------------------END VIEW CONCERN--------------------------------------
-
-    /////////////========================================TABLE EVENTS==============================================================
-
-
-    //----------------------------------BEGIN ADD COMMENT--------------------------------------
     $('#comment_modal').on('click', '#write_comment_button', function (e) {
         e.preventDefault();
         var _concernid = document.querySelector('#comment_modal').querySelector("#write_comment_button").getAttribute("concernid");
@@ -678,36 +379,6 @@
         });
     });
 
-    function AttachFile(_concernid, _commentid) {
-        var formData = new FormData();
-        var Attachement = $('#Add_Attachment')[0].files[0];
-
-        formData.append('_concernid', _concernid);
-        formData.append('_commentid', _commentid);
-        formData.append('Comment_Attachment', Attachement);
-
-
-        $.ajax({
-            url: '/Helpdesk/_Attach',
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.Result == "ERROR") { alert('Error in attaching the file!') }
-                else {
-                    alert('tete');
-                    ShowSuccessMessage('Comment successfully created.');
-                    ClearTable('#comments-table');
-                    GetComments(_concernid);
-                }
-
-            }
-        });
-    };
-    //----------------------------------END ADD COMMENT--------------------------------------
-
-    //----------------------------------BEGIN ATTACHMENT--------------------------------------
     $('#comments-table').on('click', '.comment-view', function () {
         var CommentId = $(this).attr("CommentId");
         var ConcernId = $(this).attr("ConcernId");
@@ -767,7 +438,280 @@
 
         ShowLoading('HIDE');
     });
-    //----------------------------------END ATTACHMENT--------------------------------------
+
+    function showPosition(position) {
+        return "Latitude: " + position.coords.latitude +
+            "<br>Longitude: " + position.coords.longitude;
+    }
+
+    function success(position) {
+        alert("Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
+    }
+
+    function error() {
+        alert("Sorry, no position available.");
+    }
+
+    function ClearTable(tablename) {
+        var table = $(tablename).DataTable();
+        table.destroy();
+        $(tablename).empty();
+    };
+
+    function BindTable() {
+        var FromDate = document.getElementById("From").value;
+        var ToDate = document.getElementById("To").value;
+
+        var e_concerntype = document.getElementById("ConcernType");
+        var ConcenTypeId = e_concerntype.value;
+
+        if (ConcenTypeId == "") { ConcenTypeId = 0; }
+
+        var e_status = document.getElementById("Status");
+        var Status = e_status.value;
+
+        if (Status == "") { Status = "All"; }
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Helpdesk/_GetPortalHelpdesk",
+            data: {
+                '_concerntypeid': ConcenTypeId,
+                '_status': Status,
+                '_fromdate': FromDate,
+                '_todate': ToDate
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                ShowLoading('HIDE');
+                DisplayConcerns(response);
+                $('#filter_helpdesk_modal').modal('hide');
+            },
+            failure: function (response) { console.log(response); },
+            error: function (response) { console.log(response); }
+        });
+    };
+
+    function DisplayConcerns(response) {
+        if ($.fn.DataTable.isDataTable('#helpdesk-table')) {
+            $('#helpdesk-table').DataTable().destroy();
+        }
+        
+        var mobileLabels = ["Date Filed", "Type/Concern", "File Status", "Status", "Actions"];
+
+        $("#helpdesk-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[0, "desc"]],
+            dom: "<'row mb-2'<'col-6'l><'col-6'f>>" + "<'row'<'col-12'tr>>" + "<'row mt-3'<'col-12 col-md-6'i><'col-12 col-md-6'p>>",
+            columns: [
+                { 'data': 'ConcernDate', 'title': 'Date Filed' },
+                { 'data': 'Remarks', 'title': 'Type/Concern' },
+                { 'data': 'FileStatus', 'title': 'File Status' },
+                { 'data': 'ConcernStatus', 'title': 'Status' },
+                { 'data': null, 'title': 'Actions' }
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
+                    }
+                },
+                {
+                    targets: 0, 
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        const date = new Date(row.ConcernDate);
+                        return '<strong><i class="fa-regular fa-calendar me-1 text-danger"></i>' + date.toLocaleDateString('es-pa') + '</strong>';
+                    }
+                },
+                {
+                    targets: 1, 
+                    render: function (data, type, row) {
+                        return '<div class="text-start">' +
+                            '<strong class="text-primary d-block">' + row.ConcernType + '</strong>' +
+                            '<small class="text-muted text-wrap">' + row.Remarks + '</small>' +
+                            '</div>';
+                    }
+                },
+                {
+                    targets: 2, 
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return SetTableBGColor(row.FileStatus);
+                    }
+                },
+                {
+                    targets: 3, 
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return '<span class="badge bg-light text-dark border">' + row.ConcernStatus + '</span>';
+                    }
+                },
+                {
+                    targets: 4, 
+                    orderable: false,
+                    className: 'dt-body-right',
+                    render: function (data, type, row) {
+                        return '<div class="btn-group w-100">' +
+                            '<button class="btn btn-sm btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fa-solid fa-ellipsis-vertical me-2"></i> Options' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end shadow border-0">' +
+                            '<li><a class="dropdown-item view-concern"' + row.ViewVisible + ' Concernid="' + row.Id + '"><i class="fa-regular fa-eye me-2 text-info"></i> Follow up</a></li>' +
+                            '<li><a class="dropdown-item edit-concern"' + row.EditVisible + ' Concernid="' + row.Id + '"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Edit</a></li>' +
+                            '<li><a class="dropdown-item post-concern"' + row.PostVisible + ' Concernid="' + row.Id + '"><i class="fa-solid fa-thumbtack me-2 text-success"></i> Post</a></li>' +
+                            '<li><a class="dropdown-item unpost-concern"' + row.UnpostVisible + ' Concernid="' + row.Id + '"><i class="fa-solid fa-rotate-left me-2 text-warning"></i> Unpost</a></li>' +
+                            '<li><hr class="dropdown-divider"></li>' +
+                            '<li><a class="dropdown-item cancel-concern"' + row.CancelVisible + ' Concernid="' + row.Id + '"><i class="fa-solid fa-ban me-2 text-secondary"></i> Cancel</a></li>' +
+                            '<li><a class="dropdown-item delete-concern"' + row.DeleteVisible + ' Concernid="' + row.Id + '"><i class="fa-solid fa-trash me-2 text-danger"></i> Delete</a></li>' +
+                            '</ul></div>';
+                    }
+                }
+            ]
+        });
+
+        ShowLoading('HIDE');
+    }
+
+    function SetTableBGColor(_status) {
+        var _font_color = 'white';
+        var _color = 'white';
+
+        if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Approved") { _color = '#0275d8'; }
+        else if (_status == "Cancelled") { _color = '#d9534f'; }
+        else if (_status == "Rejected") { _color = '#c94D3B'; }
+        else { _color = '#959A97'; _font_color = 'white'; }
+
+        return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+    };
+
+    function GetComments(concernid) {
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Helpdesk/_GetComments',
+            data: { '_concernid': concernid },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                document.querySelector('#comment_modal').querySelector("#write_comment_button").removeAttribute("Hidden");
+                if (response.status == "Hidden") { document.querySelector('#comment_modal').querySelector("#write_comment_button").setAttribute("Hidden", "Hidden"); }
+
+                DisplayComments(response.result, concernid);
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    }
+
+    function DisplayComments(response, concernid) {
+        $("#comments-table").DataTable(
+            {
+                autoWidth: false,
+                bLengthChange: true,
+                lengthMenu: [[10, -1], [10, "All"]],
+                bFilter: true,
+                bSort: true,
+                bPaginate: true,
+                data: response,
+                columns: [
+                    { 'data': 'Id' },
+                    { 'data': 'DateCreated' },
+                    { 'data': 'CreatedBy' },
+                    { 'data': 'Comment' },
+                ],
+                order: [[0, "desc"]],
+                columnDefs: [
+                    {
+                        title: 'Id',
+                        target: 0,
+                        visible: false,
+                        searchable: false
+                    },
+                    {
+                        title: 'Date Created',
+                        target: 1,
+                        "render": function (data, type, row, meta) {
+                            return ' <p>' + row.DateCreated + ' </p> '
+                        }
+                    },
+                    {
+                        title: 'Written by',
+                        target: 2,
+                        class: "d-none d-sm-table-cell text-center",
+                        "render": function (data, type, row, meta) {
+                            return ' <p>' + row.CreatedBy + ' </p> '
+                        }
+                    },
+                    {
+                        title: 'Comments',
+                        target: 3,
+                        "render": function (data, type, row, meta) {
+                            return ' <p>' + row.Comment + ' </p> '
+                        }
+                    },
+                    {
+                        target: 4,
+                        className: 'dt-body-right',
+                        "render": function (data, type, row, meta) {
+                            return '<div class="btn-group"> ' +
+                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
+                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
+                                '             </button> ' +
+                                ' <ul class="dropdown-menu">' +
+                                ' <li> <a class="dropdown-item comment-view"' + row.ViewVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-regular fa-eye"></i> View attachment</a></li> ' +
+                                ' <li> <a class="dropdown-item comment-attach"' + row.AttachVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-paperclip"></i> </i> Upload/Update Attachment</a></li> ' +
+                                ' <li> <a class="dropdown-item comment-delete"' + row.DeleteVisible + ' ConcernId="' + concernid + '" CommentId="' + row.Id + '"> <i class="fa-solid fa-trash"></i> </i> Delete</a></li> ' +
+
+                                '</ul>' +
+                                '</div> '
+                        }
+                    }
+                ]
+            });
+
+        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
+        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
+        $('.dataTables_paginate').addClass('mt-2 mb-2');
+        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
+        $('.sorting').addClass('bg-primary text-white');
+
+        ShowLoading('HIDE');
+    };
+
+    function AttachFile(_concernid, _commentid) {
+        var formData = new FormData();
+        var Attachement = $('#Add_Attachment')[0].files[0];
+
+        formData.append('_concernid', _concernid);
+        formData.append('_commentid', _commentid);
+        formData.append('Comment_Attachment', Attachement);
+
+
+        $.ajax({
+            url: '/Helpdesk/_Attach',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.Result == "ERROR") { alert('Error in attaching the file!') }
+                else {
+                    alert('tete');
+                    ShowSuccessMessage('Comment successfully created.');
+                    ClearTable('#comments-table');
+                    GetComments(_concernid);
+                }
+
+            }
+        });
+    };
 
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');

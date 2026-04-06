@@ -29,82 +29,6 @@
         $(tablename).empty();
     };
 
-    $("#show_clockinout_filter_btn").click(function (e) {
-        e.preventDefault();
-
-        $('#filter_clockinout_modal').modal('show');
-    });
-
-    //----------------------------------BEGIN ADD-----------------------------------
-    $("#add_correction_btn").click(function (e) {
-        e.preventDefault();
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_AddCorrection',
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#add_correction_modal').find(".modal-body").innerHTML = '';
-                $('#add_correction_modal').find(".modal-body").html(response);
-                $('#add_correction_modal').modal('show');
-
-                var _form = '#attendance-correction-Form';
-                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
-
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-        
-    });
-
-    function ChangeDateLogAdd() {        
-        var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
-
-        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
-    };
-
-    function ChangeDateLogAddPost() {
-        var _form = '#post-attendance-correction-Form';
-        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
-
-        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
-    };
-
-    $('#add_correction_modal').on('click', '#submit_correction', function (e) {
-        ShowLoading('SHOW');
-        $.ajax({
-            url: '/Attendance/_AddCorrection',
-            type: "POST",
-            data: $('#attendance-correction-Form').serialize(),
-            dataType: 'json',
-            success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
-                    $("#add_correction_modal").modal('hide');
-
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage('Attendance correction successfully created.');
-                     
-                    BindTable();
-                }
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-    //----------------------------------END ADD-----------------------------------
-
-    $('#filter_clockinout_modal').on('click', '#filter_clockincout', function (e) {
-        BindTable();
-    });
-
     function BindTable() {
         var FromDate = document.getElementById("clockinout_datepicker_from").value;
         var ToDate = document.getElementById("clockinout_datepicker_to").value;
@@ -131,108 +55,84 @@
     };
 
     function DisplayRecords(response) {
-        $("#clockinout-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[-1], ["All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'DateLog' },
-                    { 'data': 'DateName' },
-                    { 'data': 'ShiftDescription' },
-                    { 'data': 'ClockIn' },
-                    { 'data': 'ClockOut' },
-                    { 'data': 'Status' },
-                    { 'data': 'Status' },
-                    { 'data': 'Status' },
-                ],
-                order: [[0, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'Date Log',
-                        target: 0,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateLog);
-                            return ' <strong class="text-primary">' + date.toLocaleDateString('es-pa') + ' </strong> '
-                        }
-                    },
-                    {
-                        title: 'Day',
-                        class: "d-none d-sm-table-cell",
-                        target: 1
-                    },
-                    {
-                        title: 'Shift',
-                        class: "d-none d-sm-table-cell",
-                        target: 2
-                    },
-                    {
-                        title: 'Time In',
-                        class: "d-none d-sm-table-cell",
-                        target: 3
-                    },
-                    {
-                        title: 'Time Out',
-                        class: "d-none d-sm-table-cell",
-                        target: 4
-                    },
-                    {
-                        title: 'Details',
-                        class: "d-xs-block d-sm-none  d-m-none d-lg-none",
-                        target: 5,
-                        "render": function (data, type, row, meta) {
-                            return 'Date Log : ' + row.DateLog + ' ' +
-                                '<small class="d-block">Day : ' + row.DateName + '</small> ' +
-                                '<small class="d-block">Shift : ' + row.ShiftDescription + '</small> ' +
-                                '<small class="d-block">Time In : ' + row.ClockIn + '</small> ' +
-                                '<small class="d-block">Time Out : ' + row.ClockOut + '</small> ' +
-                                '<small class="d-block">Remarks : ' + row.Status + '</small> ' +
-                                SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        title: 'Remarks',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 6,
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        target: 7,
-                        title: 'Action',
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item file-correction" DateLog="' + row.DateLog + '"> <i class="fa-solid fa-calendar-check"></i> File Attendance Correction</a></li> ' +
-                                ' <li> <a class="dropdown-item file-overtime"   DateLog="' + row.DateLog + '"> <i class="fa-solid fa-business-time"></i> File Overtime</a></li> ' +
-                                ' <li> <a class="dropdown-item file-leave"      DateLog="' + row.DateLog + '"> <i class="fa-solid fa-plane"></i> File Leave</a></li> ' +
+        if ($.fn.DataTable.isDataTable('#clockinout-table')) {
+            $('#clockinout-table').DataTable().destroy();
+        }
 
-                                '</ul>' +
-                                '</div> '
-                        }
-                    },
-                ]
-            });
+        var mobileLabels = [
+            "DATE LOG",
+            "DAY",
+            "SHIFT",
+            "TIME IN",
+            "TIME OUT",
+            "REMARKS",
+            "ACTIONS"
+        ];
 
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
+        $("#clockinout-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[0, "desc"]],
+            dom: "<'row mb-3 align-items-center'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +
+                "<'row'<'col-12'tr>>" +
+                "<'row mt-3 align-items-center'<'col-12 col-md-6'i><'col-12 col-md-6'p>>",
+            columns: [
+                { 'data': 'DateLog', 'title': 'Date Log' },
+                { 'data': 'DateName', 'title': 'Day' },
+                { 'data': 'ShiftDescription', 'title': 'Shift' },
+                { 'data': 'ClockIn', 'title': 'Time In' },
+                { 'data': 'ClockOut', 'title': 'Time Out' },
+                { 'data': 'Status', 'title': 'Remarks' },
+                { 'data': null, 'title': 'Action' }
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
+                    }
+                },
+                {
+                    targets: 0,
+                    className: "align-middle fw-bold",
+                    render: function (data) {
+                        if (!data) return "";
+                        const date = new Date(data);
+                        return '<span><i class="fa-regular fa-calendar me-2 text-danger"></i>' + date.toLocaleDateString('es-pa') + '</span>';
+                    }
+                },
+                {
+                    targets: [1, 2, 3, 4],
+                    className: "text-center align-middle"
+                },
+                {
+                    targets: 5,
+                    className: "text-center align-middle",
+                    render: function (data) {
+                        return '<div class="status-badge-wrapper">' + SetTableBGColor(data) + '</div>';
+                    }
+                },
+                {
+                    targets: 6,
+                    className: 'text-center align-middle',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<div class="dropdown">' +
+                            '<button class="btn btn-sm btn-action-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fa-solid fa-ellipsis-vertical"></i>' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end shadow border-0">' +
+                            '<li><a class="dropdown-item file-correction" DateLog="' + row.DateLog + '"><i class="fa-solid fa-calendar-check text-primary me-2"></i>File Attendance Correction</a></li>' +
+                            '<li><a class="dropdown-item file-overtime" DateLog="' + row.DateLog + '"><i class="fa-solid fa-business-time text-success me-2"></i>File Overtime</a></li>' +
+                            '<li><a class="dropdown-item file-leave" DateLog="' + row.DateLog + '"><i class="fa-solid fa-plane text-info me-2"></i>File Leave</a></li>' +
+                            '</ul></div>';
+                    }
+                }
+            ]
+        });
 
         ShowLoading('HIDE');
-    };
+    }
 
     function SetTableBGColor(_status) {
         var _font_color = 'white';
@@ -250,34 +150,6 @@
         //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
         return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
     };
-
-    //----------------------------------BEGIN ADD POST OVERTIME-----------------------------------
-    $('#clockinout-table').on('click', '.file-overtime', function () {
-        var DateLog = $(this).attr("DateLog");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Overtime/_AddPostOvertime',
-            data: { '_datelog': DateLog },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#add_post_overtime_modal').find(".modal-body").innerHTML = '';
-                $('#add_post_overtime_modal').find(".modal-body").html(response);
-                $("#add_post_overtime_modal").modal('show');
-
-                var _modal = '#add_post_overtime_modal';
-                var _form = '#post-overtime-Form';
-                
-                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", GetShiftOnSelectedDate);
-                GetShiftOnSelectedDate();
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
 
     function GetShiftOnSelectedDate() {
         var _modal = '#add_post_overtime_modal';
@@ -330,37 +202,6 @@
             .catch(error => console.error("Request failed:", error));
     }
 
-    $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {
-        ShowLoading('SHOW');
-        $.ajax({
-            url: '/Overtime/_AddPostOvertime',
-            type: "POST",
-            data: $('#post-overtime-Form').serialize(),
-            dataType: 'json',
-            success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
-                    $("#add_post_overtime_modal").modal('hide');
-
-                    $file = $("#Overtime_Post_Attachment");
-                    var $filepath = $.trim($file.val());
-
-                    if ($filepath != "") {
-                        OvertimeAttachment(result.OvertimeId, 'Overtime successfully Posted.')
-                        return;
-                    }
-
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage('Overtime successfully Posted.');
-
-                    BindTable();
-                }
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
     function OvertimeAttachment(_id, _msg) {
         var formData = new FormData();
         var _Attachement = $('#Overtime_Post_Attachment')[0].files[0];
@@ -388,67 +229,6 @@
         });
 
     }
-    //----------------------------------END ADD POST OVERTIME-----------------------------------
-
-    //----------------------------------BEGIN ADD POST ATTENDANCE CORRECTION-----------------------------------
-    $('#clockinout-table').on('click', '.file-correction', function () {
-        var DateLog = $(this).attr("DateLog");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Attendance/_AddPostCorrection',
-            data: { '_datelog': DateLog },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#add_post_correction_modal').find(".modal-body").innerHTML = '';
-                $('#add_post_correction_modal').find(".modal-body").html(response);
-                $("#add_post_correction_modal").modal('show');
-
-                var _form = '#post-attendance-correction-Form';
-                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAddPost);
-
-                ChangeDateLogAddPost();
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
-    $('#add_post_correction_modal').on('click', '#submit_post_correction', function (e) {
-        ShowLoading('SHOW');
-        $.ajax({
-            url: '/Attendance/_AddPostCorrection',
-            type: "POST",
-            data: $('#post-attendance-correction-Form').serialize(),
-            dataType: 'json',
-            success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
-                    $("#add_post_correction_modal").modal('hide');
-
-
-                    $file = $("#Correction_Attachment");
-                    var $filepath = $.trim($file.val());
-
-                    if ($filepath != "") {
-                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully created.')
-                        return;
-                    }
-
-
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage('Attendance correction successfully Posted.');
-
-                    BindTable();
-                }
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
 
     function CorrectionAttachment(_id, _msg) {
 
@@ -480,48 +260,22 @@
         });
 
     }
-    //----------------------------------END ADD POST ATTENDANCE CORRECTION-----------------------------------
 
-    //----------------------------------BEGIN ADD POST LEAVE-----------------------------------
-    $('#clockinout-table').on('click', '.file-leave', function () {
-        var DateLog = $(this).attr("DateLog");
+    function ChangeDateLogAdd() {
+        var _form = '#attendance-correction-Form';
+        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
 
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Leave/_AddPostLeave',
-            data: { '_datelog': DateLog },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
+        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
 
-                if (isJsonString(response)) {
-                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
-                    return;
-                }
+    function ChangeDateLogAddPost() {
+        var _form = '#post-attendance-correction-Form';
+        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
 
-                ShowLoading('HIDE');
-                $('#add_post_leave_modal').find(".modal-body").innerHTML = '';
-                $('#add_post_leave_modal').find(".modal-body").html(response);
-                $("#add_post_leave_modal").modal('show');
-
-                var _form = '#post-leave-Form';
-                document.querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
-
-                document.querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
-                document.querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
-
-                document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
-                document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
-
-                ComputeLeaveDays();
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
+        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
 
     function isJsonString(str) {
         try {
@@ -679,37 +433,6 @@
         document.querySelector(_form).querySelector('#LeaveDays').value = _result;
     }
 
-    $('#add_post_leave_modal').on('click', '#submit_post_leave', function (e) {
-        ShowLoading('SHOW');
-        $.ajax({
-            url: '/Leave/_AddPostLeave',
-            type: "POST",
-            data: $('#post-leave-Form').serialize(),
-            dataType: 'json',
-            success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
-                    $("#add_post_leave_modal").modal('hide');
-
-                    $file = $("#Leave_Post_Attachment");
-                    var $filepath = $.trim($file.val());
-
-                    if ($filepath != "") {
-                        LeaveAttachment(result.LeaveId, 'Leave successfully Posted.')
-                        return;
-                    }
-
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage('Leave successfully Posted.');
-
-                    BindTable();
-                }
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
     function LeaveAttachment(_id, _msg) {
 
         var formData = new FormData();
@@ -737,10 +460,7 @@
             }
         });
     }
-    //----------------------------------END ADD POST LEAVE-----------------------------------
 
-
-    //==================================BEGIN MISC==================================
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
@@ -772,6 +492,251 @@
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
     }
-    //==================================END MISC==================================
+
+    $("#show_clockinout_filter_btn").click(function (e) {
+        e.preventDefault();
+
+        $('#filter_clockinout_modal').modal('show');
+    });
+
+    $("#add_correction_btn").click(function (e) {
+        e.preventDefault();
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_AddCorrection',
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#add_correction_modal').find(".modal-body").innerHTML = '';
+                $('#add_correction_modal').find(".modal-body").html(response);
+                $('#add_correction_modal').modal('show');
+
+                var _form = '#attendance-correction-Form';
+                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAdd);
+
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+
+    });
+
+    $('#add_correction_modal').on('click', '#submit_correction', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Attendance/_AddCorrection',
+            type: "POST",
+            data: $('#attendance-correction-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#add_correction_modal").modal('hide');
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Attendance correction successfully created.');
+
+                    BindTable();
+                }
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#filter_clockinout_modal').on('click', '#filter_clockincout', function (e) {
+        BindTable();
+    });
+
+    $('#clockinout-table').on('click', '.file-overtime', function () {
+        var DateLog = $(this).attr("DateLog");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Overtime/_AddPostOvertime',
+            data: { '_datelog': DateLog },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#add_post_overtime_modal').find(".modal-body").innerHTML = '';
+                $('#add_post_overtime_modal').find(".modal-body").html(response);
+                $("#add_post_overtime_modal").modal('show');
+
+                var _modal = '#add_post_overtime_modal';
+                var _form = '#post-overtime-Form';
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#OTFrom").addEventListener("change", GetShiftOnSelectedDate);
+                GetShiftOnSelectedDate();
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Overtime/_AddPostOvertime',
+            type: "POST",
+            data: $('#post-overtime-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#add_post_overtime_modal").modal('hide');
+
+                    $file = $("#Overtime_Post_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        OvertimeAttachment(result.OvertimeId, 'Overtime successfully Posted.')
+                        return;
+                    }
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Overtime successfully Posted.');
+
+                    BindTable();
+                }
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#clockinout-table').on('click', '.file-correction', function () {
+        var DateLog = $(this).attr("DateLog");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Attendance/_AddPostCorrection',
+            data: { '_datelog': DateLog },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#add_post_correction_modal').find(".modal-body").innerHTML = '';
+                $('#add_post_correction_modal').find(".modal-body").html(response);
+                $("#add_post_correction_modal").modal('show');
+
+                var _form = '#post-attendance-correction-Form';
+                document.querySelector(_form).querySelector("#DateLog").addEventListener("change", ChangeDateLogAddPost);
+
+                ChangeDateLogAddPost();
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#add_post_correction_modal').on('click', '#submit_post_correction', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Attendance/_AddPostCorrection',
+            type: "POST",
+            data: $('#post-attendance-correction-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#add_post_correction_modal").modal('hide');
+
+
+                    $file = $("#Correction_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        CorrectionAttachment(result.CorrectionId, 'Attendance correction successfully created.')
+                        return;
+                    }
+
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Attendance correction successfully Posted.');
+
+                    BindTable();
+                }
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#clockinout-table').on('click', '.file-leave', function () {
+        var DateLog = $(this).attr("DateLog");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Leave/_AddPostLeave',
+            data: { '_datelog': DateLog },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+
+                if (isJsonString(response)) {
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+
+                ShowLoading('HIDE');
+                $('#add_post_leave_modal').find(".modal-body").innerHTML = '';
+                $('#add_post_leave_modal').find(".modal-body").html(response);
+                $("#add_post_leave_modal").modal('show');
+
+                var _form = '#post-leave-Form';
+                document.querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
+                document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
+
+                document.querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
+                document.querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
+
+                document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
+                document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
+
+                ComputeLeaveDays();
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+
+    $('#add_post_leave_modal').on('click', '#submit_post_leave', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Leave/_AddPostLeave',
+            type: "POST",
+            data: $('#post-leave-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") { ValidationError(result); }
+                else {
+                    $("#add_post_leave_modal").modal('hide');
+
+                    $file = $("#Leave_Post_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        LeaveAttachment(result.LeaveId, 'Leave successfully Posted.')
+                        return;
+                    }
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Leave successfully Posted.');
+
+                    BindTable();
+                }
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
 });
 

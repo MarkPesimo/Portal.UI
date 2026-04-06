@@ -601,5 +601,20 @@ namespace Portal.Controllers
 
             return PartialView("~/Views/Overtime/partial/_view_attachment.cshtml", _model);
         }
+
+        [HttpGet]
+        public JsonResult GetFiledOvertime(string otDate)
+        {
+            try
+            {
+                var result = _overtimerepository.GetFiledOvertime(_loginuserid, otDate);
+
+                return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

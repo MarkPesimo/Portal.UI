@@ -1,0 +1,186 @@
+﻿@model List<APWModel.ViewModel.ACAP.Employee_model.EmployeeAnnouncement>
+@{
+    ViewBag.Title = "Announcements";
+}
+
+@section Scripts{
+    <script src="~/Scripts/Document/Document.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.toggle-content').on('click', function (e) {
+                e.preventDefault();
+                var $container = $(this).closest('.announcement-item');
+                var $body = $container.find('.announcement-body');
+
+                if ($body.hasClass('collapsed')) {
+                    $body.removeClass('collapsed');
+                    $(this).html('<i class="fa-solid fa-chevron-up me-1"></i>See Less');
+                } else {
+                    $body.addClass('collapsed');
+                    $(this).html('<i class="fa-solid fa-chevron-down me-1"></i>See More');
+                }
+            });
+        });
+    </script>
+}
+
+<section class="main">
+    <div class="main-title py-3 border-bottom bg-white shadow-sm">
+        <div class="container-fluid">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-center text-lg-start">
+                    <h1 class="h4 mt-2 mb-lg-0 fw-bold text-primary">
+                        <i class="fa-solid fa-bullhorn me-2"></i>Announcements
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 small">
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Document")">Document</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Monitoring</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-auto">
+                    <span class="badge bg-soft-primary text-primary px-3 py-2">
+                        Total: @(Model?.Count ?? 0)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content py-4 bg-light min-vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-7 col-md-10">
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <div class="card mb-3 border-0 shadow-sm fb-card announcement-item @(item.IsRead ? "" : "border-start border-4 border-primary")">
+                                <div class="card-body p-4">
+
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar-circle me-2 bg-primary text-white d-flex align-items-center justify-content-center fw-bold">
+                                            @item.Type.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 fw-bold text-dark">@item.Type</h6>
+                                            <small class="text-muted d-block" style="font-size: 0.8rem;">
+                                                @item.DateCreated.ToString("MMM dd, yyyy") · <i class="fa-solid fa-earth-americas" style="font-size: 0.7rem;"></i>
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <span class="badge @GetImportanceClass(item.Importance) rounded-pill fw-normal" style="font-size: 0.7rem;">
+                                                @item.Importance
+                                            </span>
+                                            @if (!item.IsRead)
+                                            {
+                                                <span class="badge bg-danger rounded-pill ms-1 pulse-small" style="font-size: 0.65rem;">NEW</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <h5 class="fw-bold text-dark mb-2">@item.Title</h5>
+                                    <div class="announcement-body text-muted mb-3 collapsed">
+                                        @Html.Raw(item.Body)
+                                    </div>
+
+                                    <div class="d-flex justify-content-end border-top pt-2">
+                                        <a href="javascript:void(0)" class="toggle-content text-primary fw-bold text-decoration-none small">
+                                            <i class="fa-solid fa-chevron-down me-1"></i>See More
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-box-open display-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">No announcements found for you.</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer py-3 bg-light border-top">
+        <div class="container-fluid text-center">
+            <span class="text-muted small">
+                Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a>
+            </span>
+        </div>
+    </footer>
+</section>
+
+@helper GetImportanceClass(string importance)
+{
+    switch (importance?.ToLower())
+    {
+        case "high":
+        case "urgent":<text>bg-danger</text> break;
+    case "normal":
+    case "medium": <text>bg-primary</text> break;
+default: <text>bg-secondary</text>break;
+}
+}
+
+<style>
+    .fb-card {
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+    }
+
+    .bg-soft-primary {
+        background-color: #e7f1ff;
+    }
+
+    .announcement-body {
+        line-height: 1.6;
+        font-size: 0.95rem;
+        white-space: pre-wrap;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+
+        .announcement-body.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            max-height: 4.8em;
+        }
+
+    .pulse-small {
+        animation: pulse-red 2s infinite;
+    }
+
+    @@keyframes pulse-red {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .toggle-content:hover {
+        text-decoration: underline !important;
+    }
+</style>

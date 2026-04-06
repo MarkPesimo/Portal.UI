@@ -1,14 +1,89 @@
-﻿<div class="alert instruction-box shadow-sm mb-4">
-    <div class="d-flex align-items-center">
-        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
-        <div>
-            <h6 class="fw-bold mb-1">Overtime Filing Rules</h6>
-            <ul class="mb-0 small">
-                <li><strong>Continuous Overtime:</strong> Enable this for "Straight Duty" where no breaks were taken. If disabled, the system automatically deducts a 1-hour break for any overtime exceeding 4 hours.</li>
-                <li><strong>Filing Deadline:</strong> Overtime must be filed within 48 hours (2 days) of the rendered date.</li>
-                <li><strong>Holiday & Rest day OT:</strong> Ensure you have both Time In and Time Out recorded when filing overtime on a holiday/Restday.</li>
-                <li><strong>Holiday & Rest day OT:</strong> Please ensure you enter the actual overtime start time—not your shift-out time—so the total overtime can be calculated correctly.</li>
+﻿<div class="instruction-box shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
+    <div class="d-flex align-items-center justify-content-between p-3 bg-warning-subtle border-start border-5 border-warning"
+         data-bs-toggle="collapse"
+         href="#otInstructionsCollapse"
+         role="button"
+         aria-expanded="false"
+         aria-controls="otInstructionsCollapse"
+         style="cursor: pointer;">
+
+        <div class="d-flex align-items-center">
+            <div class="pulse-container me-3">
+                <i class="fa-solid fa-circle-info fs-4 text-warning"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0 text-dark">Overtime Filing Rules</h6>
+                <small class="text-muted d-block d-md-none">Tap to view requirements</small>
+            </div>
+        </div>
+
+        <div class="text-end">
+            <span class="badge rounded-pill bg-warning text-dark mb-1 d-none d-md-inline-block">Important</span>
+            <i class="fa-solid fa-chevron-down text-dark ms-2 transition-icon"></i>
+        </div>
+    </div>
+
+    <div class="collapse" id="otInstructionsCollapse">
+        <div class="p-3 bg-white">
+            <ul class="list-unstyled mb-0 small">
+                <li class="mb-2 d-flex">
+                    <i class="fa-solid fa-check text-success me-2 mt-1"></i>
+                    <span><strong>Continuous Overtime:</strong> Enable for "Straight Duty". Otherwise, 1-hour is deducted after 4hrs OT.</span>
+                </li>
+                <li class="mb-2 d-flex">
+                    <i class="fa-solid fa-clock text-danger me-2 mt-1"></i>
+                    <span><strong>48-Hour Limit:</strong> OT must be filed within 2 days of the rendered date.</span>
+                </li>
+                <li class="mb-2 d-flex">
+                    <i class="fa-solid fa-calendar-check text-primary me-2 mt-1"></i>
+                    <span><strong>Holiday/Rest Day:</strong> Ensure both Time In and Time Out are recorded.</span>
+                </li>
+                <li class="d-flex">
+                    <i class="fa-solid fa-pen-to-square text-primary me-2 mt-1"></i>
+                    <span><strong>Actual Start:</strong> Use the actual OT start time, not your standard shift-out.</span>
+                </li>
             </ul>
         </div>
     </div>
 </div>
+
+<style>
+    .pulse-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .pulse-container::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 193, 7, 0.4);
+        border-radius: 50%;
+        animation: pulse-animation 2s infinite;
+    }
+
+    @@keyframes pulse-animation {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        70% { transform: scale(1.8); opacity: 0; }
+        100% { transform: scale(0.9); opacity: 0; }
+    }
+
+    [aria-expanded="true"] .transition-icon {
+        transform: rotate(180deg);
+    }
+    .transition-icon {
+        transition: all 0.3s ease;
+    }
+
+    .instruction-box:hover {
+        filter: brightness(0.98);
+        transition: 0.2s;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd !important;
+    }
+</style>

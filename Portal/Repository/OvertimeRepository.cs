@@ -276,5 +276,26 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
+
+        public List<OvertimeModel> GetFiledOvertime(int _empId, string _otDate)
+        {
+            try
+            {
+                List<OvertimeModel> _obj = new List<OvertimeModel>();
+                
+                string _endpoint = "Overtime/GetFiledOvertime/" + _empId + "/" + _otDate;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<List<OvertimeModel>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
     }
 }

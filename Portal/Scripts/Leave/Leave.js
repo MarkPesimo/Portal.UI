@@ -59,41 +59,7 @@
             error: function (response) { console.log(response); }
         });
     };
-
-    $("#show_leave_filter_btn").click(function (e) {
-        e.preventDefault();
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: "/Leave/_GetLeaveMonitoringFilter",
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#filter_leave_modal').find(".modal-body").html(response);
-                $('#filter_leave_modal').modal('show');
-            },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
-        });
-    });
-
-    $('#filter_leave_modal').on('click', '#filter_leave', function (e) {
-        var FromDate = document.getElementById("LeaveFrom").value;
-        var ToDate = document.getElementById("LeaveTo").value;
-
-        var e_leavetype = document.getElementById("LeaveTypeId");
-        var LeaveTypeId = e_leavetype.value;
-
-        if (LeaveTypeId == "") { LeaveTypeId = 0; }
-
-        ClearTable('#leave-table');
-        BindTable(LeaveTypeId, FromDate, ToDate);
-
-    });
-
-    //----------------------------------BEGIN TABLE---------------------------------------------
+    
     function BindTable(LeaveTypeId, FromDate, ToDate) {
         ShowLoading('SHOW');
         $.ajax({
@@ -107,163 +73,178 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-                //console.log(response);
                 ShowLoading('HIDE');
                 ClearTable('leave-table');
                 DisplayLeaves(response.result);
                 $('#filter_leave_modal').modal('hide');
             },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
+            failure: function (response) {
+                ShowLoading('HIDE');
+                console.log(response);
+            },
+            error: function (response) {
+                ShowLoading('HIDE');
+                console.log(response);
+            }
         });
     };
 
     function ClearTable(tablename) {
-        var table = $(tablename).DataTable();
-        table.destroy();
-        $(tablename).empty();
+        var tableId = '#' + tablename;
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().destroy();
+        }
+        $(tableId).find('tbody').empty();
     };
 
     function DisplayLeaves(response) {
-        $("#leave-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[10, -1], [10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'DateFiled' },        //0
-                    { 'data': 'LeaveType' },        //1
-                    { 'data': 'DateFrom' },         //2
-                    { 'data': 'DateTo' },           //3
+        var dataSet = (response == null) ? [] : response;
+        
+        if ($.fn.DataTable.isDataTable('#leave-table')) {
+            $('#leave-table').DataTable().destroy();
+        }
+        
+        var mobileLabels = [
+            "DATE FILED",
+            "LEAVE TYPE",
+            "FROM",
+            "TO",
+            "DAY(S)",
+            "REASON",
+            "STATUS",
+            "ACTIONS"
+        ];
 
-                    { 'data': 'NoOfDays' },         //4
-                    { 'data': 'Reason' },           //5
-                    { 'data': 'Status' },           //6
-                    { 'data': 'Status' },
-                ],
-                order: [[2, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'Date filed',
-                        target: 0,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateFiled);
-                            return date.toLocaleDateString('es-pa')
-                        }
-                    },
-                    {
-                        title: 'Type',
-                        target: 1,
-                        class: "d-none d-sm-table-cell text-center",
-                        "render": function (data, type, row, meta) {
-                            return ' <strong class="text-primary">' + row.LeaveType + ' </strong> '
-                        }
-                    },
-                    {
-                        title: 'Leave from',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 2,
-                        //class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateFrom);
-                            return date.toLocaleDateString('es-pa') 
-                        }
-                    },
-                    {
-                        title: 'Leave to',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 3,
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateTo);
-                            return date.toLocaleDateString('es-pa')
-                        }
-                    },
-                    {
-                        title: 'Day(s)',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 4
-                    },
-                    {
-                        title: 'Reason',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 5
-                    },
-                    {
-                        title: 'Status',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 6,
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        title: 'Details',
-                        class: "d-xs-block d-sm-none d-m-none d-lg-none",
-                        target: 7,
-                        "render": function (data, type, row, meta) {
-                            return 'Date Filed : ' + row.DateFiled + ' ' +
-                                '<small class="d-block">Leave type : <strong class="text-primary">' + row.LeaveType + '</strong></small> ' +
-                                '<small class="d-block">Leave date : ' + row.DateFrom + ' to ' + row.DateTo + '</small> ' +
-                                '<small class="d-block">Day(s) : ' + row.NoOfDays + '</small> ' +
-                                '<small class="d-block">Status : ' + row.Reason + '</small> ' +
-                                SetTableBGColor(row.Status)
-
-                        }
-                    },
-                    {
-                        target: 8,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +                                
-                                ' <li> <a class="dropdown-item edit-leave"' + row.EditVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-leave"' + row.PostVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-leave"' + row.UnpostVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item print-leave"' + row.PrintVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-print"></i> Print</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-leave"' + row.CancelVisible + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-
-                                '</ul>' +
-                                '</div> '
-                        }
+        $("#leave-table").DataTable({
+            autoWidth: false,
+            data: dataSet,
+            order: [[2, "desc"]], 
+            dom: "<'row mb-3 align-items-center'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +
+                "<'row'<'col-12'tr>>" +
+                "<'row mt-3 align-items-center'<'col-12 col-md-6'i><'col-12 col-md-6'p>>",
+            columns: [
+                { 'data': 'DateFiled' },
+                { 'data': 'LeaveType' },
+                { 'data': 'DateFrom' },
+                { 'data': 'DateTo' },
+                { 'data': 'NoOfDays' },
+                { 'data': 'Reason' },
+                { 'data': 'Status' },
+                { 'data': null }, 
+                { 'data': null }  
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
                     }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
-
-        ShowLoading('HIDE');
-    };
+                },
+                {
+                    targets: 0,
+                    className: "align-middle fw-bold",
+                    render: function (data) {
+                        if (!data) return "";
+                        const date = new Date(data);
+                        return '<span><i class="fa-regular fa-calendar me-2 text-danger"></i>' + date.toLocaleDateString('es-pa') + '</span>';
+                    }
+                },
+                {
+                    targets: 1,
+                    className: "text-center align-middle",
+                    render: function (data) {
+                        var colorClass = (data && data.includes("Vacation")) ? "text-maroon" : "text-primary";
+                        return '<strong class="' + colorClass + '">' + (data || "") + '</strong>';
+                    }
+                },
+                {
+                    targets: [2, 3],
+                    className: "text-center align-middle",
+                    render: function (data) {
+                        if (!data) return "";
+                        const date = new Date(data);
+                        return '<span>' + date.toLocaleDateString('es-pa') + '</span>';
+                    }
+                },
+                {
+                    targets: 4,
+                    className: "text-center align-middle fw-bold",
+                    render: function (data) {
+                        return '<span class="badge bg-light text-dark border px-3">' + (data || 0) + '</span>';
+                    }
+                },
+                {
+                    targets: 5,
+                    className: "align-middle",
+                    render: function (data) {
+                        return '<span class="text-muted small text-wrap d-inline-block" style="max-width:200px; line-height:1.2;">' + (data || "") + '</span>';
+                    }
+                },
+                {
+                    targets: 6,
+                    className: "text-center align-middle",
+                    render: function (data) {
+                        return '<div class="status-badge-wrapper">' + SetTableBGColor(data) + '</div>';
+                    }
+                },
+                {
+                    targets: 7,
+                    className: 'text-center align-middle',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<div class="dropdown">' +
+                            '<button class="btn btn-sm btn-action-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fa-solid fa-ellipsis-vertical"></i>' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end shadow border-0">' +
+                            '<li><a class="dropdown-item edit-leave" ' + (row.EditVisible || "") + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit</a></li>' +
+                            '<li><a class="dropdown-item post-leave" ' + (row.PostVisible || "") + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"><i class="fa-solid fa-thumbtack text-success me-2"></i>Post</a></li>' +
+                            '<li><a class="dropdown-item unpost-leave" ' + (row.UnpostVisible || "") + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"><i class="fa-solid fa-rotate-left text-warning me-2"></i>Unpost</a></li>' +
+                            '<li><a class="dropdown-item print-leave" ' + (row.PrintVisible || "") + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"><i class="fa-solid fa-print text-info me-2"></i>Print</a></li>' +
+                            '<li><hr class="dropdown-divider"></li>' +
+                            '<li><a class="dropdown-item cancel-leave text-danger" ' + (row.CancelVisible || "") + ' Leaveid="' + row.Id + '" guid="' + row.LeaveGUID + '"><i class="fa-solid fa-ban me-2"></i>Cancel</a></li>' +
+                            '</ul></div>';
+                    }
+                },
+                {
+                    targets: 8,
+                    orderable: false,
+                    className: "d-none d-lg-table-cell", 
+                    render: function () { return ''; }
+                }
+            ]
+        });
+    }
 
     function SetTableBGColor(_status) {
         var _font_color = 'white';
         var _color = 'white';
-
-        if (_status == 'Posted') { _color = '#5cb85c'; }
-        else if (_status == "Approved") { _color = '#0275d8'; }
-        else if (_status == "Attached to DTR") { _color = '#0275d8'; }
-        else if (_status == "Approved by Client") { _color = '#0275d8'; }
-        else if (_status == "Approved by Payroll") { _color = '#10a9e0'; }
-        else if (_status == "Cancelled") { _color = '#d9534f'; }
-        else if (_status == "Rejected") { _color = '#c94D3B'; }
-        else { _color = '#959A97'; _font_color = 'white'; }
-
-        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
-        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
+        var _displayStatus = _status; 
+        
+        if (_status == 'Posted') {
+            _displayStatus = 'Pending';
+            _color = '#ffc107'; 
+            _font_color = '#212529'; 
+        }
+        else if (_status == "Approved" || _status == "Attached to DTR" || _status == "Approved by Client") {
+            _color = '#0275d8';
+        }
+        else if (_status == "Approved by Payroll") {
+            _color = '#10a9e0';
+        }
+        else if (_status == "Cancelled") {
+            _color = '#d9534f';
+        }
+        else if (_status == "Rejected") {
+            _color = '#c94D3B';
+        }
+        else {
+            _color = '#959A97';
+            _font_color = 'white';
+        }
+        
+        return '<span class="badge rounded-pill" style="background: ' + _color + '; color: ' + _font_color + ';">' + _displayStatus + '</span>';
     };
-    //----------------------------------END TABLE---------------------------------------------
 
     function isJsonString(str) {
         try {
@@ -273,48 +254,7 @@
         }
         return true;
     }
-
-    //----------------------------------BEGIN ADD LEAVE--------------------------------------
-    $("#file_leave_btn").click(function (e) {
-        e.preventDefault();
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Leave/_AddLeave',
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-
-                if (isJsonString(response)) {
-                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
-                    return;
-                }
-                $('#add_leave_modal').find(".modal-body").innerHTML = '';
-                $('#add_leave_modal').find(".modal-body").html(response);
-                $("#add_leave_modal").modal('show');
-
-                var _modal = '#add_leave_modal';
-                var _form = '#leave-Form';
-                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
-
-                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
-                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
-
-                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfAdd);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfAdd);
-
-                //ComputeLeaveDays();
-                ComputeLeaveDaysAPI();
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-
+    
     function ToggleNotSameDayAdd() {     
         ComputeLeaveDaysAPI();
     };
@@ -534,7 +474,6 @@
             .catch(error => console.error("Request failed:", error));
     }
 
-
     function ComputeLeaveDays() {
 
         var _form = '#leave-Form';
@@ -588,46 +527,6 @@
         document.querySelector(_form).querySelector('#LeaveDays').value = _result;
         //return _result;
     }
-
-    $('#add_leave_modal').on('click', '#submit-leave-button', function (e) {
-        ShowLoading('SHOW');
-        $.ajax({
-            url: '/Leave/_ManageLeave',
-            type: "POST",
-            data: $('#leave-Form').serialize(),
-            dataType: 'json',
-            success: function (result) {
-                if (result.Result == "ERROR") {
-                    ShowWarningMessage(result.Message);
-                    return;
-                } else {
-                    $("#add_leave_modal").modal('hide');
-
-                    $file = $("#Leave_Attachment");
-                    var $filepath = $.trim($file.val());
-
-                    if ($filepath != "") {
-                        LeaveAttachmentAdd(result.LeaveId, 'Leave successfully created.')
-                        return;
-                    }
-
-                    ShowLoading('HIDE');
-                    ShowSuccessMessage('Leave successfully created.');
-
-                    ClearTable('#leave-table');
-                    LoadDefault();
-                }
-            },
-            failure: function (response) {
-                ShowWarningMessage(response.responseText);
-            },
-            error: function (response) {
-                ShowWarningMessage(response.responseText);
-            }
-        });
-    });
-
-    //----------------------------------END ADD LEAVE--------------------------------------
 
     function LeaveAttachmentEdit(_id, _msg) {
  
@@ -688,70 +587,7 @@
         });
 
     }
-
-    //----------------------------------BEGIN EDIT LEAVE--------------------------------------
-    $('#leave-table').on('click', '.edit-leave', function () {
-        var LeaveId = $(this).attr("Leaveid");
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: '/Leave/_EditLeave',
-            data: { '_id': LeaveId },
-            contentType: "application/json; charset=utf-8",
-            dataType: "html",
-            success: function (response) {
-                ShowLoading('HIDE');
-                $('#edit_leave_modal').find(".modal-body").innerHTML = '';
-                $('#edit_leave_modal').find(".modal-body").html(response);
-                $("#edit_leave_modal").modal('show');
-
-                var _modal = '#edit_leave_modal';
-                var _form = '#edit-leave-Form';
-                var is_halfday = document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").checked;
-                var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
-
-                if (is_halfday == true) { div_sameday_halfday_details.classList.remove('d-none'); }
-                else { div_sameday_halfday_details.classList.add('d-none');}
-
-                var _leavefrom = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value);
-                var _leaveto = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value);
-
-                var div_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday');
-                var div_not_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-not-sameday-halfday');
-
-                if (_leavefrom < _leaveto) {
-                    div_sameday_halfday.classList.add('d-none');
-                    div_not_sameday_halfday.classList.remove('d-none');
-                }
-                
-                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayEdit);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayEdit);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayEdit);
-
-                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfEdit);
-                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfEdit);
-
-                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfEdit);
-                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfEdit);
-
-                //ComputeLeaveDaysAPIEdit();
-
-                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
-                //var _has_attachment = document.getElementById("HasAttachement").value;
-                //var _view_button = document.querySelector('#edit_leave_modal').querySelector('#view_attached_btn');
-                //_view_button.style.visibility = _has_attachment;
-
-                //var _edit_button = document.querySelector('#edit_task_modal').querySelector('#edit_task_btn');
-                //if (_det_status == 'Draft') { _edit_button.style.visibility = 'none'; }
-                //else { _edit_button.style.visibility = 'hidden'; }
-                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
-            },
-            failure: function (response) { LogError(response); },
-            error: function (response) { LogError(response); }
-        });
-    });
-       
+        
     function ToggleNotSameDayEdit() {
         ComputeLeaveDaysAPIEdit();
     };
@@ -933,7 +769,6 @@
         ComputeLeaveDaysNotSameDayAPIEdit();
     };
 
-
     function ComputeLeaveDaysNotSameDayAPIEdit() {
         var _modal = '#edit_leave_modal';
         var _form = '#edit-leave-Form';
@@ -961,6 +796,180 @@
             .catch(error => console.error("Request failed:", error));
     }
 
+    $("#show_leave_filter_btn").click(function (e) {
+        e.preventDefault();
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Leave/_GetLeaveMonitoringFilter",
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#filter_leave_modal').find(".modal-body").html(response);
+                $('#filter_leave_modal').modal('show');
+            },
+            failure: function (response) { console.log(response); },
+            error: function (response) { console.log(response); }
+        });
+    });
+
+    $('#filter_leave_modal').on('click', '#filter_leave', function (e) {
+        var FromDate = document.getElementById("LeaveFrom").value;
+        var ToDate = document.getElementById("LeaveTo").value;
+
+        var e_leavetype = document.getElementById("LeaveTypeId");
+        var LeaveTypeId = e_leavetype.value;
+
+        if (LeaveTypeId == "") { LeaveTypeId = 0; }
+
+        ClearTable('leave-table');
+        BindTable(LeaveTypeId, FromDate, ToDate);
+    });
+
+    $("#file_leave_btn").click(function (e) {
+        e.preventDefault();
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Leave/_AddLeave',
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+
+                if (isJsonString(response)) {
+                    ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
+                    return;
+                }
+                $('#add_leave_modal').find(".modal-body").innerHTML = '';
+                $('#add_leave_modal').find(".modal-body").html(response);
+                $("#add_leave_modal").modal('show');
+
+                var _modal = '#add_leave_modal';
+                var _form = '#leave-Form';
+                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfAdd);
+
+                //ComputeLeaveDays();
+                ComputeLeaveDaysAPI();
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+    });
+    
+    $('#add_leave_modal').on('click', '#submit-leave-button', function (e) {
+        ShowLoading('SHOW');
+        $.ajax({
+            url: '/Leave/_ManageLeave',
+            type: "POST",
+            data: $('#leave-Form').serialize(),
+            dataType: 'json',
+            success: function (result) {
+                if (result.Result == "ERROR") {
+                    ShowWarningMessage(result.Message);
+                    return;
+                } else {
+                    $("#add_leave_modal").modal('hide');
+
+                    $file = $("#Leave_Attachment");
+                    var $filepath = $.trim($file.val());
+
+                    if ($filepath != "") {
+                        LeaveAttachmentAdd(result.LeaveId, 'Leave successfully created.')
+                        return;
+                    }
+
+                    ShowLoading('HIDE');
+                    ShowSuccessMessage('Leave successfully created.');
+
+                    location.reload();
+                    //ClearTable('#leave-table');
+                    LoadDefault();
+                }
+            },
+            failure: function (response) {
+                ShowWarningMessage(response.responseText);
+            },
+            error: function (response) {
+                ShowWarningMessage(response.responseText);
+            }
+        });
+    });
+
+    $('#leave-table').on('click', '.edit-leave', function () {
+        var LeaveId = $(this).attr("Leaveid");
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: '/Leave/_EditLeave',
+            data: { '_id': LeaveId },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                ShowLoading('HIDE');
+                $('#edit_leave_modal').find(".modal-body").innerHTML = '';
+                $('#edit_leave_modal').find(".modal-body").html(response);
+                $("#edit_leave_modal").modal('show');
+
+                var _modal = '#edit_leave_modal';
+                var _form = '#edit-leave-Form';
+                var is_halfday = document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").checked;
+                var div_sameday_halfday_details = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday-details');
+
+                if (is_halfday == true) { div_sameday_halfday_details.classList.remove('d-none'); }
+                else { div_sameday_halfday_details.classList.add('d-none'); }
+
+                var _leavefrom = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value);
+                var _leaveto = Date.parse(document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value);
+
+                var div_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-sameday-halfday');
+                var div_not_sameday_halfday = document.querySelector(_modal).querySelector(_form).querySelector('#div-not-sameday-halfday');
+
+                if (_leavefrom < _leaveto) {
+                    div_sameday_halfday.classList.add('d-none');
+                    div_not_sameday_halfday.classList.remove('d-none');
+                }
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayEdit);
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfEdit);
+
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfEdit);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfEdit);
+
+                //ComputeLeaveDaysAPIEdit();
+
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+                //var _has_attachment = document.getElementById("HasAttachement").value;
+                //var _view_button = document.querySelector('#edit_leave_modal').querySelector('#view_attached_btn');
+                //_view_button.style.visibility = _has_attachment;
+
+                //var _edit_button = document.querySelector('#edit_task_modal').querySelector('#edit_task_btn');
+                //if (_det_status == 'Draft') { _edit_button.style.visibility = 'none'; }
+                //else { _edit_button.style.visibility = 'hidden'; }
+                //----------------------SHOW/HIDE VIEW BUTTON-----------------------
+            },
+            failure: function (response) { LogError(response); },
+            error: function (response) { LogError(response); }
+        });
+
+    });
+
     $('#edit_leave_modal').on('click', '#update-leave-button', function (e) {
         ShowLoading('SHOW');
         $.ajax({
@@ -984,7 +993,8 @@
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully updated.');
 
-                    ClearTable('#leave-table');
+                    location.reload();
+                    //ClearTable('#leave-table');
                     LoadDefault();
                 }
             }
@@ -1017,9 +1027,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END EDIT LEAVE--------------------------------------
 
-    //----------------------------------BEGIN POST LEAVE--------------------------------------
     $('#leave-table').on('click', '.post-leave', function () {
         var LeaveId = $(this).attr("Leaveid");
 
@@ -1064,15 +1072,14 @@
                         }
                     });
 
-                    ClearTable('#leave-table');
+                    location.reload();
+                    //ClearTable('#leave-table');
                     LoadDefault();
                 }
             }
         });
     });
-    //----------------------------------END POST LEAVE--------------------------------------
 
-    //----------------------------------END PRINT LEAVE--------------------------------------
     $('#leave-table').on('click', '.print-leave', function () {
         var guid = $(this).attr("guid");
 
@@ -1092,9 +1099,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END PRINT LEAVE--------------------------------------
 
-    //----------------------------------BEGIN UNPOST LEAVE--------------------------------------
     $('#leave-table').on('click', '.unpost-leave', function () {
         var LeaveId = $(this).attr("Leaveid");
 
@@ -1137,15 +1142,14 @@
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully Posted.');
 
+                    location.reload();
                     ClearTable('#leave-table');
                     LoadDefault();
                 }
             }
         });
     });
-    //----------------------------------END UNPOST LEAVE--------------------------------------
 
-    //----------------------------------BEGIN CANCEL LEAVE--------------------------------------
     $('#leave-table').on('click', '.cancel-leave', function () {
         var LeaveId = $(this).attr("Leaveid");
 
@@ -1195,17 +1199,14 @@
                     ShowLoading('HIDE');
                     ShowSuccessMessage('Leave successfully Cancelled.');
 
-                    ClearTable('#leave-table');
+                    location.reload();
+                    //ClearTable('#leave-table');
                     LoadDefault();
                 }
             }
         });
     });
 
-    //----------------------------------END CANCEL LEAVE--------------------------------------
-
-
-    //==================================BEGIN MISC==================================
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
@@ -1285,6 +1286,5 @@
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
-    //==================================END MISC==================================
 });
 

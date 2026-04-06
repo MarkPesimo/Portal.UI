@@ -13,6 +13,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using static APWModel.ViewModel.Portal.DTR_model.DTRmodel;
 using System.Globalization;
+using static APWModel.ViewModel.COOR.AdminTools.SystemAdministration.SystemAdministration_model;
 
 namespace Portal.Controllers
 {
@@ -1103,6 +1104,77 @@ namespace Portal.Controllers
             };
 
             return PartialView("~/Views/Attendance/partial/Correction/_view_attachment.cshtml", _model);
+        }
+
+        [HttpGet]
+        public ActionResult GetPortalAnnouncements()
+        {
+            try
+            {
+                var currentUser = User as ContextLoginUser_model;
+                int userId = currentUser?.UserId ?? 0;
+
+                if (userId == 0) return Json(new List<AnnouncementDetail_model>(), JsonRequestBehavior.AllowGet);
+                
+                List<AnnouncementDetail_model> _obj = _attendancerepository.GetPortalAnnouncements(userId);
+
+                return Json(_obj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult ViewAttachment(int id, string fileType)
+        {
+            try
+            {
+                string folderPath = Path.Combine(PortalConstant.AnnouncementAttachment);
+                
+                string fileName = id + fileType;
+                
+                string fullPath = Path.Combine(folderPath, fileName);
+
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    return HttpNotFound("Attachment not found on server.");
+                }
+
+                byte[] fileBytes = System.IO.File.ReadAllBytes(fullPath);
+                
+                string contentType = MimeMapping.GetMimeMapping(fullPath);
+                
+                return File(fileBytes, contentType);
+            }
+            catch (Exception ex)
+            {
+                return new HttpStatusCodeResult(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult MarkAnnouncementAsRead(int announcementId)
+        {
+            try
+            {
+                var model = new AnnouncementDetail_model
+                {
+                    Mode = 3,
+                    AnnouncementId = announcementId,
+                    EmpId = _loginuserid, 
+                    ReadStatus = true
+                };
+                
+                int result = _attendancerepository.ManageAnnouncementDetail(model);
+
+                return Json(new { Success = result > 0 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Success = false, Message = ex.Message });
+            }
         }
     }
 }

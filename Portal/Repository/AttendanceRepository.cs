@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Web;
+using static APWModel.ViewModel.COOR.AdminTools.SystemAdministration.SystemAdministration_model;
 using static APWModel.ViewModel.Portal.Attendance_model;
 using static APWModel.ViewModel.Portal.DTR_model;
 using static APWModel.ViewModel.Portal.DTR_model.DTRmodel;
@@ -421,6 +422,55 @@ namespace Portal.Repository
                 return _obj;
             }
             catch (Exception) { throw; }
+        }
+
+        public List<AnnouncementDetail_model> GetPortalAnnouncements(int _portalUserId)
+        {
+            try
+            {
+                List<AnnouncementDetail_model> _obj = new List<AnnouncementDetail_model>();
+                
+                string _endpoint = "SystemAdministration/GetPortalAnnouncements/" + _portalUserId.ToString();
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<AnnouncementDetail_model>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public int ManageAnnouncementDetail(AnnouncementDetail_model _model)
+        {
+            int _id = 0;
+            string _endpoint = "AdminTools/ManageAnnouncementDetail";
+
+            string _body_content = JsonConvert.SerializeObject(_model);
+            HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
+
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result;
+
+                var _jsonResult = JsonConvert.DeserializeObject<dynamic>(_value);
+
+                if (_jsonResult != null && _jsonResult.Id != null)
+                {
+                    _id = (int)_jsonResult.Id;
+                }
+            }
+
+            return _id;
         }
     }
 }

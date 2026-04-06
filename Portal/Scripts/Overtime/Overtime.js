@@ -20,10 +20,9 @@
 
         
 
-        BindTable(curr_year + "-01-01", curr_year + "-12-31", "All");
+        BindTable(curr_year + "-01-01", curr_year + "-12-31", "Posted");
     };
-
-    //-----------------------------------BEGIN FILTER-----------------------------------
+    
     $("#show_overtime_filter_btn").click(function (e) {
         e.preventDefault();
 
@@ -65,9 +64,7 @@
         BindTable(OTFrom, OTTo, Status);
 
     });
-    //-----------------------------------END FILTER-----------------------------------
 
-    //----------------------------------BEGIN TABLE---------------------------------------------
     function BindTable(FromDate, ToDate, Status) {
         ShowLoading('SHOW');
         $.ajax({
@@ -92,138 +89,121 @@
     };
 
     function ClearTable(tablename) {
-        var table = $(tablename).DataTable();
-        table.destroy();
-        $(tablename).empty();
+        if ($.fn.DataTable.isDataTable(tablename)) {
+            var table = $(tablename).DataTable();
+            table.clear().destroy();
+        }
+        $(tablename + " tbody").empty();
     };
 
     function DisplayOvertimes(response) {
-        $("#overtime-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[10, -1], [10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'DateFiled' },
-                    { 'data': 'OTFrom' },
-                    { 'data': 'OTEnd' },
-                    { 'data': 'OTHours' },
+        if ($.fn.DataTable.isDataTable('#overtime-table')) {
+            $('#overtime-table').DataTable().destroy();
+        }
 
-                    { 'data': 'Reason' },
-                    { 'data': 'Status' },
-                    { 'data': 'ApprovedOTHours' },
-                    { 'data': 'Remarks' },
-                    { 'data': 'Status' },
-                ],
-                order: [[0, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'OT Date',
-                        target: 0,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.OTFrom);
-                            return date.toLocaleDateString('es-pa')
-                        }
-                    }, 
-                    {
-                        title: 'From',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 1,
-
-                    },
-                    {
-                        title: 'To',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 2
-                    },
-                    {
-                        title: 'Filed OT Hour(s)',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 3
-                    },
-                    {
-                        title: 'Reason',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 4
-                    },
-                    {
-                        title: 'Status',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 5,
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        title: 'Approved OT Hour(s)',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 6,
-                        //"render": function (data, type, row, meta) {
-                        //    return '0.00'
-                        //}
-                    },
-                    {
-                        title: 'Remarks',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 7,
-                    },
-                    {
-                        title: 'Details',
-                        class: "d-xs-block d-sm-none d-m-none d-lg-none ",
-                        target: 8,
-                        "render": function (data, type, row, meta) {
-                            return 'Date Filed : ' + row.DateFiled + ' ' +
-                                '<small class="d-block">OT from : ' + row.OTFrom + '</small> ' +
-                                '<small class="d-block">OT to : ' + row.OTEnd + '</small> ' +
-                                '<small class="d-block">Filed OT Hour(s) : ' + row.OTHours + '</small> ' +
-                                '<small class="d-block">Approved OT Hour(s) : ' + row.ApprovedOTHours + '</small> ' +
-                                '<small class="d-block">Reason : ' + row.Reason + '</small> ' +
-                                SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        target: 9,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                ' <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item edit-overtime"' + row.EditVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-overtime"' + row.PostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-overtime"' + row.UnpostVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item print-overtime"' + row.PrintVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"><i class="fa-solid fa-print"></i> Print</a></li> ' +
-                                ' <li> <a class="dropdown-item edit-approved-overtime"' + row.EditApprovedVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID + '"><i class="fa-solid fa-circle-check"></i> Edit Approved</a></li> ' +
-                                ' <li><hr></li> ' +
-                                ' <li> <a class="dropdown-item cancel-overtime"' + row.CancelVisible + ' Overtimeid="' + row.Id + '" guid="' + row.OvertimeGUID  + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-                                ' </ul>' +
-                                ' </div> '
-                        }
+        $("#overtime-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[0, "desc"]],
+            dom: "<'row'<'col-6'l><'col-6'f>>" +
+                "<'row'<'col-12'tr>>" +
+                "<'row'<'col-6'i><'col-6'p>>",
+            columns: [
+                { 'data': 'DateFiled' },       
+                { 'data': 'OTFrom' },          
+                { 'data': 'OTEnd' },           
+                { 'data': 'OTHours' },         
+                { 'data': 'Reason' },          
+                { 'data': 'Status' },          
+                { 'data': 'ApprovedOTHours' }, 
+                { 'data': 'Remarks' },         
+                { 'data': null },              
+                { 'data': null }               
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: "align-middle fw-bold",
+                    createdCell: function (td) { $(td).attr('data-label', 'Date Filed'); },
+                    render: function (data, type, row) {
+                        return '<span><i class="fa-regular fa-calendar-check me-2 text-danger"></i>' + row.DateFiled + '</span>';
                     }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
-
+                },
+                {
+                    targets: [1, 2],
+                    className: "text-center align-middle",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        var labels = ["", "OT Start", "OT End"];
+                        if (labels[col]) $(td).attr('data-label', labels[col]);
+                    },
+                    render: function (data) { return '<span>' + (data || '') + '</span>'; }
+                },
+                {
+                    targets: 3,
+                    className: "text-center align-middle fw-bold",
+                    createdCell: function (td) { $(td).attr('data-label', 'Hour(s)'); },
+                    render: function (data) { return '<span class="text-primary">' + parseFloat(data).toFixed(2) + '</span>'; }
+                },
+                {
+                    targets: 4,
+                    className: "align-middle",
+                    createdCell: function (td) { $(td).attr('data-label', 'Reason'); },
+                    render: function (data) { return '<span class="text-wrap" style="max-width: 200px; display: inline-block;">' + data + '</span>'; }
+                },
+                {
+                    targets: 5,
+                    className: "text-center align-middle",
+                    createdCell: function (td) { $(td).attr('data-label', 'Status'); },
+                    render: function (data, type, row) {
+                        var displayStatus = (row.Status === 'Posted') ? 'Pending' : row.Status;
+                        return '<div class="status-badge-wrapper">' + SetTableBGColor(displayStatus) + '</div>';
+                    }
+                },
+                {
+                    targets: [6, 7],
+                    className: "text-center align-middle",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        var labels = ["", "", "", "", "", "", "Approved", "Remarks"];
+                        if (labels[col]) $(td).attr('data-label', labels[col]);
+                    },
+                    render: function (data) { return '<span>' + (data || '---') + '</span>'; }
+                },
+                {
+                    targets: 8,
+                    visible: true,
+                    className: "d-none d-lg-table-cell text-center align-middle",
+                    render: function () { return ""; }
+                },
+                {
+                    targets: 9,
+                    className: 'text-center align-middle',
+                    orderable: false,
+                    createdCell: function (td) { $(td).attr('data-label', 'Options'); },
+                    render: function (data, type, row) {
+                        return '<div class="dropdown">' +
+                            '<button class="btn btn-action-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fa-solid fa-ellipsis-vertical"></i>' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end shadow border-0">' +
+                            '<li><a class="dropdown-item edit-overtime" ' + row.EditVisible + ' Overtimeid="' + row.Id + '"><i class="fa-solid fa-pen text-primary me-2"></i>Edit</a></li>' +
+                            '<li><a class="dropdown-item print-overtime" ' + row.PrintVisible + ' Overtimeid="' + row.Id + '"><i class="fa-solid fa-print text-info me-2"></i>Print</a></li>' +
+                            '<li><hr class="dropdown-divider"></li>' +
+                            '<li><a class="dropdown-item cancel-overtime text-danger" ' + row.CancelVisible + ' Overtimeid="' + row.Id + '"><i class="fa-solid fa-ban me-2"></i>Cancel</a></li>' +
+                            '</ul></div>';
+                    }
+                }
+            ],
+            initComplete: function () { this.api().columns.adjust(); }
+        });
         ShowLoading('HIDE');
-    };
+    }
 
     function SetTableBGColor(_status) {
         var _font_color = 'white';
         var _color = 'white';
 
         if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Pending") { _color = '#ffc107'; _font_color = 'black'; } 
         else if (_status == "Approved") { _color = '#0275d8'; }
         else if (_status == "Attached to DTR") { _color = '#0275d8'; }
         else if (_status == "Cancelled") { _color = '#d9534f'; }
@@ -231,12 +211,9 @@
         else { _color = '#959A97'; _font_color = 'white'; }
 
         //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
-        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '; color: ' + _font_color + '">' + _status + '</span>'
     };
-    //----------------------------------END TABLE---------------------------------------------
 
-
-    //----------------------------------BEGIN ADD OVERTIME--------------------------------------
     $("#file_overtime_btn").click(function (e) {
         e.preventDefault();
 
@@ -367,7 +344,6 @@
             .catch(error => console.error("Request failed:", error));
     }
 
-
     $('#add_overtime_modal').on('click', '#submit-overtime-button', function (e) {
         ShowLoading('SHOW');
         $.ajax({
@@ -399,9 +375,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END ADD OVERTIME--------------------------------------
 
-    //----------------------------------BEGIN EDIT APPROVED OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.edit-approved-overtime', function () {
         var OvertimeId = $(this).attr("Overtimeid");
 
@@ -485,10 +459,7 @@
             }
         });
     });
-
-    //----------------------------------END EDIT APPROVED OVERTIME--------------------------------------
-
-    //----------------------------------BEGIN EDIT OVERTIME--------------------------------------
+    
     $('#overtime-table').on('click', '.edit-overtime', function () {
         var OvertimeId = $(this).attr("Overtimeid");
 
@@ -584,9 +555,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END EDIT OVERTIME--------------------------------------
 
-    //----------------------------------BEGIN POST OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.post-overtime', function () {
         var OvertimeId = $(this).attr("Overtimeid");
 
@@ -629,9 +598,7 @@
             }
         });
     });
-    //----------------------------------END POST LEAVE--------------------------------------
 
-    //----------------------------------END PRINT OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.print-overtime', function () {
         var guid = $(this).attr("guid");
 
@@ -651,9 +618,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END PRINT OVERTIME--------------------------------------
 
-    //----------------------------------BEGIN UNPOST OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.unpost-overtime', function () {
         var OvertimeId = $(this).attr("Overtimeid");
 
@@ -696,10 +661,7 @@
             }
         });
     });
-    //----------------------------------END UNPOST OVERTIME--------------------------------------
 
-
-    //----------------------------------BEGIN CANCEL OVERTIME--------------------------------------
     $('#overtime-table').on('click', '.cancel-overtime', function () {
         var OvertimeId = $(this).attr("Overtimeid");
 
@@ -742,9 +704,57 @@
             }
         });
     });
-    //----------------------------------END CANCEL OVERTIME--------------------------------------
 
+    $(document).on('change', '#OTFrom', function () {
+        var urlPath = '/Overtime/GetFiledOvertime';
 
+        var otDate = $(this).val();
+
+        if (otDate) {
+            $.ajax({
+                url: urlPath,
+                type: 'GET',
+                data: { otDate: otDate },
+                success: function (res) {
+                    var $container = $('#existing-ot-container');
+                    var $list = $('#existing-ot-list');
+
+                    if (res.success && res.data && res.data.length > 0) {
+                        $list.empty();
+
+                        $.each(res.data, function (i, item) {
+                            var from = formatTime(item.OTFrom);
+                            var to = formatTime(item.OTTo);
+                            var reason = item.Reason ? item.Reason : "No reason provided";
+
+                            $list.append('<li><strong>' + from + ' to ' + to + '</strong> — ' + reason + '</li>');
+                        });
+
+                        $container.slideDown();
+                    } else {
+                        $container.slideUp();
+                    }
+                },
+                error: function (err) {
+                    console.error("AJAX Error details:", err);
+                }
+            });
+        }
+    });
+    
+    function formatTime(jsonDate) {
+        if (!jsonDate) return "";
+
+        var date;
+        if (typeof jsonDate === 'string' && jsonDate.indexOf('Date') >= 0) {
+            date = new Date(parseInt(jsonDate.substr(6)));
+        } else {
+            date = new Date(jsonDate);
+        }
+
+        return date.getHours().toString().padStart(2, '0') + ":" +
+            date.getMinutes().toString().padStart(2, '0');
+    }
 
     function OvertimeAttachment(_id, _msg) {
 
@@ -832,7 +842,7 @@
             }
         });
     }
-    //==================================BEGIN MISC==================================
+
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
@@ -840,7 +850,6 @@
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
-
 
     function LogError(response) {
         ShowLoading('HIDE');
@@ -865,6 +874,5 @@
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
     }
-    //==================================END MISC==================================
 });
 

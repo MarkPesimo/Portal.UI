@@ -22,14 +22,7 @@
         ShowLoading('HIDE');
         BindTable();
     });
-
-    //----------------------------------BEGIN TABLE----------------------------------------------
-    function ClearTable(tablename) {
-        var table = $(tablename).DataTable();
-        table.destroy();
-        $(tablename).empty();
-    };
-
+    
     $("#show_correction_filter_btn").click(function (e) {
         e.preventDefault();
 
@@ -40,171 +33,6 @@
         BindTable();
     });
 
-    function BindTable() {
-        var FromDate = document.getElementById("correction_from").value;
-        var ToDate = document.getElementById("correction_to").value;
-
-        var e_status = document.getElementById("Correction-status");
-        var Status = e_status.value;
-
-        if (Status == "") { Status = "All"; }
-
-        ShowLoading('SHOW');
-        $.ajax({
-            type: "GET",
-            url: "/Attendance/GetAttendanceCorrectionList",
-            data: {
-                '_fromdate': FromDate,
-                '_todate': ToDate,
-                '_status': Status
-            },
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                ShowLoading('HIDE');
-                ClearTable("#correction-table");
-                DisplayRecords(response);
-                $('#filter_correction_modal').modal('hide');
-            },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
-        });
-    };
-
-    function DisplayRecords(response) {
-        $("#correction-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[-1], ["All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'DateFiled' },
-                    { 'data': 'DateLog' },
-                    { 'data': 'ShiftDescription' },
-                    { 'data': 'TimeIn' },
-                    { 'data': 'Reason' },
-                    
-                    
-                    { 'data': 'Status' },
-                    { 'data': 'Remarks' },
-                    { 'data': 'Status' },
-                ],
-                order: [[1, "desc"]],
-                columnDefs: [
-                    {
-                        title: 'Date Filed',
-                        target: 0,
-                        class: "d-none d-sm-table-cell text-center",
-                    },
-                    {
-                        title: 'Correction Date',
-                        target: 1,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateLog);
-                            return ' <strong class="text-primary">' + date.toLocaleDateString('es-pa') + ' </strong> '
-                        }
-                    },
-                    {
-                        title: 'Shift',
-                        target: 2,
-                        class: "d-none d-sm-table-cell",
-                    },
-                    {
-                        title: 'Time In/Out',
-                        target: 3,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateLog);
-                            return '<small class="d-block">' + row.TimeIn + ' </small> ' +
-                                ' <small class="d-block">' + row.TimeOut + ' </small> '
-                        }
-                    },
-                    {
-                        title: 'Reason',
-                        target: 4,
-                        class: "d-none d-sm-table-cell",
-                    },
-                    {
-                        title: 'Status',
-                        class: "d-none d-sm-table-cell text-center",
-                        target: 5,
-                        "render": function (data, type, row, meta) {
-                            return SetTableBGColor(row.Status)
-                        }
-                    },
-                    {
-                        title: 'Remarks',
-                        target: 6,
-                        class: "d-none d-sm-table-cell",
-                    },
-            
-                               
-                    {
-                        title: 'Details',
-                        class: "d-xs-block d-sm-none d-m-none d-lg-none",
-                        target: 7,
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.DateLog);
-                            return '<small class="d-block"> Date log : <strong class="text-primary"> ' + row.DateLog + '</strong> </small>  ' +
-                                '<small class="d-block">Time In : ' + row.TimeIn + '</small> ' +
-                                '<small class="d-block">Time Out : ' + row.TimeOut + '</small> ' +
-                                '<small class="d-block">Reason : ' + row.Reason + '</small> ' +
-                                SetTableBGColor(row.Status)
-
-                        }
-                    },
-                    {
-                        target: 8,
-                        className: 'dt-body-right',
-                        "render": function (data, type, row, meta) {
-                            return '<div class="btn-group"> ' +
-                                '   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"> ' +
-                                ' <i class="fa-solid fa-ellipsis-vertical me-2"></i> Option ' +
-                                '             </button> ' +
-                                ' <ul class="dropdown-menu">' +
-                                ' <li> <a class="dropdown-item edit-correction"' + row.EditVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-pen-to-square"></i> Edit</a></li> ' +
-                                ' <li> <a class="dropdown-item post-correction"' + row.PostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-thumbtack"></i> Post</a></li> ' +
-                                ' <li> <a class="dropdown-item unpost-correction"' + row.UnpostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-rotate-left"></i> Unpost</a></li> ' +
-                                ' <li> <a class="dropdown-item print-correction"' + row.PrintVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-print"></i> Print</a></li> ' +
-                                ' <li> <a class="dropdown-item cancel-correction"' + row.CancelVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"> <i class="fa-solid fa-ban"></i> Cancel</a></li> ' +
-                                '</ul>' +
-                                '</div> '
-                        }
-                    }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
-
-        ShowLoading('HIDE');
-    };
-
-    function SetTableBGColor(_status) {
-        var _font_color = 'white';
-        var _color = '#6C757D';
-        if (_status == 'Posted') { _color = '#5cb85c'; }
-        else if (_status == "Approved") { _color = '#0275d8'; }
-        else if (_status == "Attached to DTR") { _color = '#0275d8'; }
-        else if (_status == "Cancelled") { _color = '#d9534f'; }
-        else if (_status == "Rejected") { _color = '#c94D3B'; }
-        else { _font_color = 'black'; }
-
-        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
-        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
-    };
-    //----------------------------------END TABLE----------------------------------------------
-
-    //----------------------------------BEGIN ADD CORRECTION-----------------------------------
     $("#add_correction_btn").click(function (e) {
         e.preventDefault();
 
@@ -230,25 +58,6 @@
             error: function (response) { LogError(response); }
         });
     });
-
-    function ChangeDateLogAdd() {
-        var _modal = '#add_correction_modal';
-        var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
-
-        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
-    };
-
-    function ChangeDateLogEdit() {
-        var _modal = '#edit_correction_modal';
-        var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
-
-        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
-    };
-
 
     $('#add_correction_modal').on('click', '#submit_correction', function (e) {
         ShowLoading('SHOW');
@@ -283,9 +92,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END ADD CORRECTION-----------------------------------
 
-    //----------------------------------BEGIN EDIT CORRECTION--------------------------------------
     $('#correction-table').on('click', '.edit-correction', function () {
         var CorrectionId = $(this).attr("Correctionid");
         //alert(CorrectionId);
@@ -308,14 +115,6 @@
             error: function (response) { LogError(response); }
         });
     });
-
-    function ChangeDateLogEdit() {
-        var _form = '#attendance-correction-Form';
-        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
-
-        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
-        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
-    };
 
     $('#edit_correction_modal').on('click', '#update_correction', function (e) {
         ShowLoading('SHOW');
@@ -369,9 +168,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END EDIT CORRECTION--------------------------------------
 
-    //----------------------------------BEGIN POST CORRECTION--------------------------------------
     $('#correction-table').on('click', '.post-correction', function () {
         var CorrectionId = $(this).attr("Correctionid");
 
@@ -420,9 +217,7 @@
             }
         });
     });
-    //----------------------------------END POST CORRECTION--------------------------------------
 
-    //----------------------------------END PRINT CORRECTION--------------------------------------
     $('#correction-table').on('click', '.print-correction', function () {
         var guid = $(this).attr("guid");
 
@@ -442,9 +237,7 @@
             error: function (response) { LogError(response); }
         });
     });
-    //----------------------------------END PRINT CORRECTION--------------------------------------
 
-    //----------------------------------BEGIN UNPOST CORRECTION--------------------------------------
     $('#correction-table').on('click', '.unpost-correction', function () {
         var CorrectionId = $(this).attr("Correctionid");
 
@@ -484,9 +277,7 @@
             }
         });
     });
-    //----------------------------------END UNPOST CORRECTION--------------------------------------
 
-    //----------------------------------BEGIN CANCEL CORRECTION--------------------------------------
     $('#correction-table').on('click', '.cancel-correction', function () {
         var CorrectionId = $(this).attr("Correctionid");
 
@@ -526,9 +317,153 @@
             }
         });
     });
-    //----------------------------------END CANCEL CORRECTION--------------------------------------
 
+    function ClearTable(tablename) {
+        var table = $(tablename).DataTable();
+        table.destroy();
+        $(tablename).empty();
+    };
 
+    function BindTable() {
+        var FromDate = document.getElementById("correction_from").value;
+        var ToDate = document.getElementById("correction_to").value;
+
+        var e_status = document.getElementById("Correction-status");
+        var Status = e_status.value;
+
+        if (Status == "") { Status = "All"; }
+
+        ShowLoading('SHOW');
+        $.ajax({
+            type: "GET",
+            url: "/Attendance/GetAttendanceCorrectionList",
+            data: {
+                '_fromdate': FromDate,
+                '_todate': ToDate,
+                '_status': Status
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                ShowLoading('HIDE');
+                ClearTable("#correction-table");
+                DisplayRecords(response);
+                $('#filter_correction_modal').modal('hide');
+            },
+            failure: function (response) { console.log(response); },
+            error: function (response) { console.log(response); }
+        });
+    };
+
+    function DisplayRecords(response) {
+        if ($.fn.DataTable.isDataTable('#correction-table')) {
+            $('#correction-table').DataTable().destroy();
+        }
+
+        var mobileLabels = ["DATE FILED", "CORRECTION DATE", "SHIFT", "TIME IN/OUT", "REASON", "STATUS", "REMARKS", "ACTIONS"];
+
+        $("#correction-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[1, "desc"]],
+            dom: "<'row'<'col-6'l><'col-6'f>>" + "<'row'<'col-12'tr>>" + "<'row mt-3'<'col-12 col-md-6'i><'col-12 col-md-6'p>>",
+            columns: [
+                { 'data': 'DateFiled' },
+                { 'data': 'DateLog' },
+                { 'data': 'ShiftDescription' },
+                { 'data': null },
+                { 'data': 'Reason' },
+                { 'data': 'Status' },
+                { 'data': 'Remarks' },
+                { 'data': null }
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
+                    }
+                },
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        const date = new Date(row.DateLog);
+                        return '<strong>' + date.toLocaleDateString('es-pa') + '</strong>';
+                    }
+                },
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return '<small class="d-block">' + row.TimeIn + '</small><small class="d-block">' + row.TimeOut + '</small>';
+                    }
+                },
+                {
+                    targets: 5,
+                    render: function (data) { return SetTableBGColor(data); }
+                },
+                {
+                    targets: 7, 
+                    orderable: false,
+                    className: 'dt-body-right',
+                    render: function (data, type, row) {
+                        return '<div class="btn-group">' +
+                            '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fa-solid fa-ellipsis-vertical me-2"></i> Options' +
+                            '</button>' +
+                            '<ul class="dropdown-menu dropdown-menu-end">' +
+                            '<li><a class="dropdown-item edit-correction"' + row.EditVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"><i class="fa-solid fa-pen-to-square"></i> Edit</a></li>' +
+                            '<li><a class="dropdown-item post-correction"' + row.PostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"><i class="fa-solid fa-thumbtack"></i> Post</a></li>' +
+                            '<li><a class="dropdown-item unpost-correction"' + row.UnpostVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"><i class="fa-solid fa-rotate-left"></i> Unpost</a></li>' +
+                            '<li><a class="dropdown-item print-correction"' + row.PrintVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"><i class="fa-solid fa-print"></i> Print</a></li>' +
+                            '<li><a class="dropdown-item cancel-correction"' + row.CancelVisible + ' Correctionid="' + row.Id + '" guid="' + row.CorrectionGUID + '"><i class="fa-solid fa-ban"></i> Cancel</a></li>' +
+                            '</ul></div>';
+                    }
+                }
+            ]
+        });
+
+        ShowLoading('HIDE');
+    }
+
+    function SetTableBGColor(_status) {
+        var _font_color = 'white';
+        var _color = '#6C757D';
+        if (_status == 'Posted') { _color = '#5cb85c'; }
+        else if (_status == "Approved") { _color = '#0275d8'; }
+        else if (_status == "Attached to DTR") { _color = '#0275d8'; }
+        else if (_status == "Cancelled") { _color = '#d9534f'; }
+        else if (_status == "Rejected") { _color = '#c94D3B'; }
+        else { _font_color = 'black'; }
+
+        //return '<a href="#" class="mt-2 btn btn-sm " style="background : ' + _color + ';border-radius:10%; color: ' + _font_color + '"> ' + _status + '</a>'
+        return '<span class="badge rounded-pill "  style="background : ' + _color + '">' + _status + '</span>'
+    };
+
+    function ChangeDateLogAdd() {
+        var _modal = '#add_correction_modal';
+        var _form = '#attendance-correction-Form';
+        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
+
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
+
+    function ChangeDateLogEdit() {
+        var _modal = '#edit_correction_modal';
+        var _form = '#attendance-correction-Form';
+        var _datelog = document.querySelector(_modal).querySelector(_form).querySelector("#DateLog").value
+
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_modal).querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
+
+    function ChangeDateLogEdit() {
+        var _form = '#attendance-correction-Form';
+        var _datelog = document.querySelector(_form).querySelector("#DateLog").value
+
+        document.querySelector(_form).querySelector("#TimeInDate").value = _datelog;
+        document.querySelector(_form).querySelector("#TimeOutDate").value = _datelog;
+    };
 
     function CorrectionAttachment(_id, _msg) {
 
@@ -561,7 +496,6 @@
 
     }
 
-
     function CorrectionEditAttachment(_id, _msg) {
 
         var formData = new FormData();
@@ -592,8 +526,7 @@
         });
 
     }
-
-    //==================================BEGIN MISC==================================
+    
     function ShowSuccessMessage(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterSuccess-body").innerHTML = _msg;
@@ -625,5 +558,4 @@
         if (show === 'SHOW') { x.style.visibility = ''; }
         else { x.style.visibility = 'hidden'; }
     }
-    //==================================END MISC==================================
 });

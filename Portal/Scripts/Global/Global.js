@@ -12,37 +12,63 @@
             dataType: "json",
             success: function (response) {
                 ShowLoading('HIDE');
-                //console.log(response);
-                document.getElementById('my-shift').innerHTML = '<i class="fa-solid fa-business-time"></i> Shift Sched : ' + response.ShiftDescription;
-                //get the current date, store it on the current-date attribute of my-shift button, this will be used as a validation
-                //in clocking out to check
+                
+                var shiftHtml = '<i class="fa-solid fa-business-time"></i> Shift : ' + response.ShiftDescription;
+                var deskShift = document.getElementById('my-shift');
+                var mobShift = document.getElementById('mobile-shift-display');
 
+                if (deskShift) deskShift.innerHTML = shiftHtml;
+                if (mobShift) mobShift.innerHTML = shiftHtml;
+                
+                var restDayValue = (response.RestDay == null || response.RestDay == '') ? 'N/A' : response.RestDay;
 
-                document.getElementById('clock-in-button').setAttribute('attendance_id', response.Id)
-                document.getElementById('clock-in-button').setAttribute('shift_id', response.ShiftId)
-                document.getElementById('clock-out-button').setAttribute('attendance_id', response.Id)
-                document.getElementById('clock-out-button').setAttribute('shift_id', response.ShiftId)
+                var deskRD = document.getElementById('my-restday'); 
+                var mobRD = document.getElementById('mobile-restday-display');
 
-                document.getElementById('clock-in-button').setAttribute('data-clockin-value', response.ClockIn)
-                document.getElementById('clock-out-button').setAttribute('data-clockout-value', response.ClockOut)
+                if (deskRD) deskRD.innerHTML = restDayValue;
+                if (mobRD) mobRD.innerHTML = restDayValue;
+                
+                var btnIn = document.getElementById('clock-in-button');
+                var btnInMob = document.getElementById('clock-in-button-mob');
+                var btnOut = document.getElementById('clock-out-button');
+                var btnOutMob = document.getElementById('clock-out-button-mob');
 
-                if (response.ClockIn == '') {                    
-                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock In';
+                [btnIn, btnInMob, btnOut, btnOutMob].forEach(function (btn) {
+                    if (btn) {
+                        btn.setAttribute('attendance_id', response.Id);
+                        btn.setAttribute('shift_id', response.ShiftId);
+                    }
+                });
+                
+                var clockInText = (response.ClockIn == '')
+                    ? '<i class="fa-regular fa-clock"></i> Clock In'
+                    : '<i class="fa-regular fa-clock"></i> ' + response.ClockIn;
+
+                if (btnIn) {
+                    btnIn.innerHTML = clockInText;
+                    btnIn.setAttribute('data-clockin-value', response.ClockIn);
                 }
-                else {
-                    document.getElementById('clock-in-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockIn;
+                if (btnInMob) {
+                    btnInMob.innerHTML = clockInText;
+                    btnInMob.setAttribute('data-clockin-value', response.ClockIn);
                 }
+                
+                var clockOutText = (response.ClockOut == '')
+                    ? '<i class="fa-regular fa-clock"></i> Clock Out'
+                    : '<i class="fa-regular fa-clock"></i> ' + response.ClockOut;
 
-                if (response.ClockOut == '') {
-                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> Clock Out';
+                if (btnOut) {
+                    btnOut.innerHTML = clockOutText;
+                    btnOut.setAttribute('data-clockout-value', response.ClockOut);
                 }
-                else {
-                    document.getElementById('clock-out-button').innerHTML = '<i class="fa-regular fa-clock"></i> ' + response.ClockOut;
+                if (btnOutMob) {
+                    btnOutMob.innerHTML = clockOutText;
+                    btnOutMob.setAttribute('data-clockout-value', response.ClockOut);
                 }
 
             },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
+            failure: function (response) { console.log(response); ShowLoading('HIDE'); },
+            error: function (response) { console.log(response); ShowLoading('HIDE'); }
         });
     };
 
@@ -58,7 +84,7 @@
 
     
 
-    $('#nav-header').on('click', '#clock-in-button', async function () {
+    $(document).on('click', '#clock-in-button, #clock-in-button-mob', function () {
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
 
@@ -195,7 +221,7 @@
         });
     });
 
-    $('#nav-header').on('click', '#clock-out-button', function () {
+    $(document).on('click', '#clock-out-button, #clock-out-button-mob', function () {
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
 
@@ -411,7 +437,6 @@
         else { x.style.visibility = 'hidden'; }
     }
 
-
     function LogError(response) {
         ShowLoading('HIDE');
         console.log(response.responseText);
@@ -442,6 +467,7 @@
         const toasterFunction = bootstrap.Toast.getOrCreateInstance(toaster);
         toasterFunction.show();
     }
+
     function ShowAccessDenied(_msg) {
         ShowLoading('HIDE');
         document.getElementById("toasterAccess-body").innerHTML = _msg;

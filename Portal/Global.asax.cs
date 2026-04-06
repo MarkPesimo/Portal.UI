@@ -1,4 +1,5 @@
 ﻿using APWModel.ViewModel.Global;
+using Portal.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,16 @@ namespace Portal
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+        //private AccountRepository _accountrepository { get; set; }
+
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            //if (_accountrepository == null) { _accountrepository = new AccountRepository(); }
         }
 
         protected void Application_PostAuthenticateRequest(Object sender, EventArgs e)
@@ -51,6 +56,8 @@ namespace Portal
                         newUser.LeaveMenuVisibility = serializeModel.LeaveMenuVisibility;
                         newUser.AttendanceMenuVisibility = serializeModel.AttendanceMenuVisibility;
 
+                        newUser.EmployerName = serializeModel.CompanyLogo;
+                        //newUser.EmployerName = "APW TECH";
                         HttpContext.Current.User = newUser;
                     }
                 }

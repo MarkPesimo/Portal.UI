@@ -1,42 +1,150 @@
-﻿
-
-@{
+﻿@{
     ViewBag.Title = "Daily Time Record";
 }
 
-@section Scripts
-{
-    <script src="@Url.Content("~/Scripts/Attendance/DTR.js")"></script>
+<style>
+    #dtr-table thead th {
+        background-color: #8B0000 !important;
+        color: white !important;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding: 15px 10px !important;
+        border: none !important;
+        text-align: center !important;
+    }
+
+    #dtr-table {
+        border-collapse: separate !important;
+        border-spacing: 0 10px !important;
+        width: 100% !important;
+    }
+
+        #dtr-table tbody tr {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        #dtr-table td {
+            padding: 12px !important;
+            border-top: 1px solid #eee !important;
+            border-bottom: 1px solid #eee !important;
+            vertical-align: middle !important;
+        }
+
+            #dtr-table td:first-child {
+                border-left: 1px solid #eee !important;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+
+            #dtr-table td:last-child {
+                border-right: 1px solid #eee !important;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+
+@@media screen and (max-width: 991px) {
+    #correction-table td::before,
+    #dtr-table td::before {
+        content: attr(data-label);
+        font-weight: 800;
+        color: #8B0000; 
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        float: left;
+        margin-right: 10px;
+    }
 }
+    @@media screen and (max-width: 991px) {
+        .mobile-btn-wrapper {
+            display: flex !important;
+            width: 100% !important;
+            gap: 8px;
+            margin-top: 15px !important;
+        }
+
+            .mobile-btn-wrapper .btn {
+                flex: 1 !important;
+                margin: 0 !important;
+            }
+        .dataTables_wrapper .row:first-child {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .dataTables_length, .dataTables_filter {
+            width: auto !important;
+            margin: 0 !important;
+        }
+
+            .dataTables_filter input {
+                width: 110px !important;
+            }
+        #dtr-table thead {
+            display: none !important;
+        }
+
+        #dtr-table, #dtr-table tbody, #dtr-table tr, #dtr-table td {
+            display: block !important;
+            width: 100% !important;
+        }
+
+            #dtr-table tbody tr {
+                margin-bottom: 20px !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 15px !important;
+                padding: 15px !important;
+                background: #fff !important;
+            }
+
+            #dtr-table td {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 8px 0 !important;
+                border: none !important;
+            }
+        .mobile-details-cell {
+            display: block !important;
+        }
+
+        .desktop-only-cell {
+            display: none !important;
+        }
+
+        #dtr-table td::before {
+            content: attr(data-label);
+            font-weight: 800;
+            color: #8B0000;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+    }
+</style>
 
 <section class="main">
     <div class="main-title py-3">
         <div class="container-fluid" id="industry-header-div">
             <div class="row justify-content-between align-items-center">
-                <div class="col-lg-auto text-center text-lg-start b-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">DTR Monitoring</h1>
+                <div class="col-lg-auto text-center text-lg-start">
+                    <h1 class="h4 mb-0">DTR Monitoring</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Attendance")">Attendance</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Daily Time Record</li>
+                            <li class="breadcrumb-item"><a href="#" class="text-danger text-decoration-none">Home</a></li>
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Attendance")" class="text-danger text-decoration-none">Attendance</a></li>
+                            <li class="breadcrumb-item active">Daily Time Record</li>
                         </ol>
                     </nav>
                 </div>
 
-                <div class="col-lg-auto mt-lg-0 mt-4">
-                    <div class="row">
-                        <div class="col-lg-auto col-6">
-                            <button type="button" class="btn btn-sm ms-lg-1 btn-dark rounded" id="show_dtr_filter_btn">
-                                <i class="fa-solid fa-sliders"></i> Filter Records
-                            </button>
-                        </div>
-                        <div class="col-lg-auto col-6">
-                            <button type="button" class="btn btn-sm ms-lg-1 btn-primary rounded" id="add_dtr_btn">
-                                <i class="fa-solid fa-plus"></i> File DTR
-                            </button>
-                        </div>
-                    </div>
+                <div class="col-lg-auto mobile-btn-wrapper">
+                    <button type="button" class="btn btn-sm ms-lg-1 btn-dark rounded shadow-sm" id="show_dtr_filter_btn">
+                        <i class="fa-solid fa-sliders"></i> Filter Records
+                    </button>
+                    <button type="button" class="btn btn-sm ms-lg-1 btn-primary rounded shadow-sm" id="add_dtr_btn">
+                        <i class="fa-solid fa-plus"></i> File DTR
+                    </button>
                 </div>
             </div>
         </div>
@@ -44,33 +152,30 @@
 
     <div class="main-content py-3">
         <div class="container-fluid">
-            <div class="widget widget-table">
-                <div class="table-responsive">
-                    <table class="table table-sm table-striped table-hover align-middle" id="dtr-table">
-                        <thead>
-                            <tr>
-                                <th class="bg-primary text-white">Date Filed</th>
-                                <th class="bg-primary text-white">Description</th>
-                                @*<th class="bg-primary text-white">Date From & To</th>*@
-                                <th class="bg-primary text-white">Status</th>
-                                <th class="bg-primary text-white">Details</th>
-                                <th class="bg-primary text-white">&nbsp;</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            <div class="table-responsive" style="overflow:visible !important;">
+                <table class="table align-middle" id="dtr-table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Date Filed</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
 </section>
 
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/Attendance/DTR.js")"></script> }
 
 @Html.Partial("~/Views/Attendance/Modal/dtr/_filter_dtr_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/dtr/_add_dtr_modal.cshtml")
-
 @Html.Partial("~/Views/Attendance/Modal/dtr/_edit_dtr_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/dtr/_post_dtr_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/dtr/_unpost_dtr_modal.cshtml")
 @Html.Partial("~/Views/Attendance/Modal/dtr/_cancel_dtr_modal.cshtml")
-
 @Html.Partial("~/Views/Attendance/Modal/dtr/_preview_dtr_modal.cshtml")

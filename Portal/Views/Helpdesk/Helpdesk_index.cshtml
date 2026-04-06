@@ -4,89 +4,177 @@
     ViewBag.Title = "Helpdesk";
 }
 
-@section Scripts{
-    <script src="~/Scripts/Helpdesk/helpdesk.js"></script>
-}
+<style>
+    #helpdesk-table thead th {
+        background-color: #8B0000 !important;
+        color: white !important;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding: 15px 10px !important;
+        text-align: center !important;
+        border: none !important;
+    }
 
+    #helpdesk-table {
+        border-collapse: separate !important;
+        border-spacing: 0 10px !important;
+        width: 100% !important;
+    }
+
+        #helpdesk-table tbody tr {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        #helpdesk-table td {
+            padding: 12px !important;
+            border-top: 1px solid #eee !important;
+            border-bottom: 1px solid #eee !important;
+            vertical-align: middle !important;
+        }
+
+    @@media screen and (max-width: 991px) {
+        .mobile-btn-wrapper {
+            display: flex !important;
+            width: 100% !important;
+            gap: 8px;
+            margin-top: 15px !important;
+        }
+
+            .mobile-btn-wrapper .btn {
+                flex: 1 !important;
+                margin: 0 !important;
+            }
+
+        .dataTables_wrapper .row:first-child {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        #helpdesk-table thead {
+            display: none !important;
+        }
+
+        #helpdesk-table, #helpdesk-table tbody, #helpdesk-table tr, #helpdesk-table td {
+            display: block !important;
+            width: 100% !important;
+        }
+
+            #helpdesk-table tbody tr {
+                margin-bottom: 20px !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 12px !important;
+                padding: 12px !important;
+                background: #fff !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            }
+
+            #helpdesk-table td {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 10px 0 !important;
+                border: none !important;
+                border-bottom: 1px dashed #eee !important;
+            }
+
+                #helpdesk-table td:last-child {
+                    border-bottom: none !important;
+                }
+
+                #helpdesk-table td::before {
+                    content: attr(data-label);
+                    font-weight: 800;
+                    color: #8B0000;
+                    font-size: 0.7rem;
+                    text-transform: uppercase;
+                }
+    }
+
+
+    @@media screen and (max-width: 991px) {
+        #helpdesk-table thead {
+            display: none !important;
+        }
+
+        #helpdesk-table td {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 10px 8px !important;
+            border-bottom: 1px dashed #eee !important;
+            text-align: right !important; 
+        }
+
+            #helpdesk-table td::before {
+                content: attr(data-label); 
+                font-weight: 800;
+                color: #8B0000; 
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                text-align: left !important;
+                flex: 1; 
+            }
+    }
+</style>
 
 <section class="main">
     <div class="main-title py-3">
         <div class="container-fluid">
-            <div class="row justify-content-between align-items-center" id="helpdesk-main-div">
-                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">Helpdesk</h1>
-
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-center text-lg-start">
+                    <h1 class="h4 mb-0">Helpdesk</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Helpdesk</li>
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-danger text-decoration-none">Home</a></li>
+                            <li class="breadcrumb-item active">Helpdesk</li>
                         </ol>
                     </nav>
                 </div>
 
-                <div class="col-lg-auto mt-lg-0 mt-4">
-                    <div class="row">
-                        @*<div class="col-lg-auto  col-4">
-            <button type="button" class="btn btn-sm ms-lg-1 btn-success rounded" id="how-to-button">
-                <i class="fa-regular fa-circle-question"></i> How to
-            </button>
-        </div>*@
-
-
-                
-
-                        <div class="col-lg-auto col-4">
-                            <button type="button" class="btn btn-sm ms-lg-1 btn-dark rounded" id="show_helpdesk_filter_btn">
-                                <i class="fa-solid fa-sliders"></i> Filter Records
-                            </button>
-                        </div>
-
-                        <div class="col-lg-auto  col-4">
-                            <button type="button" class="btn btn-sm ms-lg-1 btn-primary rounded" id="add_concern_btn">
-                                <i class="fa-solid fa-plus"></i> Add Concern
-                            </button>
-                        </div>
-                    </div>
+                <div class="col-lg-auto mobile-btn-wrapper">
+                    <button type="button" class="btn btn-sm btn-dark rounded" id="show_helpdesk_filter_btn">
+                        <i class="fa-solid fa-sliders"></i> Filter Records
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary rounded" id="add_concern_btn">
+                        <i class="fa-solid fa-plus"></i> Add Concern
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-
     <div class="main-content py-3">
         <div class="container-fluid">
-            <div class="widget widget-table">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle" id="helpdesk-table">
-                        <thead>
-                            <tr>
-                                <th class="bg-primary text-white">Date Filed</th>
-                                <th class="bg-primary text-white">Type</th>
-                                <th class="bg-primary text-white">Concern</th>
-                                <th class="bg-primary text-white">File Status</th>
-                                <th class="bg-primary text-white">Concern Status</th>
-                                <th class="bg-primary text-white">Details</th>
-                                <th class="bg-primary text-white"></th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            <div class="table-responsive" style="overflow:visible !important;">
+                <table class="table align-middle" id="helpdesk-table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Date Filed</th>
+                            <th>Type/Concern</th>
+                            <th>File Status</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
 </section>
 
+@section Scripts {
+    <script src="~/Scripts/Helpdesk/helpdesk.js"></script> }
 
 @Html.Partial("~/Views/Helpdesk/Modal/_helpdesk_filter_modal.cshtml", Model)
-
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_add_concern_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_edit_concern_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_post_concern_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_unpost_concern_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_cancel_concern_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/concern/_delete_concern_modal.cshtml")
-
 @Html.Partial("~/Views/Helpdesk/Modal/comment/_comment_modal.cshtml")
 @Html.Partial("~/Views/Helpdesk/Modal/comment/_add_comment_modal.cshtml")
-
 @Html.Partial("~/Views/Helpdesk/Modal/comment/_Attach_modal.cshtml")

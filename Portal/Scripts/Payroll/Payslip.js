@@ -23,11 +23,29 @@
         BindTable();
     });
 
-
     $("#show_payslip_filter_btn").click(function (e) {
         e.preventDefault();
 
         $('#filter_payslip_modal').modal('show');
+    });
+
+    $("#filter_payslip").click(function (e) {
+        e.preventDefault();
+
+        var table = $('#payslip-table').DataTable();
+        //table.destroy();
+        $('#payslip-table').empty();
+
+        BindTable();
+    });
+    
+    $('#payslip-table').on('click', '.download-button', function () {
+        var PayrollID = $(this).attr("_id");
+
+ 
+        let new_actionURL = '/Payroll/PrintPayslip?_payrollid=' + PayrollID;
+        window.open(new_actionURL, 'Payslip', 'top=10, status=no, toolbar=no, resizable=yes, scrollbars=yes, width=800, height=600');
+        return false;
     });
 
     function BindTable() {
@@ -55,77 +73,49 @@
     };
 
     function DisplayPayslipList(response) {
-        $("#payslip-table").DataTable(
-            {
-                autoWidth: false,
-                bLengthChange: true,
-                lengthMenu: [[10, -1], [10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [
-                    { 'data': 'PayDate' },
-                    { 'data': 'PayrollPeriod' },
-                ],
-                order: [[0, "desc"]],
-                columnDefs: [
- 
-                    {
-                        title: 'Pay Date',
-                        target: 0,
-                        class: "d-none d-sm-table-cell",
-                        "render": function (data, type, row, meta) {
-                            const date = new Date(row.PayDate);
-                            return ' <strong class="text-primary">' + date.toLocaleDateString('es-pa') + ' </strong> '
-                        }
-                    },
-                    {
-                        title: 'Payroll Description',
-                        target: 1
-                    },
-                    {
-                        target: 2,
-                        data: null,
-                        "render": function (data) {
-                            return ' <a href="#" class="btn btn-sm btn-primary download-button"     data-toggle="tooltip" title="Download"           _id=' + data.PayrollId + '> ' +
-                                ' <i class="fa-regular fa-circle-down"></i> Download' +
-                                ' </a>'
-                        }
+        if ($.fn.DataTable.isDataTable('#payslip-table')) {
+            $('#payslip-table').DataTable().destroy();
+        }
+
+        var mobileLabels = ["Pay Date", "Payroll Description", "Action"];
+
+        $("#payslip-table").DataTable({
+            autoWidth: false,
+            data: response,
+            order: [[0, "desc"]],
+            columns: [
+                { 'data': 'PayDate' },
+                { 'data': 'PayrollPeriod' },
+                { 'data': null }
+            ],
+            columnDefs: [
+                {
+                    targets: "_all",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('data-label', mobileLabels[col]);
                     }
-                ]
-            });
-
-        $('.dataTables_length').addClass('bs-select ms-2 mt-2');
-        $('.dataTables_filter').addClass('me-2 mb-1 mt-2');
-        $('.dataTables_paginate').addClass('mt-2 mb-2');
-        $('.dataTables_info').addClass('ms-2 mt-2 mb-2');
-        $('.sorting').addClass('bg-primary text-white');
-
+                },
+                {
+                    targets: 0,
+                    render: function (data) {
+                        const date = new Date(data);
+                        return '<strong>' + date.toLocaleDateString('es-pa') + '</strong>';
+                    }
+                },
+                {
+                    targets: 2,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a href="#" class="btn btn-sm btn-primary w-85 download-button" _id="' + row.PayrollId + '">' +
+                            '<i class="fa-regular fa-circle-down me-2"></i> Download' +
+                            '</a>';
+                    }
+                }
+            ]
+        });
 
         ShowLoading('HIDE');
-    };
-
-    $("#filter_payslip").click(function (e) {
-        e.preventDefault();
-
-        var table = $('#payslip-table').DataTable();
-        table.destroy();
-        $('#payslip-table').empty();
-
-        BindTable();
-    });
-
-    /////////////========================================TABLE EVENTS==============================================================
-    $('#payslip-table').on('click', '.download-button', function () {
-        var PayrollID = $(this).attr("_id");
-
- 
-        let new_actionURL = '/Payroll/PrintPayslip?_payrollid=' + PayrollID;
-        window.open(new_actionURL, 'Payslip', 'top=10, status=no, toolbar=no, resizable=yes, scrollbars=yes, width=800, height=600');
-        return false;
-    });
-    /////////////========================================TABLE EVENTS==============================================================
+    }
 
     function ShowLoading(show) {
         var x = document.getElementById("preloader");

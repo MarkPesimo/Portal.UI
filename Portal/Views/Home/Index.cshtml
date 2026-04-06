@@ -1,6 +1,10 @@
-﻿
+﻿@using APWModel.ViewModel.Global
+
 @{
     ViewBag.Title = "Home Page";
+
+    var currentUser = User as ContextLoginUser_model;
+    var currentEmployer = currentUser?.EmployerName?.Trim().ToUpper() ?? "";
 }
 
 @section Scripts
@@ -8,57 +12,522 @@
     <script src="@Url.Content("~/Scripts/Global/Home.js")"></script>
 }
 
-
-<section class="main">
-    <div class="main-title py-3">
-        <div class="container-fluid" id="industry-header-div">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">APW Employee Portal</h1>
-
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        </ol>
-                    </nav>
+    <section class="main">
+        <div class="container-fluid d-lg-none py-3 border-bottom bg-white shadow-sm" @(currentUser?.AttendanceMenuVisibility)>
+            <div class="row align-items-center g-2">
+                <div class="col-3 text-center">
+                    <img src="\CandidateImages\@(currentUser?.CandidateId).JPEG"
+                         class="img-fluid rounded-circle border border-2 @(currentEmployer == "APW TECH" ? "border-tech-blue" : "border-primary")"
+                         style="width: 55px; height: 55px; object-fit: cover;" alt="Profile">
+                </div>
+                <div class="col-9">
+                    <div class="mb-0">
+                        <span class="text-muted" style="font-size: 0.75rem;">Welcome,</span>
+                        <span class="fw-bold text-dark d-block" style="font-size: 1.1rem; line-height: 1.1; margin-top: -2px;">
+                            @(currentUser?.Username)
+                        </span>
+                    </div>
+                    <div class="extra-small-text mt-1">
+                        <span id="mobile-shift-display" class="text-muted fw-bold d-block">
+                            <i class="fa-solid fa-business-time @(currentEmployer == "APW TECH" ? "text-tech-blue" : "")"></i> Loading Shift...
+                        </span>
+                        <span class="fw-bold d-block @(currentEmployer == "APW TECH" ? "text-tech-blue" : "text-info")">
+                            <i class="fa-solid fa-calendar-day"></i> RD:
+                            <span id="mobile-restday-display" class="text-dark">Loading...</span>
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        @if (currentEmployer == "APW TECH")
+                        {
+                            <button class="btn btn-tech-outline-blue btn-sm py-2 px-3 flex-fill fw-bold rounded-pill" id="clock-in-button-mob" type="button">
+                                <i class="fa-regular fa-clock me-1"></i> Clock In
+                            </button>
+                            <button class="btn btn-tech-solid-blue btn-sm py-2 px-3 flex-fill fw-bold rounded-pill shadow-sm" id="clock-out-button-mob" type="button">
+                                <i class="fa-regular fa-clock me-1"></i> Clock Out
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-clock-in btn-sm py-2 px-3 flex-fill fw-bold shadow-sm rounded-pill" id="clock-in-button-mob" type="button">
+                                <i class="fa-regular fa-clock me-1"></i> Clock In
+                            </button>
+                            <button class="btn btn-clock-out btn-sm py-2 px-3 flex-fill fw-bold shadow-sm rounded-pill" id="clock-out-button-mob" type="button">
+                                <i class="fa-regular fa-clock me-1"></i> Clock Out
+                            </button>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="main-content py-3">
-        <div class="container-fluid">
-            <div class="widget">
-                <div class="row justify-content-center align-items-center">
-
-                    <div class="col-11 mt-3 text-center d-sm-none">
-                        <span class="tt" data-bs-placement="bottom" title="APW logo">
-                            <img class="img-fluid" src="~/Content/images/logos/APW-Logo-02.png" alt="APW logo" />
-                        </span>
+        <div class="main-title py-3 d-none d-lg-block">
+            <div class="container-fluid" id="industry-header-div">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-lg-auto">
+                        <h1 class="h4 mt-2 mb-lg-0">APW Employee Portal</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            </ol>
+                        </nav>
                     </div>
+                </div>
+            </div>
+        </div>
+        @if (currentEmployer == "APW TECH")
+        {
+            <div class="main-content py-3 content-grow" id="section-apwtech">
+                <div class="container-fluid">
+                    <div class="widget p-0 border rounded-4 bg-white overflow-hidden" style="border-color: #e0e6ed !important;">
+                        <div class="row g-0">
+                            <div class="col-lg-8 p-4 p-md-5 d-flex flex-column justify-content-center order-2 order-lg-1">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="badge rounded-pill px-3 py-2" style="background: #eef6ff; color: #007bff; font-size: 0.7rem; letter-spacing: 1px;">
+                                        <i class="fa-solid fa-bolt-lightning me-1"></i> TECHNOLOGY EXCELLENCE
+                                    </span>
+                                </div>
+                                <h2 class="display-6 fw-bold text-dark mb-3">
+                                    Unlocking <span style="color: #007bff;">Tech Excellence</span>
+                                </h2>
+                                <p class="text-muted mb-4" style="font-size: 1rem; line-height: 1.7;">
+                                    Connecting businesses with a premium workforce of technology experts to drive digital success.
+                                </p>
 
-                    <div class="col-lg-6 col-12">
-                        <div class="display-2">
-                            <h1><strong>APW Employee Portal</strong></h1>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="p-3 h-100 rounded-3 border-start border-4 border-primary" style="background: #f8fbff;">
+                                            <h6 class="fw-bold mb-1 text-dark">Innovation</h6>
+                                            <p class="small text-muted mb-0">Cutting-edge solutions for modern business challenges.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 h-100 rounded-3 border-start border-4 border-primary" style="background: #f8fbff;">
+                                            <h6 class="fw-bold mb-1 text-dark">Expertise</h6>
+                                            <p class="small text-muted mb-0">Driven by a global network of specialized tech talent.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 d-flex align-items-center justify-content-center p-5 position-relative order-1 order-lg-2 tech-light-gradient">
+                                <div class="tech-dot-pattern-light"></div>
+                                <img class="img-fluid z-index-1"
+                                     src="https://apwtech.com.ph/assets/logo-f6517856.svg"
+                                     style="max-width: 240px;"
+                                     alt="APWTech logo" />
+                            </div>
                         </div>
-
-                        <p>
-                            A one-stop service for Asia Peopleworks, Inc. employees that provides centralized information, 24/7 payslip access, and helpdesk support for employees’ query.
-                            You can access this through your desktop computer, laptop, tablet, or smartphone.
-                        </p>
                     </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="main-content py-3 content-grow" id="section-apw">
+                <div class="container-fluid">
+                    <div class="widget p-0 border rounded-4 bg-white overflow-hidden" style="border-color: #f8d7da !important;">
+                        <div class="row g-0">
+                            <div class="col-lg-8 p-4 p-md-5 d-flex flex-column justify-content-center order-2 order-lg-1">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="badge rounded-pill px-3 py-2" style="background: #fff5f5; color: #b30000; font-size: 0.7rem; letter-spacing: 1px;">
+                                        <i class="fa-solid fa-users me-1"></i> TRUSTED STAFFING PARTNER
+                                    </span>
+                                </div>
+                                <h2 class="display-6 fw-bold text-dark mb-3">
+                                    Employee <span class="text-danger">Portal</span>
+                                </h2>
+                                <p class="text-muted mb-4" style="font-size: 1rem; line-height: 1.7;">
+                                    A one-stop service for Asia Peopleworks, Inc. employees providing centralized information and support.
+                                </p>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="p-3 h-100 rounded-3 border-start border-4 border-danger" style="background: #fffafa;">
+                                            <h6 class="fw-bold mb-1 text-dark">Efficiency</h6>
+                                            <p class="small text-muted mb-0">Simplified HR and Payroll processes.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 h-100 rounded-3 border-start border-4 border-danger" style="background: #fffafa;">
+                                            <h6 class="fw-bold mb-1 text-dark">Empowerment</h6>
+                                            <p class="small text-muted mb-0">Tools to help you grow professionally.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="col-4 text-center d-none d-md-block">
-                        <span class="tt" data-bs-placement="bottom" title="APW logo">
-                            <img class="img-fluid" src="~/content/Images/logos/APW-Logo-02.png" alt="APW logo" width="400" height="300" />
-                        </span>
+                            <div class="col-lg-4 d-flex align-items-center justify-content-center p-5 position-relative order-1 order-lg-2 apw-light-gradient">
+                                <div class="apw-dot-pattern-light"></div>
+                                <img class="img-fluid z-index-1"
+                                     src="~/content/Images/logos/APW-Logo-01.png"
+                                     style="max-width: 260px;"
+                                     alt="APW logo" />
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+        }
 
+        <footer class="footer py-3 bg-light border-top fixed-bottom">
+            <div class="container-fluid text-center">
+                <span class="text-muted small">
+                    Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">APW</a> |
+                    <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
+                    <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
+                </span>
+            </div>
+        </footer>
+    </section>
 
+    <div class="modal fade" id="announcementModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="header-icon-circle">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+                        <div>
+                            <h4 class="modal-title mb-0">Updates & Announcements</h4>
+                            <p class="text-muted small mb-0">What's happening in the company.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
+                <div class="modal-body p-4" style="max-height: 60vh; overflow-y: auto;">
+                    <div id="announcementList">
+                    </div>
+                </div>
 
+                <div class="modal-footer border-0 bg-light-subtle">
+                    <button type="button" class="btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</section>
+
+    <style>
+    .main-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 92vh;
+    }
+
+    .content-grow {
+        flex: 1;
+    }
+
+    .btn-clock-in {
+        background: linear-gradient(145deg, #b30000, #800000);
+        color: white;
+        border: none;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .btn-clock-in:active {
+        transform: scale(0.96);
+        box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .btn-clock-out {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #ced4da;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s ease;
+    }
+
+    .btn-clock-out:active {
+        transform: scale(0.96);
+    }
+
+    .widget {
+        box-shadow: none !important;
+    }
+
+    .rounded-4 {
+        border-radius: 1.25rem !important;
+    }
+
+    .tech-light-gradient {
+        background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+        border-left: 1px solid #e0e6ed;
+    }
+
+    .tech-dot-pattern-light {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: radial-gradient(#007bff 0.5px, transparent 0.5px);
+        background-size: 15px 15px;
+        opacity: 0.1;
+        z-index: 0;
+    }
+
+    .apw-light-gradient {
+        background: linear-gradient(135deg, #fffafa 0%, #ffffff 100%);
+        border-left: 1px solid #f8d7da;
+    }
+
+    .apw-dot-pattern-light {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: radial-gradient(#b30000 0.5px, transparent 0.5px);
+        background-size: 15px 15px;
+        opacity: 0.08;
+        z-index: 0;
+    }
+
+    .z-index-1 {
+        z-index: 1;
+    }
+
+    .extra-small-text {
+        font-size: 0.7rem;
+    }
+
+    .logo-drop-shadow {
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+    }
+
+        /***************************** Announcement Style *************************************/
+        #announcementModal .modal-content {
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background-color: #ffffff;
+        }
+
+        #announcementModal .modal-header {
+            background: #ffffff;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #f1f5f9;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+        }
+
+        #announcementModal .modal-title {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .header-icon-circle {
+            width: 42px;
+            height: 42px;
+            background: rgba(var(--employer-primary-rgb), 0.1); 
+            color: var(--employer-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .announcement-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .announcement-card:hover {
+                border-color: var(--employer-primary);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            }
+
+            .announcement-card h5 {
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+            }
+
+        .announcement-body {
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 0.75rem;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .modern-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-importance {
+            border-left: 4px solid;
+        }
+
+        #announcementModal .modal-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        #announcementModal .modal-body::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        @@media (max-width: 576px) {
+            #announcementModal .modal-header { padding: 1.25rem; }
+            .announcement-card { padding: 1.25rem !important; }
+            .announcement-card h5 { font-size: 1.1rem; }
+        }
+
+        .type-pill {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .importance-text {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .announcement-title {
+            color: #1e293b;
+            font-weight: 750;
+            margin-bottom: 0.75rem;
+        }
+
+        .announcement-meta-footer {
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .user-info, .date-info {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .expiry-notice {
+            font-size: 0.75rem;
+            color: #ef4444;
+            font-weight: 600;
+            background: #fef2f2;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .btn-attachment {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            text-decoration: none !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25); 
+            transition: all 0.2s ease;
+        }
+
+            .btn-attachment:hover {
+                background-color: #4338ca !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(79, 70, 229, 0.35);
+            }
+
+            .btn-attachment i {
+                margin-right: 6px;
+                font-size: 0.9rem;
+            }
+
+            .btn-mark-read:hover {
+                background-color: #059669 !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(16, 185, 129, 0.35) !important;
+            }
+
+        .announcement-body {
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 0.75rem;
+            display: block;
+        }
+
+            .announcement-body.clamped {
+                display: -webkit-box !important;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        .see-toggle-btn {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: #6366f1;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 5px;
+        }
+    /*****************************************************************/
+
+    @@media (max-width: 991px) {
+        .tech-light-gradient, .apw-light-gradient {
+            border-left: none;
+            border-bottom: 1px solid #eee;
+        }
+    }
+        .text-tech-blue {
+            color: #007bff !important;
+        }
+
+        .border-tech-blue {
+            border-color: #007bff !important;
+        }
+
+        .btn-tech-outline-blue {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+            transition: all 0.2s ease;
+        }
+
+            .btn-tech-outline-blue:active {
+                background-color: #f0f7ff;
+                transform: scale(0.96);
+            }
+
+        .btn-tech-solid-blue {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+            .btn-tech-solid-blue:active {
+                background-color: #0056b3;
+                transform: scale(0.96);
+            }
+
+
+
+    </style>

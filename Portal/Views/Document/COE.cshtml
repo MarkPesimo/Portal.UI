@@ -8,83 +8,93 @@
 }
 
 
-<section class="main">
-    <div class="main-title py-3">
-        <div class="container-fluid">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                    <h1 class="h4 mt-2 mb-lg-0">Documents</h1>
+    <section class="main">
+        <div class="main-title py-3">
+            <div class="container-fluid">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                        <h1 class="h4 mt-2 mb-lg-0">Documents</h1>
 
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Document")">Document</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Certificate of Employment</li>
-                        </ol>
-                    </nav>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Document")">Document</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Certificate of Employment</li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
-    <div class="main-content py-3">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-xl-4">
+        <div class="main-content py-3">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-xl-4">
 
-                </div>
+                    </div>
 
-                <div class="col-12 col-xl-4">
-                    <div class="widget">
-                        <h1 class="text-center text-black h1 mb-4">
-                            Generate COE
-                        </h1>
+                    <div class="col-12 col-xl-4">
+                        <div class="widget">
+                            <h1 class="text-center text-black h1 mb-4">
+                                Generate COE
+                            </h1>
 
-                        <div class="row">
-                            <select name="CompensationType" id="CompensationType" class="form-select mt-1">
-                                <option value="Select Compensation Type">Select Compensation Type</option>
-                                <option value="Without Compensation">Without Compensation</option>
-                                <option value="With Compensation">With Compensation</option>
-                            </select>
-                        </div>
-
-
-                        <div class="row" id="DIV_SalaryType" style="display: none;">
-                            <div class="col-6   p-0">
-                                <select name="SalaryType" id="SalaryType" class="form-select mt-1">
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Annual">Annual</option>
+                            <div class="row">
+                                <select name="CompensationType" id="CompensationType" class="form-select mt-1">
+                                    <option value="Select Compensation Type">Select Compensation Type</option>
+                                    <option value="Without Compensation">Without Compensation</option>
+                                    <option value="With Compensation">With Compensation</option>
                                 </select>
                             </div>
 
-                        </div>
 
-                        <div class="row mt-2">
-                            @*<label for="" class="form-label">Search Type</label>*@
-                            @{
-                                string _selected_reason = "";
-                            }
-                            @Html.DropDownListFor(m => _selected_reason, (IEnumerable<SelectListItem>)ViewBag._Reasons, "Select Reason", new { @class = "form-select", @placeholder = "Reason", @id = "reason-select" })
-                        </div>
+                            <div class="row" id="DIV_SalaryType" style="display: none;">
+                                <div class="col-6   p-0">
+                                    <select name="SalaryType" id="SalaryType" class="form-select mt-1">
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Annual">Annual</option>
+                                    </select>
+                                </div>
 
-                        <div class="row mt-4">
-                            <button type="button" class="btn btn-primary w-100" id="generate-coe-button">
-                                <i class="bi bi-check-circle"></i> Generate
-                            </button>
-                        </div>
+                            </div>
 
+                            <div class="row mt-2">
+                                @*<label for="" class="form-label">Search Type</label>*@
+                                @{
+                                    string _selected_reason = "";
+                                }
+                                @Html.DropDownListFor(m => _selected_reason, (IEnumerable<SelectListItem>)ViewBag._Reasons, "Select Reason", new { @class = "form-select", @placeholder = "Reason", @id = "reason-select" })
+                            </div>
+
+                            <div class="row mt-4">
+                                <button type="button" class="btn btn-primary w-100" id="generate-coe-button">
+                                    <i class="bi bi-check-circle"></i> Generate
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-4">
 
                     </div>
                 </div>
-
-                <div class="col-12 col-xl-4">
-
-                </div>
             </div>
         </div>
-    </div>
-</section>
+
+        <footer class="footer py-3 bg-light border-top fixed-bottom">
+            <div class="container-fluid text-center">
+                <span class="text-muted small">
+                    Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a> |
+                    <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
+                    <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
+                </span>
+            </div>
+        </footer>
+    </section>
 
 
 @Html.Partial("~/Views/Document/modal/_preview_coe_modal.cshtml")

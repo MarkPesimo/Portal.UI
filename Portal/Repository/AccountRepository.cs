@@ -16,23 +16,32 @@ namespace Portal.Repository
     public class AccountRepository
     {
         public GlobalRepository _globalRepository { get; set; }
+        private int _loginuserid { get; set; }
+        private int _candidate_id { get; set; }
 
         public AccountRepository()
         {
             if (_globalRepository == null) { _globalRepository = new GlobalRepository(); }
+
+            if (_loginuserid == 0)
+            {
+                LoginUser_model _user = _globalRepository.GetLoginUser();
+                if (_user != null)
+                {
+                    _loginuserid = _user.UserId;
+                    _candidate_id = _user.CandidateId;
+                }
+            }
         }
 
         public string Login(LoginModel model)
         {
-            
-            //string _hash_password = _globalRepository.Md5HashPassword(model.Password);
             var _content_prop = new Dictionary<string, string>
-                {
-                    {"userName", model.UserName },
-                    {"password", model.Password },
-                    {"AppModuleId", model.AppModuleId.ToString() }
-                };
-
+        {
+            {"userName", model.UserName },
+            {"password", model.Password },
+            {"AppModuleId", model.AppModuleId.ToString() }
+        };
 
             string _body_content = JsonConvert.SerializeObject(_content_prop);
             HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
@@ -44,29 +53,29 @@ namespace Portal.Repository
             {
                 var _value = _response.Content.ReadAsStringAsync().Result.ToString();
                 var _CustomPrincipalSerializeModel = JsonConvert.DeserializeObject<LoginUser_model>(_value);
-                
+
                 if (!_CustomPrincipalSerializeModel.Status)
                 {
                     return "Your Account is currently Inactive. Kindly coordinate with Employment Services Team.";
                 }
                 
+                _CustomPrincipalSerializeModel.CompanyLogo = GetEmployerName(model.UserName);
+                //_CustomPrincipalSerializeModel.CompanyLogo = "APW TECH";
+                // ----------------------------
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 string userData = serializer.Serialize(_CustomPrincipalSerializeModel);
-
 
                 FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
                         1,
                         model.UserName,
                         DateTime.Now, DateTime.Now.AddDays(1),
                         true,
-                        userData,
+                        userData, 
                         FormsAuthentication.FormsCookiePath);
 
                 string encryptedTicket = FormsAuthentication.Encrypt(ticket);
-
                 var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
-
                 System.Web.HttpContext.Current.Response.Cookies.Add(cookie);
 
                 return "Ok";
@@ -74,8 +83,6 @@ namespace Portal.Repository
 
             return "Incorrect Username or Password";
         }
-
-
 
         //public LoginUser_model GetLoginUser()       //HttpCookie authCookie
         //{
@@ -88,7 +95,7 @@ namespace Portal.Repository
         //        var _value = _response.Content.ReadAsStringAsync().Result.ToString();
         //        _obj = JsonConvert.DeserializeObject<LoginUser_model>(_value);
         //    }
-            
+
         //    return _obj;
         //}
 
@@ -163,5 +170,27 @@ namespace Portal.Repository
         }
         //---------------------------------END RESET PASSWORD-----------------------------------------------------
 
+        public string GetEmployerName(string _username)
+        {
+            try
+            {
+                string _employerName = string.Empty;
+                
+                string _endpoint = "Account/GetEmployerName/" + _username;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    _employerName = _response.Content.ReadAsStringAsync().Result.Replace("\"", "");
+                }
+
+                return _employerName;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

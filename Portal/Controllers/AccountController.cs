@@ -70,8 +70,6 @@ namespace Portal.Controllers
             }
         }
 
-     
-
         [HttpPost]
         public ActionResult GetLocation()
         {
@@ -284,6 +282,7 @@ namespace Portal.Controllers
                     model.Password = _globalrepository.Md5HashPassword(model.Password);
 
                     string _login_result = _accountrepository.Login(model);
+
                     if (_login_result == "Ok")
                     {
                         string _urlreferrer = Request.UrlReferrer.ToString();
@@ -436,5 +435,33 @@ namespace Portal.Controllers
         }
         //--------------------------------------------------END RESET PASSWORD--------------------------------------------------------------------
 
+        [HttpGet]
+        public ActionResult GetEmployerName()
+        {
+            try
+            {
+                string currentUsername = User.Identity.Name;
+
+                if (string.IsNullOrEmpty(currentUsername))
+                {
+                    return Json(new { success = false, message = "User not authenticated." }, JsonRequestBehavior.AllowGet);
+                }
+                
+                string employerName = _accountrepository.GetEmployerName(currentUsername);
+
+                if (!string.IsNullOrEmpty(employerName))
+                {
+                    return Json(new { success = true, data = employerName }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Employer name not found." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }
