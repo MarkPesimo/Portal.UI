@@ -190,6 +190,20 @@ namespace Portal.Controllers
                 throw;
             }
         }
+
+        public ActionResult GetAttendanceNotification(string process)
+        {
+            try
+            {
+                string _message = _attendancerepository.GetAttendanceNotification(DateTime.Now, process);
+
+                return Json(_message, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json("Error: " + ex.Message, JsonRequestBehavior.AllowGet);
+            }
+        }
         //---------------------------------END CLOCK IN & OUT----------------------------------
 
         //=======================================BEGIN ATTENDANCE CORRECTION==============================

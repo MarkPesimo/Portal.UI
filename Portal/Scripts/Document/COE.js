@@ -8,7 +8,6 @@
         document.querySelector("#CompensationType").addEventListener("change", ShowHideSalaryType);
     });
 
-
     function ShowHideSalaryType() {
         var CompensationType = document.querySelector("#CompensationType"); //document.getElementById("TaskTypeId");
         var _CompensationType = CompensationType.value;
@@ -93,7 +92,6 @@
         });
         
     });
-
 
     function GenerateCOE(_CompensationType, _SalaryType, reason) {
         //alert('yey');

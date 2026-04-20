@@ -115,9 +115,11 @@
                             ShowLoading('HIDE');
                             if (result.Status == "SUCCESS") {
                                 GetClockInClockOut();
-                                ShowSuccessMessage('You have successfully Clock-In.')
+                                
+                                CheckAttendanceNotification('TIME IN');
+                            } else {
+                                ShowAccessDenied(result.result);
                             }
-                            else { ShowAccessDenied(result.result); }
                         }
                     });
                 },
@@ -166,32 +168,93 @@
                 }
             });
         }
-
-        //ShowLoading('SHOW');
-    //    $.ajax({
-    //        url: '/Attendance/ClockIn',
-    //        type: "POST",
-    //        data:
-    //        {
-    //            '_id': AttendanceId,
-    //            '_shiftid': ShiftId,    
-    //            '_latitude': _latitude,
-    //            '_longitude': _longitude
-    //        },
-    //        dataType: 'json',
-    //        success: function (result) {
-    //            ShowLoading('HIDE');
-    //            if (result.Status == "SUCCESS") {
-    //                GetClockInClockOut();
-    //                ShowSuccessMessage('You have successfully Clock-In.')                    
-    //            }
-    //            else {
-    //                ShowAccessDenied(result.result);
-    //                //alert(result.result);
-    //            }
-    //        }
-    //    });
     });
+
+    function CheckAttendanceNotification(processType) {
+        $.ajax({
+            url: '/Attendance/GetAttendanceNotification',
+            type: "GET",
+            data: { 'process': processType },
+            dataType: 'json',
+            success: function (message) {
+                var successText = (processType === 'TIME IN') ? 'You have successfully Clocked-In.' : 'You have successfully Clocked-Out.';
+
+                if (message != null && message != '') {
+                    var formattedNotification = message.split(':').map(function (item) {
+                        return item.trim();
+                    }).join('<br/>');
+                    
+                    var fullHtmlMessage = '<strong class="text-success">' + successText + '</strong><br/><br/>' + formattedNotification;
+                    $('#attendanceNotificationMessage').html(fullHtmlMessage);
+
+                    var $iconBox = $('.icon-box');
+                    var $icon = $iconBox.find('i');
+                    
+                    var themeColor = '#007bff'; 
+                    var themeBg = '#eef6ff';
+                    var iconClass = 'fa-solid fa-calendar-check'; 
+
+                    if (message.includes("Holiday")) {
+                        var lowerMessage = message.toLowerCase();
+                        
+                        switch (true) {
+                            case lowerMessage.includes("new year"):
+                                iconClass = 'fa-solid fa-champagne-glasses';
+                                break;
+                            case lowerMessage.includes("christmas"):
+                                iconClass = 'fa-solid fa-mistletoe';
+                                break;
+                            case lowerMessage.includes("labor") || lowerMessage.includes("worker"):
+                                iconClass = 'fa-solid fa-briefcase';
+                                break;
+                            
+                            case lowerMessage.includes("eid") || lowerMessage.includes("al-fitr"):
+                                iconClass = 'fa-solid fa-mosque';
+                                break;
+                            case lowerMessage.includes("maundy") || lowerMessage.includes("good friday") || lowerMessage.includes("easter"):
+                                iconClass = 'fa-solid fa-church';
+                                break;
+                            
+                            case lowerMessage.includes("araw ng kagitingan") || lowerMessage.includes("valor"):
+                                iconClass = 'fa-solid fa-award';
+                                break;
+                            case lowerMessage.includes("independence") || lowerMessage.includes("kalayaan"):
+                                iconClass = 'fa-solid fa-flag';
+                                break;
+                            case lowerMessage.includes("hero") || lowerMessage.includes("rizal") || lowerMessage.includes("bonifacio") || lowerMessage.includes("ninoy"):
+                                iconClass = 'fa-solid fa-monument';
+                                break;
+                            
+                            case lowerMessage.includes("edsa") || lowerMessage.includes("revolution"):
+                                iconClass = 'fa-solid fa-people-group';
+                                break;
+                            case lowerMessage.includes("anniversary") || lowerMessage.includes("foundation"):
+                                iconClass = 'fa-solid fa-cake-candles';
+                                break;
+                            
+                            case lowerMessage.includes("fiesta") || lowerMessage.includes("festival"):
+                                iconClass = 'fa-solid fa-mask';
+                                break;
+                            case lowerMessage.includes("special working") || lowerMessage.includes("additional special"):
+                                iconClass = 'fa-solid fa-clipboard-check'; 
+                                break;
+                        }
+                        
+                        $iconBox.css({ 'background': themeBg, 'color': themeColor });
+                        $icon.attr('class', iconClass);
+
+                    } else {
+                        $iconBox.css({ 'background': '#fff4e5', 'color': '#ffa000' });
+                        $icon.attr('class', 'fa-solid fa-circle-exclamation');
+                    }
+
+                    $('#attendanceNotificationModal').modal('show');
+                } else {
+                    ShowSuccessMessage(successText);
+                }
+            }
+        });
+    }
 
     $('#clockin_modal').on('click', '#clock-out-previous-button', function () {
         var AttendanceId = $(this).attr("attendance_id");
@@ -286,7 +349,9 @@
                                 ShowLoading('HIDE');
                                 if (result.Status == "SUCCESS") {
                                     GetClockInClockOut();
-                                    ShowSuccessMessage('You have successfully Clock-Out.')
+                                    //ShowSuccessMessage('You have successfully Clock-Out.')
+
+                                    CheckAttendanceNotification('Time Out');
                                 }
                                 else { ShowAccessDenied(result.result); }
                             }
@@ -309,6 +374,8 @@
                                 if (result.Status == "SUCCESS") {
                                     GetClockInClockOut();
                                     ShowSuccessMessage('You have successfully Clock-Out.')
+
+                                  
                                 }
                                 else { ShowAccessDenied(result.result); }
                             }
@@ -337,27 +404,7 @@
                     }
                 });
             }
-
-            //$.ajax({
-            //    url: '/Attendance/ClockOut',
-            //    type: "POST",
-            //    data:
-            //    {
-            //        '_id': AttendanceId,
-            //        '_shiftid': ShiftId
-            //    },
-            //    dataType: 'json',
-            //    success: function (result) {
-            //        ShowLoading('HIDE');
-            //        if (result.Status == "SUCCESS") {
-            //            GetClockInClockOut();
-            //            ShowSuccessMessage('You have successfully Clock-Out.')
-            //        }
-            //        else {
-            //            ShowAccessDenied(result.result);
-            //        }
-            //    }
-            //});
+            
         }
         
     });

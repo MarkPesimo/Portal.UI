@@ -3,7 +3,7 @@
         $(".navbar-nav").find(".active").removeClass("active");
         $("#nav-Helpdesk").addClass("active");
         $("#nav-Helpdesk").addClass("bg-primary");
-
+    
         ShowLoading('HIDE');
         BindTable();
     });
@@ -36,9 +36,9 @@
         BindTable();
     });
     
-    $('#helpdesk-main-div').on('click', '#add_concern_btn', function (e) {
+    $(document).on('click', '#add_concern_btn', function (e) {
         e.preventDefault();
-
+        alert('awaweaw');
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",

@@ -287,6 +287,39 @@ namespace Portal.Repository
 
             return _id;
         }
+
+        public string GetAttendanceNotification(DateTime _datelog, string _process)
+        {
+            try
+            {
+                string _notification = string.Empty;
+
+                string _endpoint = "Attendance/GetAttendanceNotification?empId=" +
+                                   _loginuserid.ToString() +
+                                   "&dateLog=" + _datelog.ToString("yyyy-MM-dd") +
+                                   "&process=" + _process;
+
+                //string testDate = "2/25/2026";
+                //string _endpoint = "Attendance/GetAttendanceNotification?empId=" +
+                //                   "17135" +
+                //                   "&dateLog=" + testDate +
+                //                   "&process=" + _process;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _notification = _value.Trim('"');
+                }
+
+                return _notification;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         //------------------------------------------END ATTENDANCE CORRECTION----------------------------------
 
         //------------------------------------------BEGIN DTR----------------------------------
