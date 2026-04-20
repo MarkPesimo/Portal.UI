@@ -87,15 +87,13 @@
     $(document).on('click', '#clock-in-button, #clock-in-button-mob', function () {
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
-
         var _clockin_btn = document.getElementById('clock-in-button').getAttribute("data-clockin-value");
-        
 
         if (_clockin_btn != '') {
             ShowDangerMessage('The system has detected that you have already clocked in. Please verify your time entry.');
             return;
         }
-        
+
         ShowLoading('SHOW');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -103,8 +101,7 @@
                     $.ajax({
                         url: '/Attendance/ClockIn',
                         type: "POST",
-                        data:
-                        {
+                        data: {
                             '_id': AttendanceId,
                             '_shiftid': ShiftId,
                             '_latitude': position.coords.latitude,
@@ -115,7 +112,6 @@
                             ShowLoading('HIDE');
                             if (result.Status == "SUCCESS") {
                                 GetClockInClockOut();
-                                
                                 CheckAttendanceNotification('TIME IN');
                             } else {
                                 ShowAccessDenied(result.result);
@@ -127,8 +123,7 @@
                     $.ajax({
                         url: '/Attendance/ClockIn',
                         type: "POST",
-                        data:
-                        {
+                        data: {
                             '_id': AttendanceId,
                             '_shiftid': ShiftId,
                             '_latitude': 0,
@@ -139,7 +134,7 @@
                             ShowLoading('HIDE');
                             if (result.Status == "SUCCESS") {
                                 GetClockInClockOut();
-                                ShowSuccessMessage('You have successfully Clock-In.')
+                                CheckAttendanceNotification('TIME IN');
                             }
                             else { ShowAccessDenied(result.result); }
                         }
@@ -150,8 +145,7 @@
             $.ajax({
                 url: '/Attendance/ClockIn',
                 type: "POST",
-                data:
-                {
+                data: {
                     '_id': AttendanceId,
                     '_shiftid': ShiftId,
                     '_latitude': 0,
@@ -162,7 +156,7 @@
                     ShowLoading('HIDE');
                     if (result.Status == "SUCCESS") {
                         GetClockInClockOut();
-                        ShowSuccessMessage('You have successfully Clock-In.')
+                        CheckAttendanceNotification('TIME IN');
                     }
                     else { ShowAccessDenied(result.result); }
                 }
@@ -178,80 +172,53 @@
             dataType: 'json',
             success: function (message) {
                 var successText = (processType === 'TIME IN') ? 'You have successfully Clocked-In.' : 'You have successfully Clocked-Out.';
+                var $iconBox = $('.icon-box');
+                var $icon = $iconBox.find('i');
+                
+                var themeColor = '#007bff';
+                var themeBg = '#eef6ff';
+                var iconClass = 'fa-solid fa-calendar-check';
 
                 if (message != null && message != '') {
                     var formattedNotification = message.split(':').map(function (item) {
                         return item.trim();
                     }).join('<br/>');
-                    
+
                     var fullHtmlMessage = '<strong class="text-success">' + successText + '</strong><br/><br/>' + formattedNotification;
                     $('#attendanceNotificationMessage').html(fullHtmlMessage);
 
-                    var $iconBox = $('.icon-box');
-                    var $icon = $iconBox.find('i');
-                    
-                    var themeColor = '#007bff'; 
-                    var themeBg = '#eef6ff';
-                    var iconClass = 'fa-solid fa-calendar-check'; 
-
                     if (message.includes("Holiday")) {
                         var lowerMessage = message.toLowerCase();
-                        
+
                         switch (true) {
-                            case lowerMessage.includes("new year"):
-                                iconClass = 'fa-solid fa-champagne-glasses';
-                                break;
-                            case lowerMessage.includes("christmas"):
-                                iconClass = 'fa-solid fa-mistletoe';
-                                break;
-                            case lowerMessage.includes("labor") || lowerMessage.includes("worker"):
-                                iconClass = 'fa-solid fa-briefcase';
-                                break;
-                            
-                            case lowerMessage.includes("eid") || lowerMessage.includes("al-fitr"):
-                                iconClass = 'fa-solid fa-mosque';
-                                break;
-                            case lowerMessage.includes("maundy") || lowerMessage.includes("good friday") || lowerMessage.includes("easter"):
-                                iconClass = 'fa-solid fa-church';
-                                break;
-                            
-                            case lowerMessage.includes("araw ng kagitingan") || lowerMessage.includes("valor"):
-                                iconClass = 'fa-solid fa-award';
-                                break;
-                            case lowerMessage.includes("independence") || lowerMessage.includes("kalayaan"):
-                                iconClass = 'fa-solid fa-flag';
-                                break;
-                            case lowerMessage.includes("hero") || lowerMessage.includes("rizal") || lowerMessage.includes("bonifacio") || lowerMessage.includes("ninoy"):
-                                iconClass = 'fa-solid fa-monument';
-                                break;
-                            
-                            case lowerMessage.includes("edsa") || lowerMessage.includes("revolution"):
-                                iconClass = 'fa-solid fa-people-group';
-                                break;
-                            case lowerMessage.includes("anniversary") || lowerMessage.includes("foundation"):
-                                iconClass = 'fa-solid fa-cake-candles';
-                                break;
-                            
-                            case lowerMessage.includes("fiesta") || lowerMessage.includes("festival"):
-                                iconClass = 'fa-solid fa-mask';
-                                break;
-                            case lowerMessage.includes("special working") || lowerMessage.includes("additional special"):
-                                iconClass = 'fa-solid fa-clipboard-check'; 
-                                break;
+                            case lowerMessage.includes("new year"): iconClass = 'fa-solid fa-champagne-glasses'; break;
+                            case lowerMessage.includes("christmas"): iconClass = 'fa-solid fa-mistletoe'; break;
+                            case lowerMessage.includes("labor") || lowerMessage.includes("worker"): iconClass = 'fa-solid fa-briefcase'; break;
+                            case lowerMessage.includes("eid") || lowerMessage.includes("al-fitr"): iconClass = 'fa-solid fa-mosque'; break;
+                            case lowerMessage.includes("maundy") || lowerMessage.includes("good friday") || lowerMessage.includes("easter"): iconClass = 'fa-solid fa-church'; break;
+                            case lowerMessage.includes("araw ng kagitingan") || lowerMessage.includes("valor"): iconClass = 'fa-solid fa-award'; break;
+                            case lowerMessage.includes("independence") || lowerMessage.includes("kalayaan"): iconClass = 'fa-solid fa-flag'; break;
+                            case lowerMessage.includes("hero") || lowerMessage.includes("rizal") || lowerMessage.includes("bonifacio") || lowerMessage.includes("ninoy"): iconClass = 'fa-solid fa-monument'; break;
+                            case lowerMessage.includes("edsa") || lowerMessage.includes("revolution"): iconClass = 'fa-solid fa-people-group'; break;
+                            case lowerMessage.includes("anniversary") || lowerMessage.includes("foundation"): iconClass = 'fa-solid fa-cake-candles'; break;
+                            case lowerMessage.includes("fiesta") || lowerMessage.includes("festival"): iconClass = 'fa-solid fa-mask'; break;
+                            case lowerMessage.includes("special working") || lowerMessage.includes("additional special"): iconClass = 'fa-solid fa-clipboard-check'; break;
                         }
-                        
                         $iconBox.css({ 'background': themeBg, 'color': themeColor });
                         $icon.attr('class', iconClass);
-
                     } else {
                         $iconBox.css({ 'background': '#fff4e5', 'color': '#ffa000' });
                         $icon.attr('class', 'fa-solid fa-circle-exclamation');
                     }
-
-                    $('#attendanceNotificationModal').modal('show');
                 } else {
-                    ShowSuccessMessage(successText);
+                    var defaultMessage = '<strong class="text-success">' + successText + '</strong><br/><br/>Have a great day ahead!';
+                    $('#attendanceNotificationMessage').html(defaultMessage);
+                    
+                    $iconBox.css({ 'background': themeBg, 'color': themeColor });
+                    $icon.attr('class', 'fa-solid fa-calendar-check');
                 }
+                
+                $('#attendanceNotificationModal').modal('show');
             }
         });
     }
@@ -289,8 +256,8 @@
         var ShiftId = $(this).attr("shift_id");
 
         ShowLoading('SHOW');
-        if (AttendanceId == 0)          //get clock-in of the previous day
-        {
+        
+        if (AttendanceId == 0) {
             $.ajax({
                 type: "GET",
                 url: '/Attendance/GetPreviousClockIn',
@@ -298,33 +265,32 @@
                 dataType: "json",
                 success: function (response) {
                     ShowLoading('HIDE');
-                    console.log(response);
                     if (response.Status == "SUCCESS") {
-                        document.getElementById("div-label-no-clockin-today").style.visibility = "hidden";
-                        document.getElementById("div-label-with-previous-clockin").style.visibility = "hidden";
-
+                        $("#div-label-no-clockin-today, #div-label-with-previous-clockin, #div-with-previous-clockin")
+                            .addClass("d-none")
+                            .css("visibility", "visible");
 
                         if (response.WithPrevious == true) {
-                            document.getElementById("div-with-previous-clockin").style.visibility = "visible";
-                            document.getElementById("div-label-with-previous-clockin").style.visibility = "visible";
-
-                            document.getElementById('label-date-log').innerHTML = 'Date log : <Strong class="text-primary"> ' + response.result.DateLog + '</strong>';
-                            document.getElementById('label-shift-description').innerHTML = 'Shift Description : <Strong class="text-primary">' + response.result.ShiftDescription + '</strong>';
-                            document.getElementById('label-clock-in').innerHTML = 'Clock In : <Strong class="text-primary">' + response.result.ClockIn + '</strong>';
-                            document.getElementById('label-clock-out').innerHTML = 'Clock Out: <Strong class="text-primary">' + response.result.ClockOut + '</strong>';
-
-                            document.getElementById('clock-out-previous-button').setAttribute('attendance_id', response.result.Id);
-                            document.getElementById('clock-out-previous-button').setAttribute('shift_id', response.result.ShiftId);
+                            $("#div-label-with-previous-clockin").removeClass("d-none");
+                            $("#div-with-previous-clockin").removeClass("d-none");
+                            
+                            $('#label-date-log').text(response.result.DateLog);
+                            $('#label-shift-description').text(response.result.ShiftDescription);
+                            $('#label-clock-in').text(response.result.ClockIn);
+                            $('#label-clock-out').text(response.result.ClockOut || "--:--");
+                            
+                            $('#clock-out-previous-button')
+                                .attr('attendance_id', response.result.Id)
+                                .attr('shift_id', response.result.ShiftId);
                         }
                         else {
-                            document.getElementById("div-with-previous-clockin").style.visibility = "hidden";
-                            document.getElementById("div-label-no-clockin-today").style.visibility = "visible";
+                            $("#div-label-no-clockin-today").removeClass("d-none");
                         }
-
+                        
                         $("#clockin_modal").modal('show');
+                    } else {
+                        ShowAccessDenied(response.result);
                     }
-                    else { ShowAccessDenied(response.result);}
-                    
                 },
                 failure: function (response) { LogError(response); },
                 error: function (response) { LogError(response); }
@@ -337,8 +303,7 @@
                         $.ajax({
                             url: '/Attendance/ClockOut',
                             type: "POST",
-                            data:
-                            {
+                            data: {
                                 '_id': AttendanceId,
                                 '_shiftid': ShiftId,
                                 '_latitude': position.coords.latitude,
@@ -349,11 +314,10 @@
                                 ShowLoading('HIDE');
                                 if (result.Status == "SUCCESS") {
                                     GetClockInClockOut();
-                                    //ShowSuccessMessage('You have successfully Clock-Out.')
-
-                                    CheckAttendanceNotification('Time Out');
+                                    CheckAttendanceNotification('TIME OUT');
+                                } else {
+                                    ShowAccessDenied(result.result);
                                 }
-                                else { ShowAccessDenied(result.result); }
                             }
                         });
                     },
@@ -361,8 +325,7 @@
                         $.ajax({
                             url: '/Attendance/ClockOut',
                             type: "POST",
-                            data:
-                            {
+                            data: {
                                 '_id': AttendanceId,
                                 '_shiftid': ShiftId,
                                 '_latitude': 0,
@@ -373,21 +336,19 @@
                                 ShowLoading('HIDE');
                                 if (result.Status == "SUCCESS") {
                                     GetClockInClockOut();
-                                    ShowSuccessMessage('You have successfully Clock-Out.')
-
-                                  
+                                    CheckAttendanceNotification('TIME OUT');
+                                } else {
+                                    ShowAccessDenied(result.result);
                                 }
-                                else { ShowAccessDenied(result.result); }
                             }
                         });
-                    });
-            }
-            else {
+                    }
+                );
+            } else {
                 $.ajax({
                     url: '/Attendance/ClockOut',
                     type: "POST",
-                    data:
-                    {
+                    data: {
                         '_id': AttendanceId,
                         '_shiftid': ShiftId,
                         '_latitude': 0,
@@ -398,15 +359,14 @@
                         ShowLoading('HIDE');
                         if (result.Status == "SUCCESS") {
                             GetClockInClockOut();
-                            ShowSuccessMessage('You have successfully Clock-Out.')
+                            CheckAttendanceNotification('TIME OUT');
+                        } else {
+                            ShowAccessDenied(result.result);
                         }
-                        else { ShowAccessDenied(result.result); }
                     }
                 });
             }
-            
         }
-        
     });
 
 

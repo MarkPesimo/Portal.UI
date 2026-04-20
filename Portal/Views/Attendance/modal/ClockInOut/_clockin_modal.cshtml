@@ -1,54 +1,54 @@
-﻿
-<div class="modal fade" id="clockin_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header Zips-modal-header">
-                <h1 class="modal-title fs-5" id="jobOrderLabel">Previous Clock in record</h1>
+﻿<div class="modal fade" id="clockin_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark fw-bold" id="jobOrderLabel">
+                    <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Previous Clock in record
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body">
-                <div class="row" id="div-label-no-clockin-today" style="visibility:hidden">
-                    <p class="text-primary" id="label-no-clockin-today"><strong>The system detects that you don't have any existing clock-ins for today.</strong></p>
+            <div class="modal-body p-4">
+                <div id="div-label-no-clockin-today" class="d-none text-center py-3">
+                    <p class="text-danger fw-bold">The system detects that you don't have any existing clock-ins for today.</p>
                 </div>
 
-                <div class="row" id="div-label-with-previous-clockin" style="visibility:hidden">
-                    <p class="text-primary" id="label-with-previous-clockin"><strong>The system detects that you have no existing clock-ins for today. Would you like to update yesterday's clock out?</strong></p>
-                </div>
-                
-                <hr />
+                <div id="div-label-with-previous-clockin" class="d-none">
+                    <p class="text-danger fw-bold mb-3">The system detects that you have no existing clock-ins for today. Would you like to update yesterday's clock out?</p>
 
-                <div class="row" id="div-with-previous-clockin" style="visibility:hidden">
-                    
-                    <div class="col-16 mb-3">
-                        <label id="label-date-log"  for="" class="form-label">Date log : </label>
-                    </div>
+                    <hr />
 
-                    <div class="col-12 mb-3">
-                        <label id="label-shift-description" for="" class="form-label">Shift Description : </label>
-                    </div>
+                    <div id="div-with-previous-clockin" class="bg-light p-3 rounded border">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label d-block mb-1 text-muted small uppercase">Date log</label>
+                                <strong id="label-date-log" class="text-dark fs-5"></strong>
+                            </div>
 
-                    <div class="col-6 mb-3">
-                        <label id="label-clock-in" for="" class="form-label">Clock In : </label>
-                    </div>
+                            <div class="col-12">
+                                <label class="form-label d-block mb-1 text-muted small uppercase">Shift Description</label>
+                                <strong id="label-shift-description" class="text-dark"></strong>
+                            </div>
 
-                    <div class="col-6 mb-3">
-                        <label id="label-clock-out" for="" class="form-label">Clock Out : </label>
-                    </div>
+                            <div class="col-6">
+                                <label class="form-label d-block mb-1 text-muted small uppercase">Clock In</label>
+                                <strong id="label-clock-in" class="text-success"></strong>
+                            </div>
 
-                    <div class="col-12 mt-3 mb-3">
-                        <button type="button" attendance_id="0" shift_id="0" class="btn btn-primary" id="clock-out-previous-button">
-                            <i class="fa-regular fa-clock"></i> Update Clock Out
-                        </button>
+                            <div class="col-6">
+                                <label class="form-label d-block mb-1 text-muted small uppercase">Clock Out</label>
+                                <strong id="label-clock-out" class="text-muted">--:--</strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="button" attendance_id="0" shift_id="0" class="btn btn-danger w-100 py-2 fw-bold" id="clock-out-previous-button">
+                                <i class="fa-regular fa-clock me-2"></i> Update Clock Out
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            @*<div class="modal-footer">
-                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-            </div>*@
         </div>
     </div>
 </div>
-
-
