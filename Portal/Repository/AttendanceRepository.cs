@@ -505,5 +505,90 @@ namespace Portal.Repository
 
             return _id;
         }
+
+        public List<AttendanceList_model> GetPortalAttendanceList(DateTime _datefrom, DateTime _dateto)
+        {
+            try
+            {
+                List<AttendanceList_model> _obj = new List<AttendanceList_model>();
+                
+                string _endpoint = "Attendance/GetPortalAttendanceList/" + _loginuserid.ToString() + "/" +
+                                    _datefrom.ToShortDateString().Replace("/", "-") + "/" +
+                                    _dateto.ToShortDateString().Replace("/", "-");
+                
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<List<AttendanceList_model>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public int ManageShiftDepartment(AttendanceUpdateModel _model)
+        {
+            int _status = 0;
+            string _endpoint = "Attendance/ManageShiftDepartment";
+            
+            string _body_content = JsonConvert.SerializeObject(_model);
+            HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
+            
+            HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
+
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result;
+                
+                var _jsonResult = JsonConvert.DeserializeObject<dynamic>(_value);
+
+                if (_jsonResult != null)
+                {
+                    _status = (int)_jsonResult;
+                }
+            }
+
+            return _status;
+        }
+
+        public List<ShiftList_model> GetShiftList(int _clientid)
+        {
+            List<ShiftList_model> _list = new List<ShiftList_model>();
+            string _endpoint = "Attendance/GetShiftList?_clientid=" + _clientid;
+            
+            HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result;
+                
+                _list = JsonConvert.DeserializeObject<List<ShiftList_model>>(_value);
+            }
+
+            return _list;
+        }
+
+        public List<DepartmentList_model> GetDepartmentList(int _clientid)
+        {
+            List<DepartmentList_model> _list = new List<DepartmentList_model>();
+            string _endpoint = "Attendance/GetDepartmentList?_clientid=" + _clientid;
+            
+            HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+            if (_response.IsSuccessStatusCode)
+            {
+                var _value = _response.Content.ReadAsStringAsync().Result;
+                
+                _list = JsonConvert.DeserializeObject<List<DepartmentList_model>>(_value);
+            }
+
+            return _list;
+        }
     }
 }

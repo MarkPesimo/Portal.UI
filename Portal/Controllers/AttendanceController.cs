@@ -31,6 +31,7 @@ namespace Portal.Controllers
         private string _ClockInOut = "~/Views/Attendance/ClockInOut.cshtml";
         private string _Correction = "~/Views/Attendance/Correction.cshtml";
         private string _DTR = "~/Views/Attendance/DTR.cshtml";
+        private string _shiftdepartment = "~/Views/Attendance/ShiftDepartmentManagement.cshtml";
 
         public AttendanceController()
         {
@@ -77,6 +78,58 @@ namespace Portal.Controllers
             return View(_DTR); 
         }
 
+        public ActionResult ShiftDepartmentManagement()
+        {
+            if (!_globalrepository.HasClientAccess(_client_id, "SHIFTDEPARTMENT MANAGEMENT")) { return View("AccessDenied"); }
+            return View(_shiftdepartment);
+
+   
+        }
+
+        [HttpGet]
+        public JsonResult GetAttendanceData(DateTime _fromdate, DateTime _todate)
+        {
+            try
+            {
+                var _obj = _attendancerepository.GetPortalAttendanceList(_fromdate, _todate);
+                return Json(_obj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetShiftListJson()
+        {
+            var list = _attendancerepository.GetShiftList(_client_id);
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetDepartmentListJson()
+        {
+            var list = _attendancerepository.GetDepartmentList(_client_id);
+            return Json(list, JsonRequestBehavior.AllowGet);
+
+        }
+        [HttpPost]
+        public JsonResult ManageShiftDepartmentUI(AttendanceUpdateModel model)
+        {
+            try
+            {
+                model.UserId = _loginuserid;
+                
+                int status = _attendancerepository.ManageShiftDepartment(model);
+                
+                return Json(status, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(0, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         //---------------------------------BEGIN CLOCK IN & OUT----------------------------------
         public ActionResult GetClockInClockOutList(DateTime _fromdate, DateTime _todate)

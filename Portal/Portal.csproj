@@ -461,6 +461,7 @@
     <Content Include="Scripts\Attendance\ClockInOut.js" />
     <Content Include="Scripts\Attendance\Correction.js" />
     <Content Include="Scripts\Attendance\DTR.js" />
+    <Content Include="Scripts\Attendance\ShiftDepartmentManagement.js" />
     <Content Include="Scripts\Document\COE.js" />
     <Content Include="Scripts\Document\RequiredDocument.js" />
     <Content Include="Scripts\Helpdesk\Comment.js" />
@@ -684,6 +685,7 @@
     <Content Include="Views\Error\NotImplemented.cshtml" />
     <Content Include="Views\Error\ServerUnavailable.cshtml" />
     <Content Include="Views\Error\ServerBusyOrDown.cshtml" />
+    <Content Include="Views\Attendance\ShiftDepartmentManagement.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

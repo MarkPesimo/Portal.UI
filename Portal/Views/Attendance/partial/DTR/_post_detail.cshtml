@@ -46,6 +46,8 @@
                         <th>Time In</th>
                         <th>Time Out</th>
                         <th>Reg. hrs</th>
+                        <th>Department</th>
+                        <th>Late/Minute</th>
                         <th>Correction</th>
                         <th>Status</th>
                         <th>Log Entry</th>
@@ -69,6 +71,14 @@
                                 <td style="color: @a.LateColor">@a.TimeIn</td>
                                 <td style="color: @a.UndertimeColor">@a.TimeOut</td>
                                 <td>@a.WorkHours</td>
+
+                                <td>@a.DepartmentDescription</td>
+
+                                <td>
+                                    <span class="text-danger">@a.LateMinute</span> /
+                                    <span class="text-warning">@a.UndertimeMinute</span>
+                                </td>
+
                                 <td>@a.HasCorrection</td>
                                 <td>
                                     <span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@a.Status</span>
@@ -76,7 +86,6 @@
                                 <td>
                                     @a.AttendanceLogType
                                 </td>
-
                             </tr>
                         }
                     }
