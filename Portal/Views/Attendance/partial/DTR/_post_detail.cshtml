@@ -37,9 +37,13 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            @{ decimal _total_regular_hours = 0; }
-            <table class="table table-sm table-striped table-hover align-middle mb-0">
-                <thead>
+            @{
+                decimal _total_regular_hours = 0;
+                int _total_late_minutes = 0;
+                int _total_undertime_minutes = 0;
+            }
+            <table class="table table-sm table-striped table-hover align-middle mb-0" style="font-size: 0.75rem;">
+                <thead class="table-dark">
                     <tr class="text-center">
                         <th>Date Log</th>
                         <th>Schedule</th>
@@ -47,7 +51,7 @@
                         <th>Time Out</th>
                         <th>Reg. hrs</th>
                         <th>Department</th>
-                        <th>Late/Minute</th>
+                        <th>Late/Under</th>
                         <th>Correction</th>
                         <th>Status</th>
                         <th>Log Entry</th>
@@ -59,6 +63,9 @@
                         foreach (var a in Model.Attendance)
                         {
                             _total_regular_hours += a.WorkHours;
+                            _total_late_minutes += (int)a.LateMinute;
+                            _total_undertime_minutes += (int)a.UndertimeMinute;
+
                             string _status_color = "#959A97";
                             string _text_color = "white";
 
@@ -66,37 +73,49 @@
                             else if (a.Status == "Approved") { _status_color = "#198754"; }
 
                             <tr class="text-center">
-                                <td>@a.DateLog</td>
-                                <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")"> @a.WorkSchedule </td>
+                                <td class="text-nowrap">@a.DateLog</td>
+                                <td style="color: @a.LateColor" class="@(a.WorkSchedule == "Absent" ? "text-danger fw-bold" : "")">@a.WorkSchedule</td>
                                 <td style="color: @a.LateColor">@a.TimeIn</td>
                                 <td style="color: @a.UndertimeColor">@a.TimeOut</td>
-                                <td>@a.WorkHours</td>
-
+                                <td class="fw-bold">@a.WorkHours.ToString("N0")</td>
                                 <td>@a.DepartmentDescription</td>
-
                                 <td>
-                                    <span class="text-danger">@a.LateMinute</span> /
-                                    <span class="text-warning">@a.UndertimeMinute</span>
+                                    <span class="@(a.LateMinute > 0 ? "text-danger fw-bold" : "text-muted")">
+                                        @(((int)a.LateMinute).ToString("N0"))
+                                    </span>
+                                    <span class="text-muted">/</span>
+                                    <span class="@(a.UndertimeMinute > 0 ? "text-danger fw-bold" : "text-muted")">
+                                        @(((int)a.UndertimeMinute).ToString("N0"))
+                                    </span>
                                 </td>
-
                                 <td>@a.HasCorrection</td>
                                 <td>
-                                    <span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@a.Status</span>
+                                    <span class="badge rounded-pill px-2" style="background:@_status_color; color: @_text_color; font-size: 0.65rem;">@a.Status</span>
                                 </td>
-                                <td>
-                                    @a.AttendanceLogType
-                                </td>
+                                <td>@a.AttendanceLogType</td>
                             </tr>
                         }
                     }
                 </tbody>
+                <tfoot class="table-light fw-bold text-center">
+                    <tr>
+                        <td colspan="4" class="text-end">Total:</td>
+                        <td class="text-primary">@_total_regular_hours.ToString("N0")</td>
+                        <td></td>
+                        <td>
+                            <span class="text-danger">@_total_late_minutes.ToString("N0")</span> /
+                            <span class="text-danger">@_total_undertime_minutes.ToString("N0")</span>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
 
-    <div class="card-footer bg-light border-0 py-2 text-end">
+    @*<div class="card-footer bg-light border-0 py-2 text-end">
         <span class="text-muted small me-2">Total Regular Hours:</span> <span class="fw-bold text-dark">@_total_regular_hours</span>
-    </div>
+    </div>*@
 </div>
 
 <div class="card shadow-sm mb-4 border-0">
@@ -106,9 +125,9 @@
     <div class="card-body p-0">
         <div class="table-responsive">
             @{ decimal _total_othour = 0; }
-            <table class="table table-sm table-striped table-hover align-middle mb-0 uniform-table">
-                <thead>
-                    <tr>
+            <table class="table table-sm table-striped table-hover align-middle mb-0 uniform-table" style="font-size: 0.75rem;">
+                <thead class="table-dark">
+                    <tr class="text-center">
                         <th>Date</th>
                         <th>Start</th>
                         <th>End</th>
@@ -129,24 +148,35 @@
                             if (ot.Status == "Posted") { _status_color = "#ffc107"; _text_color = "black"; }
                             else if (ot.Status == "Approved") { _status_color = "#198754"; }
 
-                            <tr>
-                                <td>@ot.Date</td>
+                            <tr class="text-center">
+                                <td class="text-nowrap">@ot.Date</td>
                                 <td>@ot.Start</td>
                                 <td>@ot.End</td>
-                                <td class="fw-bold">@ot.TotalHours</td>
-                                <td class="reason-col small text-muted">@ot.Reason</td>
-                                <td><span class="badge rounded-pill px-3" style="background:@_status_color; color: @_text_color">@ot.Status</span></td>
+                                <td class="fw-bold">@ot.TotalHours.ToString("N0")</td>
+                                <td class="reason-col text-start text-muted" style="max-width: 200px; word-break: break-word;">@ot.Reason</td>
+                                <td>
+                                    <span class="badge rounded-pill px-2" style="background:@_status_color; color: @_text_color; font-size: 0.65rem;">
+                                        @ot.Status
+                                    </span>
+                                </td>
                             </tr>
                         }
                     }
                 </tbody>
+                <tfoot class="table-light fw-bold text-center">
+                    <tr>
+                        <td colspan="3" class="text-end">Total OT Hours:</td>
+                        <td class="text-primary">@_total_othour.ToString("N0")</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
 
-    <div class="card-footer bg-light border-0 py-2 text-end">
+    @*<div class="card-footer bg-light border-0 py-2 text-end">
         <span class="text-muted small me-2">Total OT Hours:</span> <span class="fw-bold text-dark">@_total_othour</span>
-    </div>
+    </div>*@
 </div>
 
 <div class="card shadow-sm border-0">
