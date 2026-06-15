@@ -686,6 +686,8 @@
     <Content Include="Views\Error\ServerUnavailable.cshtml" />
     <Content Include="Views\Error\ServerBusyOrDown.cshtml" />
     <Content Include="Views\Attendance\ShiftDepartmentManagement.cshtml" />
+    <Content Include="Views\Attendance\partial\DTR\_preview_attached_dtr_detail.cshtml" />
+    <Content Include="Views\Shared\_leave_instruction.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

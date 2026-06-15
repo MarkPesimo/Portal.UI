@@ -148,7 +148,6 @@ namespace Portal.Repository
             catch (Exception) { throw; }
         }
 
-
         public ComputeLeaveDays_model GetComputedFiledLeaveDays(DateTime d1, DateTime d2, bool isFirstDayHalf, bool isLastDayHalf)
         {
             try
@@ -168,6 +167,30 @@ namespace Portal.Repository
                 return _obj;
             }
             catch (Exception) { throw; }
+        }
+
+        public List<LeaveModel> GetFiledLeave(int _empId, string _leaveDate)
+        {
+            try
+            {
+                List<LeaveModel> _obj = new List<LeaveModel>();
+                
+                string _endpoint = "Leave/GetFiledLeave/" + _empId + "/" + _leaveDate;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<List<LeaveModel>>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

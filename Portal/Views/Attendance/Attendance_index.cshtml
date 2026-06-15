@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Attendance";
 }
 
@@ -7,81 +6,112 @@
     <script src="~/Scripts/Attendance/Attendance.js"></script>
 }
 
-    <section class="main">
-        <div class="main-title py-3">
-            <div class="container-fluid">
-                <div class="row justify-content-between align-items-center">
-                    <div class="col-lg-auto text-center text-lg-start mb-lg-0">
-                        <h1 class="h4 mt-2 mb-lg-0">Attendance</h1>
-
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Attendance</li>
-                            </ol>
-                        </nav>
-                    </div>
+<section class="main">
+    <div class="main-title py-3">
+        <div class="container-fluid">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-auto text-center text-lg-start mb-lg-0">
+                    <h1 class="h4 mt-2 mb-lg-0">Attendance</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Attendance</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="main-content py-3">
+        <div class="container-fluid">
+            <div class="row">
 
-        <div class="main-content py-3">
-            <div class="container-fluid">
-                <div class="row">
-
-                    <div class="col-lg-4 mb-3">
-                        <a href="@Url.Action("ClockInOut", "Attendance")" class="d-block w-100 widget text-center">
-                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                                <i class="fa-regular fa-clock"></i>
-                            </span>
-                            <h3 class="text-primary">Clock In & Out</h3>
-                            <p class="text-muted mb-0">View Clock in & out list</p>
-                        </a>
-                    </div>
-
-                    <div class="col-lg-4 mb-3">
-                        <a href="@Url.Action("Correction", "Attendance")" class="d-block w-100 widget text-center">
-                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                                <i class="fa-solid fa-clock-rotate-left"></i>
-                            </span>
-                            <h3 class="text-primary">Attendance Correction</h3>
-                            <p class="text-muted mb-0">File Clock in & Out Correction</p>
-                        </a>
-                    </div>
-
-                    <div class="col-lg-4 mb-3">
-                        <a href="@Url.Action("DTR", "Attendance")" class="d-block w-100 widget text-center">
-                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                                <i class="fa-solid fa-calendar-check"></i>
-                            </span>
-                            <h3 class="text-primary">Daily Time Record</h3>
-                            <p class="text-muted mb-0">Submit cut-off attendance to your superior</p>
-                        </a>
-                    </div>
-
-                    <div class="col-lg-4 mb-3">
-                        <a href="@Url.Action("ShiftDepartmentManagement", "Attendance")" class="d-block w-100 widget text-center">
-                            <span class="display-6 bg-body py-2 p-3 rounded d-inline-block mb-3">
-                                <i class="fa-solid fa-users-gear"></i>
-                            </span>
-                            <h3 class="text-primary">Shift & Department</h3>
-                            <p class="text-muted mb-0">Manage employee shift assignments and department settings</p>
-                        </a>
-                    </div>
-
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="@Url.Action("ClockInOut", "Attendance")" class="card card-widget border-0 shadow-sm p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mb-3">
+                                <i class="fa-regular fa-clock fs-2 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark fs-5 text-nowrap">Clock In & Out</h5>
+                            <p class="card-text text-muted text-nowrap">View Clock in & out list</p>
+                        </div>
+                    </a>
                 </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="@Url.Action("Correction", "Attendance")" class="card card-widget border-0 shadow-sm p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mb-3">
+                                <i class="fa-solid fa-clock-rotate-left fs-2 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark fs-5 text-nowrap">Attendance Correction</h5>
+                            <p class="card-text text-muted text-nowrap">File Clock in & Out Correction</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="@Url.Action("DTR", "Attendance")" class="card card-widget border-0 shadow-sm p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mb-3">
+                                <i class="fa-solid fa-calendar-check fs-2 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark fs-5 text-nowrap">Daily Time Record</h5>
+                            <p class="card-text text-muted text-nowrap">Submit cut-off attendance to your superior</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="@Url.Action("ShiftDepartmentManagement", "Attendance")" class="card card-widget border-0 shadow-sm p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mb-3">
+                                <i class="fa-solid fa-users-gear fs-2 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark fs-5 text-nowrap">Shift & Department</h5>
+                            <p class="card-text text-muted text-nowrap">Manage shift assignments and department settings</p>
+                        </div>
+                    </a>
+                </div>
+
             </div>
         </div>
+    </div>
 
-        <footer class="footer py-3 bg-light border-top fixed-bottom">
-            <div class="container-fluid text-center">
-                <span class="text-muted small">
-                    Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a> |
-                    <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
-                    <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
-                </span>
-            </div>
-        </footer>
-    </section>
+    <footer class="footer py-3 bg-light border-top fixed-bottom">
+        <div class="container-fluid text-center">
+            <span class="text-muted small">
+                Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a> |
+                <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
+                <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
+            </span>
+        </div>
+    </footer>
+</section>
 
+<style>
+    .card-widget {
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+        color: inherit;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+        .card-widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important;
+        }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        background-color: #f8f9fa;
+        border-radius: 50%;
+    }
+</style>

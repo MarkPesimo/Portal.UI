@@ -97,8 +97,7 @@ namespace Portal.Controllers
                 return Json(new { Status = "ERROR", Msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-
-        //---------------------------------------BEGIN ADD POST LEAVE---------------------------------------
+        
         [HttpGet]
         public ActionResult _AddPostLeave(DateTime _datelog)
         {
@@ -191,10 +190,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-
-        //---------------------------------------END ADD LEAVE---------------------------------------
-
-        //---------------------------------------BEGIN ADD LEAVE---------------------------------------
+        
         [HttpGet]
         public ActionResult _AddLeave()
         {
@@ -213,9 +209,7 @@ namespace Portal.Controllers
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
             return PartialView("~/Views/Leave/Partial/_leave_detail.cshtml", _model);
         }
-        //---------------------------------------END ADD LEAVE---------------------------------------
 
-        //---------------------------------------BEGIN EDIT LEAVE---------------------------------------
         [HttpGet]
         public ActionResult _EditLeave(int _id)
         {
@@ -226,9 +220,22 @@ namespace Portal.Controllers
             ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
             return PartialView("~/Views/Leave/Partial/_edit_leave_detail.cshtml", _obj);
         }
-        //---------------------------------------END EDIT LEAVE---------------------------------------
 
-        //---------------------------------------BEGIN POST LEAVE---------------------------------------
+        [HttpGet]
+        public JsonResult GetFiledLeave(string leaveDate)
+        {
+            try
+            {
+                var result = _leaverepository.GetFiledLeave(_loginuserid, leaveDate);
+
+                return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpGet]
         public ActionResult _PostLeave(int _id)
         {
@@ -237,9 +244,7 @@ namespace Portal.Controllers
             _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_post_detail.cshtml", _obj);
         }
-        //---------------------------------------END POST LEAVE---------------------------------------
 
-        //---------------------------------------BEGIN UNPOST LEAVE---------------------------------------
         [HttpGet]
         public ActionResult _UnpostLeave(int _id)
         {
@@ -252,9 +257,7 @@ namespace Portal.Controllers
             _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_unpost_detail.cshtml", _obj);
         }
-        //---------------------------------------END UNPOST LEAVE---------------------------------------
 
-        //---------------------------------------BEGIN CANCEL LEAVE---------------------------------------
         [HttpGet]
         public ActionResult _CancelLeave(int _id)
         {
@@ -263,8 +266,6 @@ namespace Portal.Controllers
             _obj.UserId = 112;
             return PartialView("~/Views/Leave/Partial/_cancel_detail.cshtml", _obj);
         }
-        //---------------------------------------END CANCEL LEAVE---------------------------------------
-
 
         [HttpPost]
         public ActionResult _ManageLeave(LeaveModel _model)
@@ -571,18 +572,22 @@ namespace Portal.Controllers
 
 
                 _id = _leaverepository.ManageLeave(_model);
-                //update table for the file extension 
-
-                //check if candidate id folder already exist, if not create a folder
-                //string _check_foloder = Path.Combine(Server.MapPath("~/LeaveAttachments/Filing/" + _id.ToString()), "");
-                //if (Directory.Exists(_check_foloder) == false) { Directory.CreateDirectory(_check_foloder); }
-
-
-                var path = Path.Combine(Server.MapPath("~/LeaveAttachments/Filing/" + _id.ToString() + _fileextension));
-
-                if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
-
-                Leave_Attachment.SaveAs(path);
+                
+                string networkFolder = @"\\192.168.20.23\apw system\Portal\LeaveAttachments\Filing";
+                string fileName = _id.ToString() + _fileextension;
+                string fullPath = Path.Combine(networkFolder, fileName);
+                
+                if (!Directory.Exists(networkFolder))
+                {
+                    Directory.CreateDirectory(networkFolder);
+                }
+                
+                if (System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                }
+                
+                Leave_Attachment.SaveAs(fullPath);
                 //attached procedure ends here------------------------------------------------------------------------------
 
                 return Json(new { Result = "Success" });

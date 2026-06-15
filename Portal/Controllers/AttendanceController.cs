@@ -131,7 +131,13 @@ namespace Portal.Controllers
             }
         }
 
-        //---------------------------------BEGIN CLOCK IN & OUT----------------------------------
+        [HttpGet]
+        public ActionResult _PreviewAttachedDTR(string _guid)
+        {
+            string _filename = _guid;
+            return PartialView("~/Views/Attendance/Partial/DTR/_preview_attached_dtr_detail.cshtml", _filename);
+        }
+        
         public ActionResult GetClockInClockOutList(DateTime _fromdate, DateTime _todate)
         {
             try
@@ -257,9 +263,7 @@ namespace Portal.Controllers
                 return Json("Error: " + ex.Message, JsonRequestBehavior.AllowGet);
             }
         }
-        //---------------------------------END CLOCK IN & OUT----------------------------------
 
-        //=======================================BEGIN ATTENDANCE CORRECTION==============================
         [HttpGet]
         public ActionResult GetAttendanceCorrectionList(DateTime _fromdate, DateTime _todate, string _status)
         {
@@ -287,8 +291,7 @@ namespace Portal.Controllers
                 throw;
             }
         }
-
-        //---------------------------------------BEGIN ADD POST ATTENDANCE CORRECTION---------------------------------------
+        
         [HttpGet]
         public ActionResult _AddPostCorrection(DateTime _datelog)
         {
@@ -351,10 +354,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END ADD POST  ATTENDANCE CORRECTION---------------------------------------
 
-
-        //---------------------------------------BEGIN ADD ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]
         public ActionResult _AddCorrection()
         {
@@ -418,9 +418,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END ADD ATTENDANCE CORRECTION---------------------------------------
 
-        //---------------------------------------BEGIN EDIT ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]
         public ActionResult _EditCorrection(int _id)
         {
@@ -471,9 +469,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END EDIT ATTENDANCE CORRECTION---------------------------------------
 
-        //---------------------------------------BEGIN POST ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]
         public ActionResult _PostCorrection(int _id)
         {
@@ -609,7 +605,6 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END POST ATTENDANCE CORRECTION---------------------------------------
 
         [HttpGet]
         public ActionResult _PreviewCorrection(string _guid)
@@ -632,8 +627,7 @@ namespace Portal.Controllers
             }
             else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
-
-        //---------------------------------------BEGIN UNPOST ATTENDANCE CORRECTION---------------------------------------
+        
         [HttpGet]
         public ActionResult _UnpostCorrection(int _id)
         {
@@ -661,9 +655,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END UNPOST ATTENDANCE CORRECTION---------------------------------------
 
-        //---------------------------------------BEGIN CANCEL ATTENDANCE CORRECTION---------------------------------------
         [HttpGet]
         public ActionResult _CancelCorrection(int _id)
         {
@@ -696,11 +688,7 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END CANCEL ATTENDANCE CORRECTION---------------------------------------
-        //=======================================END ATTENDANCE CORRECTION==============================
 
-
-        //=======================================BEGIN DTR==============================
         [HttpGet]
         public ActionResult GetDTRList(DateTime _fromdate, DateTime _todate, string _status)
         {
@@ -728,14 +716,7 @@ namespace Portal.Controllers
                 throw;
             }
         }
-
-        //[HttpGet]
-        //public ActionResult GetDTRDetails(int _id)
-        //{
-        //    List<APWModel.ViewModel.Portal.DTR_model.DTRDetail_model> _obj = _attendancerepository.GetDTRDetails(_id);
-        //    return PartialView("~/Views/Attendance/Partial/DTR/_post_dtr_detail.cshtml", _obj);
-        //}
-
+        
         [HttpGet]
         public ActionResult GetDTRDetails(int _id)
         {
@@ -749,8 +730,7 @@ namespace Portal.Controllers
                 throw;
             }
         }
-
-        //---------------------------------------BEGIN ADD DTR---------------------------------------
+        
         [HttpGet]
         public ActionResult _AddDTR()
         {
@@ -772,9 +752,7 @@ namespace Portal.Controllers
             
             return PartialView("~/Views/Attendance/Partial/DTR/_dtr_detail.cshtml", _model);
         }
-        //---------------------------------------END ADD DTR---------------------------------------
 
-        //---------------------------------------BEGIN EDIT DTR---------------------------------------
         [HttpGet]
         public ActionResult _EditDTR(int _id)
         {
@@ -785,9 +763,7 @@ namespace Portal.Controllers
             _obj.Mode = 1;
             return PartialView("~/Views/Attendance/Partial/DTR/_dtr_detail.cshtml", _obj);
         }
-        //---------------------------------------END EDIT DTR---------------------------------------
 
-        //---------------------------------------BEGIN POST DTR---------------------------------------
         [HttpGet]
         public ActionResult _PostDTR(int _id)
         {
@@ -800,10 +776,7 @@ namespace Portal.Controllers
 
             return PartialView("~/Views/Attendance/Partial/DTR/_post_detail.cshtml", _postDetails);
         }
-
-        //---------------------------------------END POST DTR---------------------------------------
-
-        //---------------------------------------BEGIN UNPOST DTR---------------------------------------
+        
         [HttpGet]
         public ActionResult _UnpostDTR(int _id)
         {
@@ -812,9 +785,7 @@ namespace Portal.Controllers
             _obj.Mode = 4;
             return PartialView("~/Views/Attendance/Partial/DTR/_unpost_detail.cshtml", _obj);
         }
-        //---------------------------------------END UNPOST DTR---------------------------------------
 
-        //---------------------------------------BEGIN CANCEL DTR---------------------------------------
         [HttpGet]
         public ActionResult _CancelDTR(int _id)
         {
@@ -823,7 +794,6 @@ namespace Portal.Controllers
             _obj.Mode = 2;
             return PartialView("~/Views/Attendance/Partial/DTR/_cancel_detail.cshtml", _obj);
         }
-        //---------------------------------------END CANCEL DTR---------------------------------------
 
         [HttpPost]
         public ActionResult _ManageDTR(DTRmodel _model)
@@ -1047,7 +1017,6 @@ namespace Portal.Controllers
             string _filename = _guid;
             return PartialView("~/Views/Attendance/Partial/DTR/_preview_approved_dtr_detail.cshtml", _filename);
         }
-        //=======================================END DTR==============================
 
         [HttpGet]
         public ActionResult _PreviewDTRSummary(string _guid)

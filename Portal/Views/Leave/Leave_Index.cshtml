@@ -24,23 +24,23 @@
     }
 
     .stat-value {
-        font-size: 1.05rem; 
+        font-size: 1.05rem;
         font-weight: 700;
         display: inline-block;
     }
 
     .icon-side-label {
-        font-size: 0.55rem; 
+        font-size: 0.55rem;
         font-weight: 900;
         text-transform: uppercase;
-        margin-top: 8px; 
+        margin-top: 8px;
         line-height: 1;
         letter-spacing: 0.3px;
     }
 
     #leave-table {
         border-collapse: separate !important;
-        border-spacing: 0 10px !important; 
+        border-spacing: 0 10px !important;
         width: 100% !important;
     }
 
@@ -85,12 +85,12 @@
             width: 100%;
             display: flex;
             gap: 10px;
-            justify-content: center; 
+            justify-content: center;
         }
 
         .main-title .btn {
             flex: 1;
-            max-width: 200px; 
+            max-width: 200px;
             margin-left: 0 !important;
             display: flex;
             align-items: center;
@@ -213,7 +213,7 @@
         }
     }
 
-    @@media screen and (max-width: 991px) {
+    @@media screen personalize (max-width: 991px) {
         .dataTables_length,
         .dataTables_filter {
             width: 100% !important;
@@ -286,6 +286,57 @@
         font-weight: 700;
     }
 
+    .modern-side-strip {
+        width: 6px !important;
+        align-self: stretch;
+    }
+
+    .modern-icon-container {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .leave-modern-bg {
+        background-color: #f8f9fa;
+        color: #495057;
+        border: 1px solid #e9ecef;
+    }
+
+    @@media screen and (max-width: 991px) {
+        .widget-card .d-flex.justify-content-between.align-items-start {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .widget-card .d-flex.gap-4 {
+            gap: 12px !important;
+            flex-wrap: wrap;
+        }
+
+        .widget-card .text-end {
+            text-align: left !important;
+        }
+
+        .modern-side-strip {
+            width: 6px !important;
+            height: auto !important;
+            align-self: stretch;
+            min-height: 100%;
+        }
+
+        .footer-divider {
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+        }
+    }
 </style>
 
 @section Scripts{
@@ -309,7 +360,7 @@
                     <button type="button" class="btn btn-sm btn-dark px-3 rounded shadow-sm" id="show_leave_filter_btn">
                         <i class="fa-solid fa-sliders me-1"></i> Filter Records
                     </button>
-                    <button type="button" class="btn btn-sm btn-danger px-3 rounded shadow-sm" id="file_leave_btn">
+                    <button type="button" class="btn btn-sm btn-primary rounded px-3" id="file_leave_btn">
                         <i class="fa-solid fa-plus me-1"></i> File Leave
                     </button>
                 </div>
@@ -335,32 +386,33 @@
                     <div class="col-lg-6">
                         <div class="card widget-card h-100">
                             <div class="card-body p-0">
-                                <div class="row g-0">
-                                    <div class="col-auto bg-maroon p-3 d-flex flex-column align-items-center justify-content-center text-white" style="width: 100px;">
-                                        <div class="icon-box mb-2">
-                                            <i class="fa-solid fa-house-chimney-medical fa-xl"></i>
-                                        </div>
-                                        <div class="fw-bold" style="font-size: 0.6rem; text-align:center;">SICK LEAVE</div>
-                                    </div>
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-auto bg-secondary modern-side-strip" style="height: 105px;"></div>
                                     <div class="col p-3">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="modern-icon-container leave-modern-bg me-2">
+                                                <i class="fa-solid fa-house-chimney-medical fa-lg"></i>
+                                            </div>
+                                            <div class="fw-bold text-primary small text-uppercase tracking-wider" style="font-size: 0.75rem;">Sick Leave</div>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div class="d-flex gap-4">
                                                 <div>
-                                                    <div class="stat-label">Earned</div>
-                                                    <div class="stat-value text-maroon" id="label-sl-earned"></div>
+                                                    @*<div class="stat-label">Earned</div>*@
+                                                    <div class="stat-value text-dark" id="label-sl-earned"></div>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-label">Used</div>
+                                                    @*<div class="stat-label">Used</div>*@
                                                     <div class="stat-value text-dark" id="label-sl-used"></div>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-label">Balance</div>
-                                                    <div class="stat-value text-success" id="label-sl-balance"></div>
+                                                    @*<div class="stat-label">Balance</div>*@
+                                                    <div class="stat-value text-dark" id="label-sl-balance"></div>
                                                 </div>
                                             </div>
                                             <div class="text-end">
-                                                <div class="stat-label">Total Entitlement</div>
-                                                <span class="badge bg-maroon entitled-badge" id="label-sl-entitled"></span>
+                                                @*<div class="stat-label">Total Entitlement</div>*@
+                                                <span class="badge bg-secondary entitled-badge" id="label-sl-entitled"></span>
                                             </div>
                                         </div>
                                         <div class="footer-divider pt-2 border-top d-flex justify-content-between info-footer-text">
@@ -376,32 +428,33 @@
                     <div class="col-lg-6">
                         <div class="card widget-card h-100">
                             <div class="card-body p-0">
-                                <div class="row g-0">
-                                    <div class="col-auto bg-dark p-3 d-flex flex-column align-items-center justify-content-center text-white" style="width: 100px;">
-                                        <div class="icon-box mb-2">
-                                            <i class="fa-solid fa-plane-departure fa-xl"></i>
-                                        </div>
-                                        <div class="fw-bold" style="font-size: 0.6rem; text-align:center;">VACATION LEAVE</div>
-                                    </div>
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-auto bg-secondary modern-side-strip" style="height: 105px;"></div>
                                     <div class="col p-3">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="modern-icon-container leave-modern-bg me-2">
+                                                <i class="fa-solid fa-plane-departure fa-lg"></i>
+                                            </div>
+                                            <div class="fw-bold text-primary small text-uppercase tracking-wider" style="font-size: 0.75rem;">Vacation Leave</div>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div class="d-flex gap-4">
                                                 <div>
-                                                    <div class="stat-label">Earned</div>
-                                                    <div class="stat-value text-danger" id="label-vl-earned"></div>
+                                                    @*<div class="stat-label">Earned</div>*@
+                                                    <div class="stat-value text-dark" id="label-vl-earned"></div>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-label">Used</div>
+                                                    @*<div class="stat-label">Used</div>*@
                                                     <div class="stat-value text-dark" id="label-vl-used"></div>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-label">Balance</div>
-                                                    <div class="stat-value text-success" id="label-vl-balance"></div>
+                                                    @*<div class="stat-label">Balance</div>*@
+                                                    <div class="stat-value text-dark" id="label-vl-balance"></div>
                                                 </div>
                                             </div>
                                             <div class="text-end">
-                                                <div class="stat-label">Total Entitlement</div>
-                                                <span class="badge bg-dark entitled-badge" id="label-vl-entitled"></span>
+                                                @*<div class="stat-label">Total Entitlement</div>*@
+                                                <span class="badge bg-secondary entitled-badge" id="label-vl-entitled"></span>
                                             </div>
                                         </div>
                                         <div class="footer-divider pt-2 border-top d-flex justify-content-between info-footer-text">

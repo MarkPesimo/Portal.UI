@@ -532,10 +532,7 @@
     $('#edit_overtime_modal').on('click', '#view_attached_btn', function () {
         var _fileid = document.querySelector('#edit-overtime-Form').querySelector("#Id").value;
         var _extension = document.querySelector('#edit-overtime-Form').querySelector("#FileExtension").value;
-        //alert(_taskid);
-        //alert(_extension);
-
-        //return;
+        //alert(_fileid);
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
@@ -549,7 +546,12 @@
             success: function (response) {
                 ShowLoading('HIDE');
                 $("#open_overtime_file_modal").find(".modal-body").html(response);
-                $("#open_overtime_file_modal").modal('show');
+              
+                $("#edit_overtime_modal").modal('hide');
+                
+                setTimeout(function () {
+                    $("#open_overtime_file_modal").modal('show');
+                }, 200);
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }

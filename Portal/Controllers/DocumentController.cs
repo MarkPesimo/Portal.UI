@@ -364,22 +364,24 @@ namespace Portal.Controllers
         {
             var model = _documentrepository.GetEmployee2316Files(_loginuserid);
 
-            return View(_2316Report, model);
+            if (_globalrepository.HasClientAccess(_client_id, "2316 Report"))
+            {
+                return View(_2316Report, model);
+            }
+
+            return View("AccessDenied");
         }
 
         public ActionResult Announcements()
         {
-            try
+            List<EmployeeAnnouncement> model = _documentrepository.GetAnnouncements(_loginuserid);
+      
+            if (_globalrepository.HasClientAccess(_client_id, "Announcement"))
             {
-                List<EmployeeAnnouncement> model = _documentrepository.GetAnnouncements(_loginuserid);
-                
                 return View(_announcements, model);
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Unable to load announcements. Please try again later.";
-                return View(_announcements, new List<EmployeeAnnouncement>());
-            }
+
+            return View("AccessDenied");
         }
     }
 }

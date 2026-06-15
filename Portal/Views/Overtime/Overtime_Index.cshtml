@@ -64,10 +64,13 @@
         </div>
     </div>
 
+
     <footer class="footer py-3 bg-light border-top fixed-bottom">
         <div class="container-fluid text-center">
             <span class="text-muted small">
-                Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a>
+                Powered By: <a href="https://asiapeopleworks.com.ph/" target="_blank" class="text-decoration-none">Asia Peopleworks</a> |
+                <a href="https://asiapeopleworks.com.ph/privacy-policy/" target="_blank" class="text-decoration-none">Privacy Policy</a> |
+                <a href="https://asiapeopleworks.com.ph/terms__condition/" target="_blank" class="text-decoration-none">Terms & Conditions</a>
             </span>
         </div>
     </footer>
@@ -80,29 +83,41 @@
         width: 100% !important;
     }
 
-    #overtime-table thead th {
-        background-color: #8B0000 !important;
-        color: white !important;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        padding: 15px 10px !important;
-        border: none !important;
-        vertical-align: middle !important;
-        text-align: center;
-    }
+        #overtime-table thead th {
+            background-color: #8B0000 !important;
+            color: white !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 15px 10px !important;
+            border: none !important;
+            vertical-align: middle !important;
+            text-align: center;
+        }
 
-    #overtime-table tbody tr { background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #overtime-table tbody tr {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-    #overtime-table td {
-        padding: 12px !important;
-        border-top: 1px solid #eee !important;
-        border-bottom: 1px solid #eee !important;
-        background-color: white;
-        vertical-align: middle !important;
-    }
+        #overtime-table td {
+            padding: 12px !important;
+            border-top: 1px solid #eee !important;
+            border-bottom: 1px solid #eee !important;
+            background-color: white;
+            vertical-align: middle !important;
+        }
 
-    #overtime-table td:first-child { border-left: 1px solid #eee !important; border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-    #overtime-table td:last-child { border-right: 1px solid #eee !important; border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+            #overtime-table td:first-child {
+                border-left: 1px solid #eee !important;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+
+            #overtime-table td:last-child {
+                border-right: 1px solid #eee !important;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
 
     .btn-action-circle {
         width: 32px;
@@ -125,16 +140,21 @@
         margin-bottom: 15px !important;
     }
 
-    .dataTables_wrapper .dataTables_length { margin-bottom: 0 !important; }
-    .dataTables_wrapper .dataTables_filter { margin-bottom: 0 !important; }
-
-    .dataTables_wrapper .dataTables_filter input {
-        width: auto !important;
-        display: inline-block !important;
-        margin-left: 0.5em !important;
-        border-radius: 4px;
-        border: 1px solid #ccc;
+    .dataTables_wrapper .dataTables_length {
+        margin-bottom: 0 !important;
     }
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 0 !important;
+    }
+
+        .dataTables_wrapper .dataTables_filter input {
+            width: auto !important;
+            display: inline-block !important;
+            margin-left: 0.5em !important;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
 
     .dataTables_wrapper .row:last-child {
         display: flex !important;
@@ -149,50 +169,54 @@
             width: 100% !important;
         }
 
-        #overtime-table thead { display: none !important; }
+            #overtime-table thead {
+                display: none !important;
+            }
 
-        #overtime-table tbody tr {
-            margin-bottom: 20px !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 15px !important;
-            padding: 15px !important;
-            background: #fff !important;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important;
-        }
+            #overtime-table tbody tr {
+                margin-bottom: 20px !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 15px !important;
+                padding: 15px !important;
+                background: #fff !important;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important;
+            }
 
-        #overtime-table td {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 10px 0 !important;
-            border: none !important;
-            background: transparent !important;
-        }
+            #overtime-table td {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 10px 0 !important;
+                border: none !important;
+                background: transparent !important;
+            }
 
-        #overtime-table td::before {
-            content: attr(data-label);
-            flex: 0 0 40%;
-            text-align: left !important;
-            font-weight: 800;
-            color: #8B0000;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
+                #overtime-table td::before {
+                    content: attr(data-label);
+                    flex: 0 0 40%;
+                    text-align: left !important;
+                    font-weight: 800;
+                    color: #8B0000;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                }
 
-        #overtime-table td > span, #overtime-table td > div {
-            flex: 1;
-            text-align: right !important;
-            display: block;
-        }
+                #overtime-table td > span, #overtime-table td > div {
+                    flex: 1;
+                    text-align: right !important;
+                    display: block;
+                }
 
-        #overtime-table td:last-child {
-            margin-top: 15px;
-            padding-top: 15px !important;
-            border-top: 1px dashed #eee !important;
-            display: block !important;
-        }
+                #overtime-table td:last-child {
+                    margin-top: 15px;
+                    padding-top: 15px !important;
+                    border-top: 1px dashed #eee !important;
+                    display: block !important;
+                }
 
-        #overtime-table td:last-child::before { display: none !important; }
+                    #overtime-table td:last-child::before {
+                        display: none !important;
+                    }
 
         .btn-action-circle {
             width: 100% !important;
@@ -205,11 +229,11 @@
             justify-content: center;
         }
 
-        .btn-action-circle::after {
-            content: "Actions";
-            margin-left: 10px;
-            font-weight: 600;
-        }
+            .btn-action-circle::after {
+                content: "Actions";
+                margin-left: 10px;
+                font-weight: 600;
+            }
     }
 </style>
 
@@ -219,3 +243,4 @@
 @Html.Partial("~/Views/Overtime/Modal/_post_overtime_modal.cshtml")
 @Html.Partial("~/Views/Overtime/Modal/_unpost_overtime_modal.cshtml")
 @Html.Partial("~/Views/Overtime/Modal/_cancel_overtime_modal.cshtml")
+@Html.Partial("~/Views/Overtime/Modal/_open_overtime_file_modal.cshtml")

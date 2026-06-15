@@ -53,8 +53,7 @@ namespace Portal.Controllers
             if (_globalrepository.HasClientAccess(_client_id, "OVERTIME")) { return View(_Overtime_Index); }
             else { return View("AccessDenied"); }            
         }
-
-        //---------------------------------------BEGIN FILTER---------------------------------------
+        
         [HttpGet]
         public ActionResult _Filter()
         {
@@ -62,9 +61,7 @@ namespace Portal.Controllers
             ViewBag._Status = _overtimerepository.GetStatus().Select(t => new SelectListItem { Text = t.Description, Value = t.Value }).ToList();
             return PartialView("~/Views/Overtime/Partial/_overtime_filter_detail.cshtml", _model);
         }
-        //---------------------------------------END FILTER---------------------------------------
 
-        //---------------------------------------BEGIN GET---------------------------------------
         [HttpGet]
         public ActionResult _GetOvertimeMonitoring(DateTime _otfrom, DateTime _otto, string _status)
         {
@@ -84,9 +81,7 @@ namespace Portal.Controllers
                 return Json(new { Status = "ERROR", Msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-        //---------------------------------------END GET---------------------------------------
 
-        //---------------------------------------BEGIN ADD POST OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _AddPostOvertime(DateTime _datelog)
         {
@@ -157,7 +152,6 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        //---------------------------------------END ADD POST OVERTIME---------------------------------------
 
         [HttpGet]
         public ActionResult _isSetIfContinuousOT(DateTime _datelog)
@@ -174,7 +168,6 @@ namespace Portal.Controllers
             
         }
 
-
         [HttpGet]
         public ActionResult _GetSelectedDateValue(DateTime _datelog)
         {
@@ -188,8 +181,7 @@ namespace Portal.Controllers
                 return Json(new { Status = "ERROR", error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-
-        //---------------------------------------BEGIN EDIT OVERTIME---------------------------------------
+        
         [HttpGet]
         public ActionResult _EditApprovedOvertime(int _id)
         {
@@ -200,10 +192,7 @@ namespace Portal.Controllers
 
             return PartialView("~/Views/Overtime/Partial/_edit_approved_overtime_detail.cshtml", _obj);
         }
-        //---------------------------------------END EDIT OVERTIME---------------------------------------
 
-
-        //---------------------------------------BEGIN ADD OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _AddOvertime()
         {
@@ -218,7 +207,6 @@ namespace Portal.Controllers
 
             return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _model);
         }
-        //---------------------------------------END ADD OVERTIME---------------------------------------
 
         [HttpGet]
         public JsonResult GetShift(DateTime _datelog)
@@ -233,8 +221,7 @@ namespace Portal.Controllers
                 return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-
-        //---------------------------------------BEGIN EDIT OVERTIME---------------------------------------
+        
         [HttpGet]
         public ActionResult _EditOvertime(int _id)
         {
@@ -245,9 +232,7 @@ namespace Portal.Controllers
             //return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _obj);
             return PartialView("~/Views/Overtime/Partial/_edit_overtime_detail.cshtml", _obj);
         }
-        //---------------------------------------END EDIT OVERTIME---------------------------------------
 
-        //---------------------------------------BEGIN POST OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _PostOvertime(int _id)
         {
@@ -263,9 +248,7 @@ namespace Portal.Controllers
                 throw ex;
             }            
         }
-        //---------------------------------------END POST OVERTIME---------------------------------------
 
-        //---------------------------------------BEGIN UNPOST OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _UnpostOvertime(int _id)
         {
@@ -281,9 +264,7 @@ namespace Portal.Controllers
                 throw ex;
             }            
         }
-        //---------------------------------------END UNPOST OVERTIME---------------------------------------
 
-        //---------------------------------------BEGIN CANCEL OVERTIME---------------------------------------
         [HttpGet]
         public ActionResult _CancelOvertime(int _id)
         {
@@ -299,7 +280,6 @@ namespace Portal.Controllers
                 throw ex;
             }           
         }
-        //---------------------------------------END CANCEL OVERTIME---------------------------------------
 
         public double ComputeOTHours(DateTime startTime, DateTime endTime)
         {
@@ -499,8 +479,6 @@ namespace Portal.Controllers
             }
         }
 
-         
-
         [HttpGet]
         public ActionResult _PreviewPostedOvertimeForm(string _guid)
         {
@@ -535,7 +513,6 @@ namespace Portal.Controllers
             }
             else { return PartialView("~/Views/Shared/_AccessDenied.cshtml"); }
         }
-
 
         [HttpPost]
         public ActionResult _OvertimeAttachment(int _id, HttpPostedFileBase Overtime_Attachment)

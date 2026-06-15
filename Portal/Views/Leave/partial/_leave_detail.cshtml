@@ -1,9 +1,11 @@
 ﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
 
+<style>
+    .hidden { display: none !important; }
+</style>
 
 @using (Html.BeginForm("Add", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "leave-Form", id = "leave-Form" }))
 {
-
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.EmpId)
     @Html.HiddenFor(m => m.DateFiled)
@@ -12,15 +14,21 @@
     @Html.HiddenFor(m => m.Remarks)
     @Html.HiddenFor(m => m.Mode)
     @Html.HiddenFor(m => m.Message)
-
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
 
-    <style>
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    <div class="row mb-2" id="existing-leave-container" style="display:none;">
+        <div class="col-12">
+            <div class="alert alert-warning py-2 px-3 mb-2 shadow-sm border-start border-4 border-warning">
+                <p class="mb-1 small fw-bold text-uppercase">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> Already Filed for this date:
+                </p>
+                <ul id="existing-leave-list" class="mb-0 small ps-3"></ul>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("~/Views/Shared/_leave_instruction.cshtml")
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
@@ -28,102 +36,100 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label for="LeaveTypeId" class="form-label">Leave Type</label>
-            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, new { @class = "form-select", @placeholder = "Leave Types", @id = "LeaveTypeId" })
-        </div>
-        <div class="mt-2 col-6 mb-1 d-flex align-items-center" id="checkboxWrapper">
-            @Html.CheckBoxFor(m => m.EmergencyLeave, new { @class = "form-check-input me-1", id = "checkbox" })
-            <label for="checkbox" class="form-check-label">Emergency Leave</label>
-        </div>
-    </div>
+    <div class="row mt-2">
+        <div class="col-md-5 pe-md-4 border-end">
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Shift Schedule</label>
+                <div class="row g-1">
+                    <div class="col-6">
+                        <input class="text-center form-control form-control-sm bg-light text-primary fw-bold p-1"
+                               style="font-size: 0.75rem;" id="leave-shift-in" name="leave-shift-in" readonly placeholder="In" />
+                    </div>
+                    <div class="col-6">
+                        <input class="text-center form-control form-control-sm bg-light text-primary fw-bold p-1"
+                               style="font-size: 0.75rem;" id="leave-shift-out" name="leave-shift-out" readonly placeholder="Out" />
+                    </div>
+                </div>
+            </div>
 
-    <div class="row">
-        <div class="col-6">
-            <label for="" class="form-label">From</label>
-            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @id = "LeaveFrom", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
-        </div>
-
-        <div class="col-6">
-            <label for="" class="form-label">To</label>
-            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @id = "LeaveTo", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
-        </div>
-    </div>
-
-    <div class="row mt-4" id="div-sameday-halfday">
-        <div class="col-4">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input", @name = @Model.IsHalfday, @value = @Model.IsHalfday })
-                <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Selected Date Remarks</label>
+                <input class="text-center form-control bg-light text-primary fw-bold" id="leave-day-type" name="leave-day-type" readonly placeholder="" />
             </div>
         </div>
 
-        <div class="col-8 d-none" id="div-sameday-halfday-details">
+        <div class="col-md-7 ps-md-4">
             <div class="row">
-                <div class="col">
-                    <div class="form-check form-switch mt-2">
-                        @*@Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input", @name = @Model.FirstHalf, @value = @Model.FirstHalf })*@
-                        @Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input"  })
-                        <label class="form-check-label" for="flexSwitchCheckChecked">First Half</label>
-                    </div>
+                <div class="col-6 mb-3">
+                    <label for="LeaveTypeId" class="form-label">Leave Type</label>
+                    @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, new { @class = "form-select", @placeholder = "Leave Types", @id = "LeaveTypeId" })
                 </div>
-
-                <div class="col">
-                    <div class="form-check form-switch mt-2">
-                        @Html.CheckBoxFor(m => m.SecondHalf, new { @class = "form-check-input", @name = @Model.SecondHalf, @value = @Model.SecondHalf })
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Second Half</label>
-                    </div>
+                <div class="mt-2 col-6 mb-1 d-flex align-items-center" id="checkboxWrapper">
+                    @Html.CheckBoxFor(m => m.EmergencyLeave, new { @class = "form-check-input me-1", id = "checkbox" })
+                    <label for="checkbox" class="form-check-label">Emergency Leave</label>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row mt-4 d-none" id="div-not-sameday-halfday">
-        <div class="col-6">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.FirstDay_SecondHalf, new { @class = "form-check-input", @name = @Model.FirstDay_SecondHalf, @value = @Model.FirstDay_SecondHalf })
-                <label class="form-check-label" for="flexSwitchCheckChecked">First day, Second half</label>
+            <div class="row">
+                <div class="col-6">
+                    <label for="LeaveFrom" class="form-label">From</label>
+                    @Html.TextBoxFor(m => m.LeaveFrom, new {
+                        @class = "form-control", @type = "date", @id = "LeaveFrom",
+                        @Value = Model.LeaveFrom.ToString("yyyy-MM-dd"), @onkeydown = "return false;"
+                    })
+                </div>
+                <div class="col-6">
+                    <label for="LeaveTo" class="form-label">To</label>
+                    @Html.TextBoxFor(m => m.LeaveTo, new {
+                        @class = "form-control", @type = "date", @id = "LeaveTo",
+                        @Value = Model.LeaveTo.ToString("yyyy-MM-dd"), @onkeydown = "return false;"
+                    })
+                </div>
             </div>
-        </div>
 
-        <div class="col-6">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.LastDay_FirstHalf, new { @class = "form-check-input", @name = @Model.LastDay_FirstHalf, @value = @Model.LastDay_FirstHalf })
-                <label class="form-check-label" for="flexSwitchCheckChecked">Last day, First Half</label>
+            <div class="row mt-4" id="div-sameday-halfday">
+                <div class="col-4">
+                    <div class="form-check form-switch mt-2">
+                        @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input" })
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+                    </div>
+                </div>
+                <div class="col-8 d-none" id="div-sameday-halfday-details">
+                    <div class="row">
+                        <div class="col"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input" })<label class="form-check-label">First Half</label></div></div>
+                        <div class="col"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.SecondHalf, new { @class = "form-check-input" })<label class="form-check-label">Second Half</label></div></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col-3 mb-3">
-            <label for="" class="form-label">No. of Days</label>
-            @Html.TextBoxFor(m => m.LeaveDays, new {
-    @class = "text-center form-control text-primary font-weight-bold",
-    style = "background-color: #e9ecef;",
-    @placeholder = "No. of Days",
-    @readonly = "true"
-})
+            <div class="row mt-4 d-none" id="div-not-sameday-halfday">
+                <div class="col-6"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.FirstDay_SecondHalf, new { @class = "form-check-input" })<label class="form-check-label">First day, Second half</label></div></div>
+                <div class="col-6"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.LastDay_FirstHalf, new { @class = "form-check-input" })<label class="form-check-label">Last day, First Half</label></div></div>
+            </div>
 
-        </div>
-    </div>
+            <div class="row mt-4">
+                <div class="col-4 mb-3">
+                    <label class="form-label">No. of Days</label>
+                    @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", style = "background-color: #e9ecef;", @readonly = "true" })
+                </div>
+            </div>
 
+            <div class="row mt-2">
+                <div class="col">
+                    <label class="form-label">Reason</label>
+                    @Html.TextAreaFor(m => m.Reason, 2, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
+                </div>
+            </div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <label for="" class="form-label">Reason</label>
-            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
-        </div>
-    </div>
-
-    <div class="row mt-2">
-        <div class="col">
-            <input class="form-control" type="file" name="Leave_Attachment" id="Leave_Attachment_Add">
+            <div class="row mt-2">
+                <div class="col">
+                    <label class="form-label">Attachment (Optional)</label>
+                    <input class="form-control" type="file" name="Leave_Attachment" id="Leave_Attachment_Add">
+                </div>
+            </div>
         </div>
     </div>
 }
-
-
 
 <script>
     $(document).ready(function () {
@@ -191,6 +197,41 @@
         setDateRules();
 
         $("#LeaveTypeId").on("change", setDateRules);
+
         $("#checkbox").on("change", setDateRules);
+
+        $("#LeaveFrom").on("change", function () {
+            var fromDate = $(this).val();
+            var toInput = $("#LeaveTo");
+            
+            toInput.val(fromDate);
+            toInput.attr("min", fromDate);
+            
+            toInput.trigger("change");
+            
+            setDateRules();
+        });
+
+        function updateInstructionVisibility() {
+            var leaveType = $("#LeaveTypeId").val();
+
+            $(".rule-group").addClass("d-none");
+            
+            if (leaveType == "1") {
+                $("#rule-sl").removeClass("d-none");
+            } else if (leaveType == "2") {
+                $("#rule-vl").removeClass("d-none");
+            } else {
+                $("#rule-generic").removeClass("d-none");
+            }
+        }
+
+        updateInstructionVisibility();
+        
+        $("#LeaveTypeId").on("change", updateInstructionVisibility);
+
     });
+
+
+
 </script>

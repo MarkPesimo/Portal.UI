@@ -21,18 +21,12 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label for="" class="form-label">Date Log</label>
-            @Html.TextBoxFor(m => m.DateLog, new {
-                @class = "form-control",
-                @placeholder = "mm/dd/yyyy",
-                @type = "date",
-                @Value = Model.DateLog.ToString("yyyy-MM-dd")
-            })
-        </div>
+    <div style="display:none;">
+        @Html.TextBoxFor(m => m.DateLog, new { @type = "date", @Value = Model.DateLog.ToString("yyyy-MM-dd"), @id = "DateLog" })
+    </div>
 
-        <div class="col-6 mb-3">
+    <div class="row mb-3">
+        <div class="col-6">
             <label for="" class="form-label">Work Location</label>
             @Html.DropDownListFor(m => m.WorkLocation,
                 new List<SelectListItem> {
@@ -43,53 +37,85 @@
                 "Please Select",
                 new { @class = "form-select" })
         </div>
+        <div class="col-6"></div>
     </div>
 
-
-    <div class="row">
-        <div class="col mb-3">
+    <div class="row mb-3">
+        <div class="col-12">
             <label for="" class="form-label">Shift</label>
             @Html.DropDownListFor(m => m.ShiftId, (IEnumerable<SelectListItem>)ViewBag._ClientShift, "Please Select", new { @class = "form-select", @placeholder = "Shift" })
         </div>
     </div>
 
-    <div class="row">
-        <label for="" class="form-label">Time In</label>
-        <div class="col">
-            @Html.TextBoxFor(m => m.TimeInDate, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeInDate.ToString("yyyy-MM-dd") })
+    <div class="row mb-3">
+        <div class="col-12">
+            <label for="" class="form-label">Time In</label>
         </div>
-        <div class="col">
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.TimeInDate, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeInDate.ToString("yyyy-MM-dd"), @id = "TimeInDate" })
+        </div>
+        <div class="col-6">
             @Html.TextBoxFor(m => m.TimeInTime, new { @class = "form-control", @placeholder = "Time Out", @type = "time", @Value = Model.TimeInTime.ToString("HH:mm"), @id = "TimeInTime" })
         </div>
     </div>
 
-    <div class="row mt-2">
-        <label for="" class="form-label">Time Out</label>
-        <div class="col">
-            @Html.TextBoxFor(m => m.TimeOutDate, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeOutDate.ToString("yyyy-MM-dd") })
+    <div class="row mb-3">
+        <div class="col-12">
+            <label for="" class="form-label">Time Out</label>
         </div>
-        <div class="col">
+        <div class="col-6">
+            @Html.TextBoxFor(m => m.TimeOutDate, new { @class = "form-control", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.TimeOutDate.ToString("yyyy-MM-dd"), @id = "TimeOutDate" })
+        </div>
+        <div class="col-6">
             @Html.TextBoxFor(m => m.TimeOutTime, new { @class = "form-control", @placeholder = "Time Out", @type = "time", @Value = Model.TimeOutTime.ToString("HH:mm"), @id = "TimeOutTime" })
         </div>
     </div>
 
-    <div class="row mt-2 ">
-        <div class="col">
+    <div class="row mb-3">
+        <div class="col-12">
             <label class="form-label-custom">Reason for Attendance correction</label>
             @Html.TextAreaFor(m => m.Reason, 3, 40, new { @class = "form-control", @placeholder = "Briefly explain the reason for applying an Attendance correction..." })
-
-            
         </div>
     </div>
 
-
-    <div class="row mt-2">
-        <div class="col">
+    <div class="row mb-3">
+        <div class="col-12">
             <label class="form-label-custom">Update Attachment (Optional)</label>
             <input class="form-control" type="file" name="Correction_Attachment" id="Correction_Attachment">
         </div>
     </div>
 }
 
+<script type="text/javascript">
+    (function () {
+        function initDateSync() {
+            var timeInDateInput = document.getElementById("TimeInDate");
+            var timeOutDateInput = document.getElementById("TimeOutDate");
+            var dateLogInput = document.getElementById("DateLog");
 
+            if (timeInDateInput) {
+                var syncDates = function () {
+                    var selectedValue = timeInDateInput.value;
 
+                    // Sync to Time Out Date
+                    if (timeOutDateInput) {
+                        timeOutDateInput.value = selectedValue;
+                    }
+                    // Sync to Date Log
+                    if (dateLogInput) {
+                        dateLogInput.value = selectedValue;
+                    }
+                };
+
+                timeInDateInput.addEventListener("input", syncDates);
+                timeInDateInput.addEventListener("change", syncDates);
+            }
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initDateSync);
+        } else {
+            initDateSync();
+        }
+    })();
+</script>
