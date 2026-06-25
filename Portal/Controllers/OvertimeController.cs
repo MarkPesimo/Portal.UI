@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 
 using ClosedXML.Excel;
 using Excel = Microsoft.Office.Interop.Excel;
+using static APWModel.ViewModel.Portal.DTR_model;
 
 namespace Portal.Controllers
 {
@@ -21,6 +22,7 @@ namespace Portal.Controllers
     {
         private GlobalRepository _globalrepository { get; set; }
         private OvertimeRepository _overtimerepository { get; set; }
+        private AttendanceRepository _attendancerepository { get; set; }
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
         private int _client_id { get; set; }
@@ -34,6 +36,7 @@ namespace Portal.Controllers
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_overtimerepository == null) { _overtimerepository = new OvertimeRepository(); }
+            if (_attendancerepository== null) { _attendancerepository= new AttendanceRepository(); }
             if (_loginuserid == 0)
             {
                 LoginUser_model _user = _globalrepository.GetLoginUser();
@@ -196,13 +199,16 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddOvertime()
         {
+            RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "OT");
+
             OvertimeModel _model = new OvertimeModel
             {
                 EmpId = _loginuserid,
                 UserId = 112,
-                ClientId = _client_id,                
+                ClientId = _client_id,
                 Mode = 0,
-                ContinuousOt = _overtimerepository.SetIfContinuousOT(DateTime.Now)
+                ContinuousOt = _overtimerepository.SetIfContinuousOT(DateTime.Now),
+                DynamicRuleMessage = _rule?.Message  
             };
 
             return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _model);
@@ -294,8 +300,18 @@ namespace Portal.Controllers
             {
                 if (_model.Remarks == null) { _model.Remarks = ""; }
                 if (_model.Message == null) { _model.Message = ""; }
+                
+                int otDaysAllowed = 2;
+                if (!string.IsNullOrEmpty(_model.DynamicRuleMessage)
+                    && _model.DynamicRuleMessage != "No Client Detected"
+                    && _model.DynamicRuleMessage != "Follow default rule.")
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(_model.DynamicRuleMessage, @"\d+");
+                    if (match.Success) { otDaysAllowed = int.Parse(match.Value); }
+                }
+                // ----------------------------------
 
-                if (_model.Mode == 2)           //cancel
+                if (_model.Mode == 2) // cancel
                 {
                     if (_model.DTRId != 0)
                     {
@@ -309,12 +325,11 @@ namespace Portal.Controllers
                     {
                         return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
                     }
-
-                    DateTime _datetodate = DateTime.Now;
-                    double _noofdays = (_datetodate - DateTime.Parse(_model.OTFrom.ToString())).TotalDays;
-                    if (_noofdays > 2)
+                    
+                    double _noofdays = (DateTime.Now.Date - _model.OTFrom.Date).TotalDays;
+                    if (_noofdays > otDaysAllowed)
                     {
-                        return Json(new { Result = "ERROR", Message = "You cannot submit an overtime request for work performed more than two days ago.", ElementName = "OTFrom" });
+                        return Json(new { Result = "ERROR", Message = $"You cannot submit an overtime request for work performed more than {otDaysAllowed} days ago.", ElementName = "OTFrom" });
                     }
 
                     DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());
@@ -325,24 +340,15 @@ namespace Portal.Controllers
                         return Json(new { Result = "ERROR", Message = "The Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
                     }
 
-                    if (ComputeOTHours(DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString()), DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString())) <= 0)
+                    if (ComputeOTHours(_from, _to) <= 0)
                     {
                         return Json(new { Result = "ERROR", Message = "The value of Overtime [from] must be greater than the value of Overtime [to].", ElementName = "OTFrom" });
                     }
                 }
-
-                if (_model.Mode == 3)           //psoting
-                {
-                    if (ComputeOTHours(DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString()), DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString())) <= 0)
-                    {
-                        return Json(new { Result = "ERROR", Message = "The value of Overtime [from] must be greater than the value of Overtime [to].", ElementName = "OTFrom" });
-                    }                    
-                }
-
+                
                 if (ModelState.IsValid)
                 {
                     string _gen_result = "";
-                    //if (_model.Mode == 3) { _gen_result = GenerateOvertimeForm(_model.Id); }
                     int _id = _overtimerepository.ManageOvertime(_model);
 
                     if (_model.Mode == 0 || _model.Mode == 1)
@@ -351,7 +357,7 @@ namespace Portal.Controllers
                         _model.Id = _id;
                         _id = _overtimerepository.ManageOvertime(_model);
                     }
-                    
+
                     return Json(new { Result = "Success", MemoryResult = _gen_result, OvertimeId = _id });
                 }
 

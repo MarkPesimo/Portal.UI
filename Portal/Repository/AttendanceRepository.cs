@@ -78,38 +78,31 @@ namespace Portal.Repository
         {
             bool _result = false;
             string _endpoint = "Attendance/ClockInClockOut";
-
             if (_model.Latitude == null) { _model.Latitude = "0"; }
             if (_model.Longitude == null) { _model.Longitude = "0"; }
 
-            //GeolocationResponse _location = GetLocation();
-            //if (_location != null)
-            //{
-            //    _model.Latitude = _location.location.lat.ToString();
-            //    _model.Longitude = _location.location.lng.ToString();
-            //}
-            
-
             var _content_prop = new Dictionary<string, string>
             {
-                {"Id",                      _model.Id.ToString() },
-                {"Type",                    _model.Type.ToString() },
-                {"EmpID",                   _model.EmpID.ToString() },
-                {"ShiftId",                 _model.ShiftId.ToString()},
-                {"Latitude",                 _model.Latitude.ToString()},
-                {"Longitude",                 _model.Longitude.ToString()},
+                {"Id",              _model.Id.ToString() },
+                {"Type",            _model.Type.ToString() },
+                {"EmpID",           _model.EmpID.ToString() },
+                {"ShiftId",         _model.ShiftId.ToString()},
+                {"Latitude",        _model.Latitude.ToString()},
+                {"Longitude",       _model.Longitude.ToString()},
+                {"IPAddress",       _model.IPAddress ?? ""},
+                {"DeviceType",      _model.DeviceType ?? ""},
+                {"Browser",         _model.Browser ?? ""},
+                {"OperatingSystem", _model.OperatingSystem ?? ""},
+                {"UserAgent",       _model.UserAgent ?? ""},
             };
-
             string _body_content = JsonConvert.SerializeObject(_content_prop);
             HttpContent _content = new StringContent(_body_content, Encoding.UTF8, "application/json");
-
             HttpResponseMessage _response = _globalRepository.GeneratePostRequest(_endpoint, _content);
             if (_response.IsSuccessStatusCode)
             {
                 var _value = _response.Content.ReadAsStringAsync().Result.ToString();
                 _result = bool.Parse(_value);
             }
-
             return _result;
         }
 
@@ -184,8 +177,7 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
-
-        //------------------------------------------BEGIN ATTENDANCE CORRECTION----------------------------------
+        
         public List<CorrectionList_model> GetAttendanceCorrectionList(DateTime _datefrom, DateTime _dateto, string _status)
         {
             try
@@ -320,9 +312,7 @@ namespace Portal.Repository
                 throw;
             }
         }
-        //------------------------------------------END ATTENDANCE CORRECTION----------------------------------
 
-        //------------------------------------------BEGIN DTR----------------------------------
         public List<DTRList_model> GetdtrList(DateTime _datefrom, DateTime _dateto, string _status)
         {
             try
@@ -417,7 +407,6 @@ namespace Portal.Repository
             }
             catch (Exception) { throw; }
         }
-        //------------------------------------------END DTR----------------------------------
 
         public DTRPostDetailResult GetPostDTR(int dtrId)
         {
@@ -589,6 +578,50 @@ namespace Portal.Repository
             }
 
             return _list;
+        }
+
+        public RuleResult_model GetDynamicRules(int clientId, string requestType)
+        {
+            try
+            {
+                RuleResult_model _obj = new RuleResult_model();
+                string _endpoint = "Attendance/GetDynamicRules/" + clientId.ToString() + "/" + requestType;
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<RuleResult_model>(_value);
+                }
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
+        public RuleResult_model ValidateFiledRequest(int clientId, string requestType, DateTime startDate, DateTime endDate, string feature)
+        {
+            try
+            {
+                RuleResult_model _obj = new RuleResult_model();
+
+                string start = startDate.ToString("yyyy-MM-dd");
+                string end = endDate.ToString("yyyy-MM-dd");
+                
+                string _endpoint = "Attendance/ValidateRequest/" + clientId.ToString() + "/" + requestType + "/" + start + "/" + end + "/" + feature;
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<RuleResult_model>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

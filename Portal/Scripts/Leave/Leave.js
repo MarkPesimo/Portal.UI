@@ -9,6 +9,8 @@
         LoadDefault();
         GetLeaveBalance(1);
         GetLeaveBalance(2);
+        GetLeaveBalance(4);
+        GetLeaveBalance(5);
     });
 
     function LoadDefault() {
@@ -26,40 +28,44 @@
         $.ajax({
             type: "GET",
             url: "/Leave/_GetLeaveBalance",
-            data: {
-                '_leavetypeid': leavetypeid,
-            },
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
+            data: { '_leavetypeid': leavetypeid },
             success: function (response) {
-                //console.log(response);
                 ShowLoading('HIDE');
-                if (leavetypeid == 1)           //SICK LEAVE
-                {
-                    document.getElementById('label-sl-balance').innerHTML = 'Balance : <strong class="text-primary">' + response.result.Balance + '</strong> </p>';
-                    document.getElementById('label-sl-earned').innerHTML = 'Earned : <strong class="text-primary">' + response.result.Earned + '</strong> </p>';
-                    document.getElementById('label-sl-used').innerHTML = 'Used : <strong class="text-primary">' + response.result.Used + '</strong> </p>';
+                var p = (leavetypeid == 1) ? "sl" : (leavetypeid == 2) ? "vl" : (leavetypeid == 4) ? "ml" : "pl";
 
-                    document.getElementById('label-sl-entitled').innerHTML = ' <span class="text-dark">Entitled</span> : <strong class="text-primary">' + response.result.EntitledLeave + '</strong></p>';
-                    document.getElementById('label-sl-valid-until').innerHTML = 'Valid Until : <strong class="text-primary">' + response.result.ValidUntil + '</strong> </p>';
-                    document.getElementById('label-sl-earned-at').innerHTML = 'Credits earned at : <strong class="text-primary">' + response.result.EarnedAt + '</strong> </p>';
-                }
-                else if (leavetypeid == 2)      //VACATION LEAVE
-                {
-                    document.getElementById('label-vl-balance').innerHTML = 'Balance : <strong class="text-primary">' + response.result.Balance + '</strong> </p>';
-                    document.getElementById('label-vl-earned').innerHTML = 'Earned : <strong class="text-primary">' + response.result.Earned + '</strong> </p>';
-                    document.getElementById('label-vl-used').innerHTML = 'Used : <strong class="text-primary">' + response.result.Used + '</strong> </p>';
-
-                    document.getElementById('label-vl-entitled').innerHTML = '<span class="text-dark">Entitled</span> : <strong class="text-primary">' + response.result.EntitledLeave + '</strong> </p>';
-                    document.getElementById('label-vl-valid-until').innerHTML = 'Valid Until : <strong class="text-primary">' + response.result.ValidUntil + '</strong> </p>';
-                    document.getElementById('label-vl-earned-at').innerHTML = 'Credits earned at : <strong class="text-primary">' + response.result.EarnedAt + '</strong> </p>';
+                if (response && response.result) {
+                    var res = response.result;
+                    $('#card-type-' + leavetypeid).removeClass('d-none');
+                    document.getElementById('label-' + p + '-balance').innerHTML = 'Balance : <strong class="text-leave-green">' + res.Balance + '</strong>';
+                    document.getElementById('label-' + p + '-earned').innerHTML = 'Earned : <strong>' + res.Earned + '</strong>';
+                    document.getElementById('label-' + p + '-used').innerHTML = 'Used : <strong>' + res.Used + '</strong>';
+                    document.getElementById('label-' + p + '-entitled').innerHTML = 'Entitled : <strong>' + res.EntitledLeave + '</strong>';
+                    document.getElementById('label-' + p + '-valid-until').innerHTML = 'Valid Until : <strong class="text-leave-green">' + res.ValidUntil + '</strong>';
+                    document.getElementById('label-' + p + '-earned-at').innerHTML = 'Credits earned at : <strong>' + res.EarnedAt + '</strong>';
+                } else {
+                    $('#card-type-' + leavetypeid).addClass('d-none');
                 }
             },
-            failure: function (response) { console.log(response); },
-            error: function (response) { console.log(response); }
+            error: function () {
+                ShowLoading('HIDE');
+                $('#card-type-' + leavetypeid).addClass('d-none');
+            }
         });
-    };
-    
+    }
+
+    var leaveCardsExpanded = false;
+
+    $(document).on('click', '.leave-card-header', function () {
+        leaveCardsExpanded = !leaveCardsExpanded;
+        $('.leave-card-header').toggleClass('expanded', leaveCardsExpanded);
+
+        if (leaveCardsExpanded) {
+            $('.leave-card-body').slideDown(200);
+        } else {
+            $('.leave-card-body').slideUp(200);
+        }
+    });
+
     function BindTable(LeaveTypeId, FromDate, ToDate) {
         ShowLoading('SHOW');
         $.ajax({
@@ -779,7 +785,6 @@
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
-
                 if (isJsonString(response)) {
                     ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
                     return;
@@ -787,26 +792,19 @@
                 $('#add_leave_modal').find(".modal-body").innerHTML = '';
                 $('#add_leave_modal').find(".modal-body").html(response);
                 $("#add_leave_modal").modal('show');
-
                 var _modal = '#add_leave_modal';
                 var _form = '#leave-Form';
-                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", GetLeaveShiftOnSelectedDate);
+                GetLeaveShiftOnSelectedDate(_modal, _form);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", function () {
+                    GetLeaveShiftOnSelectedDate(_modal, _form);
+                });
                 document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
                 document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
                 document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
-
-              
-
                 document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
                 document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
-
                 document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleFirstDaySecondHalfAdd);
                 document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleLastDayFirstHalfAdd);
-
-
-                GetLeaveShiftOnSelectedDate(_modal, _form);
-
-                //ComputeLeaveDays();
                 ComputeLeaveDaysAPI();
             },
             failure: function (response) { LogError(response); },
@@ -881,13 +879,11 @@
                     div_sameday_halfday.classList.add('d-none');
                     div_not_sameday_halfday.classList.remove('d-none');
                 }
-
-                // ---- Shift schedule: initial load + on date change ----
+                
                 GetLeaveShiftOnSelectedDate(_modal, _form);
                 document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", function () {
                     GetLeaveShiftOnSelectedDate(_modal, _form);
                 });
-                // -------------------------------------------------------
 
                 document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayEdit);
                 document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayEdit);

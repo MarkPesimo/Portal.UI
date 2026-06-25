@@ -13,6 +13,7 @@
     @Html.HiddenFor(m => m.Message)
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
+    @Html.HiddenFor(m => m.DynamicRuleMessage)
 
     <div class="row mb-2" id="existing-ot-container" style="display:none;">
         <div class="col-12">
@@ -23,7 +24,65 @@
         </div>
     </div>
 
-    @Html.Partial("~/Views/Shared/_overtime_instruction.cshtml")
+    @* @Html.Partial("~/Views/Shared/_overtime_instruction.cshtml") *@
+    
+    <div class="instruction-box shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-warning-subtle border-start border-5 border-warning"
+             data-bs-toggle="collapse"
+             href="#otInstructionsCollapse"
+             role="button"
+             aria-expanded="false"
+             aria-controls="otInstructionsCollapse"
+             style="cursor: pointer;">
+            <div class="d-flex align-items-center">
+                <div class="pulse-container me-3">
+                    <i class="fa-solid fa-circle-info fs-4 text-warning"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">Overtime Filing Rules</h6>
+                    <small class="text-muted d-block d-md-none">Tap to view requirements</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <span class="badge rounded-pill bg-warning text-dark mb-1 d-none d-md-inline-block">Important</span>
+                <i class="fa-solid fa-chevron-down text-dark ms-2 transition-icon"></i>
+            </div>
+        </div>
+        <div class="collapse" id="otInstructionsCollapse">
+            <div class="p-3 bg-white">
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-2 d-flex">
+                        <i class="fa-solid fa-check text-success me-2 mt-1"></i>
+                        <span><strong>Continuous Overtime:</strong> Enable for "Straight Duty". Otherwise, 1-hour is deducted after 4hrs OT.</span>
+                    </li>
+                    <li class="mb-2 d-flex">
+                        <i class="fa-solid fa-calendar-check text-primary me-2 mt-1"></i>
+                        <span><strong>Holiday/Rest Day:</strong> Ensure both Time In and Time Out are recorded.</span>
+                    </li>
+                    <li class="mb-2 d-flex">
+                        <i class="fa-solid fa-pen-to-square text-primary me-2 mt-1"></i>
+                        <span><strong>Actual Start:</strong> Use the actual OT start time, not your standard shift-out.</span>
+                    </li>
+
+                    @if (Model.DynamicRuleMessage == "No Client Detected" || Model.DynamicRuleMessage == "Follow default rule." || string.IsNullOrEmpty(Model.DynamicRuleMessage))
+                    {
+                        <li class="mb-2 d-flex">
+                            <i class="fa-solid fa-clock text-danger me-2 mt-1"></i>
+                            <span><strong>48-Hour Limit:</strong> OT must be filed within 2 days of the rendered date.</span>
+                        </li>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.DynamicRuleMessage) && Model.DynamicRuleMessage != "No Client Detected" && Model.DynamicRuleMessage != "Follow default rule.")
+                    {
+                        <li class="mb-2 d-flex">
+                            <i class="fa-solid fa-triangle-exclamation text-warning me-2 mt-1"></i>
+                            <span><strong>Filing Rule:</strong> @Model.DynamicRuleMessage</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
@@ -68,15 +127,39 @@
         </div>
 
         <div class="col-md-7 ps-md-4">
+            @{
+                int otDaysAllowed = 1;
+                if (!string.IsNullOrEmpty(Model.DynamicRuleMessage)
+                    && Model.DynamicRuleMessage != "No Client Detected"
+                    && Model.DynamicRuleMessage != "Follow default rule.")
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(Model.DynamicRuleMessage, @"\d+");
+                    if (match.Success) { otDaysAllowed = int.Parse(match.Value); }
+                }
+                string otMinDate = DateTime.Now.AddDays(-otDaysAllowed).ToString("yyyy-MM-dd");
+            }
+
             <div class="row mb-3">
                 <div class="col-12">
                     <label class="form-label fw-bold small text-uppercase text-muted">Overtime Start</label>
                 </div>
                 <div class="col-7">
-                    @Html.TextBoxFor(m => m.OTFrom, new { @class = "form-control", @type = "date", @Value = Model.OTFrom.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
+                    @Html.TextBoxFor(m => m.OTFrom, new {
+                        @class = "form-control",
+                        @type = "date",
+                        @Value = Model.OTFrom.ToString("yyyy-MM-dd"),
+                        @min = otMinDate,
+                        @onkeydown = "return false;"
+                    })
                 </div>
                 <div class="col-5">
-                    @Html.TextBoxFor(m => m.OTFromTime, new { @class = "form-control", @type = "time", @Value = Model.OTFromTime.ToString("HH:mm"), @id = "OTFromTime" })
+                    @Html.TextBoxFor(m => m.OTFromTime, new {
+                        @class = "form-control",
+                        @type = "time",
+                        @Value = Model.OTFromTime.ToString("HH:mm"),
+                        @id = "OTFromTime",
+                        @onkeydown = "return false;"
+                    })
                 </div>
             </div>
 
@@ -85,10 +168,22 @@
                     <label class="form-label fw-bold small text-uppercase text-muted">Overtime End</label>
                 </div>
                 <div class="col-7">
-                    @Html.TextBoxFor(m => m.OTTo, new { @class = "form-control", @type = "date", @Value = Model.OTTo.ToString("yyyy-MM-dd"), @min = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd") })
+                    @Html.TextBoxFor(m => m.OTTo, new {
+                        @class = "form-control",
+                        @type = "date",
+                        @Value = Model.OTTo.ToString("yyyy-MM-dd"),
+                        @min = otMinDate,
+                        @onkeydown = "return false;"
+                    })
                 </div>
                 <div class="col-5">
-                    @Html.TextBoxFor(m => m.OTToTime, new { @class = "form-control", @type = "time", @Value = Model.OTToTime.ToString("HH:mm"), @id = "OTToTime" })
+                    @Html.TextBoxFor(m => m.OTToTime, new {
+                        @class = "form-control",
+                        @type = "time",
+                        @Value = Model.OTToTime.ToString("HH:mm"),
+                        @id = "OTToTime",
+                        @onkeydown = "return false;"
+                    })
                 </div>
             </div>
 
@@ -104,3 +199,56 @@
         </div>
     </div>
 }
+
+<style>
+    .pulse-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+        .pulse-container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 193, 7, 0.4);
+            border-radius: 50%;
+            animation: pulse-animation 2s infinite;
+        }
+
+    @@keyframes pulse-animation {
+        0% {
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+
+        70% {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+    }
+
+    [aria-expanded="true"] .transition-icon {
+        transform: rotate(180deg);
+    }
+
+    .transition-icon {
+        transition: all 0.3s ease;
+    }
+
+    .instruction-box:hover {
+        filter: brightness(0.98);
+        transition: 0.2s;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd !important;
+    }
+</style>

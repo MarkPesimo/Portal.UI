@@ -14,6 +14,7 @@ using System.IO;
 using static APWModel.ViewModel.Portal.DTR_model.DTRmodel;
 using System.Globalization;
 using static APWModel.ViewModel.COOR.AdminTools.SystemAdministration.SystemAdministration_model;
+using System.Text.RegularExpressions;
 
 namespace Portal.Controllers
 {
@@ -187,7 +188,26 @@ namespace Portal.Controllers
                 {
                     return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
                 }
-                
+
+                string ip = Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                            ?? Request.ServerVariables["REMOTE_ADDR"];
+
+                string ua = Request.UserAgent ?? "";
+
+                string deviceType = Regex.IsMatch(ua, @"Mobi|Android|iPhone|iPad", RegexOptions.IgnoreCase)
+                                    ? "Mobile" : "Desktop";
+
+                string os = Regex.IsMatch(ua, @"Android", RegexOptions.IgnoreCase) ? "Android" :
+                            Regex.IsMatch(ua, @"iPhone|iPad", RegexOptions.IgnoreCase) ? "iOS" :
+                            Regex.IsMatch(ua, @"Windows", RegexOptions.IgnoreCase) ? "Windows" :
+                            Regex.IsMatch(ua, @"Mac", RegexOptions.IgnoreCase) ? "macOS" :
+                            Regex.IsMatch(ua, @"Linux", RegexOptions.IgnoreCase) ? "Linux" : "Unknown";
+
+                string browser = Regex.IsMatch(ua, @"Edg/", RegexOptions.IgnoreCase) ? "Edge" :
+                                 Regex.IsMatch(ua, @"Chrome", RegexOptions.IgnoreCase) ? "Chrome" :
+                                 Regex.IsMatch(ua, @"Firefox", RegexOptions.IgnoreCase) ? "Firefox" :
+                                 Regex.IsMatch(ua, @"Safari", RegexOptions.IgnoreCase) ? "Safari" : "Unknown";
+
                 ClockInClockOut_model _obj = new ClockInClockOut_model
                 {
                     Id = _id,
@@ -195,11 +215,16 @@ namespace Portal.Controllers
                     Type = "CLOCK-IN",
                     ShiftId = _shiftid,
                     Latitude = _latitude,
-                    Longitude = _longitude
+                    Longitude = _longitude,
+                    IPAddress = ip,
+                    DeviceType = deviceType,
+                    Browser = browser,
+                    OperatingSystem = os,
+                    UserAgent = ua
                 };
 
                 bool _result = _attendancerepository.ClockInClockOut(_obj);
-                return Json(new { Status = "SUCCESS", result = _result }, JsonRequestBehavior.AllowGet);                                                   
+                return Json(new { Status = "SUCCESS", result = _result }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -216,7 +241,23 @@ namespace Portal.Controllers
                 {
                     return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
                 }
+                
+                string ip = Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ?? Request.ServerVariables["REMOTE_ADDR"];
+                string ua = Request.UserAgent ?? "";
 
+                string deviceType = Regex.IsMatch(ua, @"Mobi|Android|iPhone|iPad", RegexOptions.IgnoreCase) ? "Mobile" : "Desktop";
+
+                string os = Regex.IsMatch(ua, @"Android", RegexOptions.IgnoreCase) ? "Android" :
+                            Regex.IsMatch(ua, @"iPhone|iPad", RegexOptions.IgnoreCase) ? "iOS" :
+                            Regex.IsMatch(ua, @"Windows", RegexOptions.IgnoreCase) ? "Windows" :
+                            Regex.IsMatch(ua, @"Mac", RegexOptions.IgnoreCase) ? "macOS" :
+                            Regex.IsMatch(ua, @"Linux", RegexOptions.IgnoreCase) ? "Linux" : "Unknown";
+
+                string browser = Regex.IsMatch(ua, @"Edg/", RegexOptions.IgnoreCase) ? "Edge" :
+                                 Regex.IsMatch(ua, @"Chrome", RegexOptions.IgnoreCase) ? "Chrome" :
+                                 Regex.IsMatch(ua, @"Firefox", RegexOptions.IgnoreCase) ? "Firefox" :
+                                 Regex.IsMatch(ua, @"Safari", RegexOptions.IgnoreCase) ? "Safari" : "Unknown";
+                
                 ClockInClockOut_model _obj = new ClockInClockOut_model
                 {
                     Id = _id,
@@ -224,7 +265,12 @@ namespace Portal.Controllers
                     Type = "CLOCK-OUT",
                     ShiftId = _shiftid,
                     Latitude = _latitude,
-                    Longitude = _longitude
+                    Longitude = _longitude,
+                    IPAddress = ip,
+                    DeviceType = deviceType,
+                    Browser = browser,
+                    OperatingSystem = os,
+                    UserAgent = ua
                 };
 
                 bool _result = _attendancerepository.ClockInClockOut(_obj);
@@ -234,7 +280,6 @@ namespace Portal.Controllers
             {
                 return Json(new { Status = "ERROR", result = false, msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
-
         }
 
         public ActionResult GetClockInClockOut()

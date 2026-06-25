@@ -20,6 +20,7 @@ namespace Portal.Controllers
     {
         private GlobalRepository _globalrepository { get; set; }
         private LeaveRepository _leaverepository { get; set; }
+        private AttendanceRepository _attendancerepository{ get; set; }
         private int _loginuserid { get; set; }
         private int _candidate_id { get; set; }
         public int _client_id { get; set; }
@@ -32,6 +33,7 @@ namespace Portal.Controllers
         {
             if (_globalrepository == null) { _globalrepository = new GlobalRepository(); }
             if (_leaverepository == null) { _leaverepository = new LeaveRepository(); }
+            if (_attendancerepository == null) { _attendancerepository = new AttendanceRepository(); }
             if (_loginuserid == 0)
             {
                 LoginUser_model _user = _globalrepository.GetLoginUser();
@@ -190,12 +192,16 @@ namespace Portal.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
-        
+
         [HttpGet]
         public ActionResult _AddLeave()
         {
-            if (!_globalrepository.HasClientAccess(_client_id, "FILE LEAVE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
-
+            if (!_globalrepository.HasClientAccess(_client_id, "FILE LEAVE"))
+            {
+                return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet);
+            }
+            
+            string defaultLeaveType = "SL";
 
             LeaveModel _model = new LeaveModel
             {
@@ -204,10 +210,35 @@ namespace Portal.Controllers
                 Mode = 0,
                 FirstHalf = false,
                 SecondHalf = false,
+                LeaveType = defaultLeaveType
             };
 
-            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
+            var ruleResult = _attendancerepository.GetDynamicRules(_client_id, defaultLeaveType);
+            _model.DynamicRuleMessage = ruleResult?.Message;
+
+            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
+                .Select(t => new SelectListItem
+                {
+                    Text = t.LeaveType,
+                    Value = t.Id.ToString(),
+                    Selected = (t.LeaveType == defaultLeaveType)
+                }).ToList();
+
             return PartialView("~/Views/Leave/Partial/_leave_detail.cshtml", _model);
+        }
+
+        [HttpGet]
+        public JsonResult GetDynamicRulesData(string leaveTypeName)
+        {
+            string requestType = (leaveTypeName == "Vacation Leave") ? "VL" : "SL";
+            
+            var result = _attendancerepository.GetDynamicRules(_client_id, requestType);
+
+            return Json(new
+            {
+                Message = result?.Message,
+                RequestType = requestType
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -303,27 +334,32 @@ namespace Portal.Controllers
 
                 if (_model.Mode != 4)
                 {
-                    if (_model.LeaveTypeId == 2)        //vacation leave
-                    {
-                        if (_noofdays < 3)
-                        {
-                            if (!_model.EmergencyLeave)
-                            {
-                                return Json(new { Result = "ERROR", Message = "Vacation leave must be filed at least 3 days before the actual leave date.", ElementName = "LeaveFrom" });
-                            }
+                    var ruleData = _attendancerepository.GetDynamicRules(_client_id, _model.DynamicRuleMessage);
 
-                        }
-                    }
-                    else if (_model.LeaveTypeId == 1)
+                    if (ruleData != null && !string.IsNullOrEmpty(ruleData.Message))
                     {
-                        if (_noofdays < -7)
+                        var match = System.Text.RegularExpressions.Regex.Match(ruleData.Message, @"\d+");
+                        if (match.Success)
                         {
-                            return Json(new { Result = "ERROR", Message = "You cannot file a sick leave request if the date is within the past seven (7) days..", ElementName = "LeaveFrom" });
+                            int allowedDays = int.Parse(match.Value);
+
+                            if (_model.DynamicRuleMessage == "VL")
+                            {
+                                if (_noofdays < allowedDays && !_model.EmergencyLeave)
+                                {
+                                    return Json(new { Result = "ERROR", Message = $"Vacation leave must be filed at least {allowedDays} days before the actual leave date.", ElementName = "LeaveFrom" });
+                                }
+                            }
+                            else
+                            {
+                                if (_noofdays < -allowedDays)
+                                {
+                                    return Json(new { Result = "ERROR", Message = $"Request must be filed within {allowedDays} days.", ElementName = "LeaveFrom" });
+                                }
+                            }
                         }
                     }
                 }
-                
-                
 
                 if (_model.Mode == 0 || _model.Mode == 1)
                 {
@@ -331,17 +367,16 @@ namespace Portal.Controllers
                     {
                         return Json(new { Result = "ERROR", Message = "The date of leave [from] cannot be ahead to the date of leave [to].", ElementName = "LeaveFrom" });
                     }
-                 
+
                     if (_model.LeaveDays <= 0)
                     {
                         return Json(new { Result = "ERROR", Message = "Leave day(s) cannot be Zero or less than Zero.", ElementName = "LeaveDays" });
                     }
 
-                    //check leave balance
                     LeaveBalance_model _obj = _leaverepository.GetLeaveBalance(_model.LeaveTypeId);
-                    if (_obj!= null)
+                    if (_obj != null)
                     {
-                        if (decimal.Parse( _obj.Balance) <= 0)
+                        if (decimal.Parse(_obj.Balance) <= 0)
                         {
                             return Json(new { Result = "ERROR", Message = "Insufficient leave balance.", ElementName = "LeaveFrom" });
                         }
@@ -355,8 +390,6 @@ namespace Portal.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    //if (_model.Mode == 3) { GenerateLeaveForm(_model.Id); }
-
                     int _id = _leaverepository.ManageLeave(_model);
                     return Json(new { Result = "Success", LeaveId = _id });
                 }
@@ -366,11 +399,7 @@ namespace Portal.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    Result = "ERROR",
-                    Message = ex.InnerException != null ? ex.InnerException.Message : ex.Message
-                });
+                return Json(new { Result = "ERROR", Message = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
             }
         }
 

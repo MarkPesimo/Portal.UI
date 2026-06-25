@@ -1,7 +1,9 @@
 ﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
 
 <style>
-    .hidden { display: none !important; }
+    .hidden {
+        display: none !important;
+    }
 </style>
 
 @using (Html.BeginForm("Add", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "leave-Form", id = "leave-Form" }))
@@ -16,6 +18,7 @@
     @Html.HiddenFor(m => m.Message)
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
+    @Html.Hidden("CurrentRequestType", "SL")
 
     <div class="row mb-2" id="existing-leave-container" style="display:none;">
         <div class="col-12">
@@ -28,7 +31,40 @@
         </div>
     </div>
 
-    @Html.Partial("~/Views/Shared/_leave_instruction.cshtml")
+    @* @Html.Partial("~/Views/Shared/_leave_instruction.cshtml") *@
+
+    <div class="instruction-box shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-info-subtle border-start border-5 border-info"
+             data-bs-toggle="collapse" href="#leaveInstructionsCollapse" role="button" aria-expanded="true" aria-controls="leaveInstructionsCollapse" style="cursor: pointer;">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-circle-info fs-4 text-info me-3"></i>
+                <h6 class="fw-bold mb-0 text-dark">Leave Filing Policy</h6>
+            </div>
+            <i class="fa-solid fa-chevron-down text-dark transition-icon"></i>
+        </div>
+        <div class="collapse show" id="leaveInstructionsCollapse">
+            <div class="p-3 bg-white border-top">
+                <div id="rule-container">
+                    @if (Model.DynamicRuleMessage == "Follow default rule.")
+                    {
+                        <ul class="list-unstyled mb-0 small">
+                            <li class="d-flex"><i class="fa-solid fa-stethoscope text-danger me-2"></i> <span><strong>Sick Leave:</strong> File within the last 5 working days.</span></li>
+                        </ul>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.DynamicRuleMessage))
+                    {
+                        <p class="small text-muted mb-0">
+                            <i class="fa-solid fa-circle-info text-info me-2"></i> @Model.DynamicRuleMessage
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-0">Select a leave type to view specific requirements.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
@@ -59,30 +95,46 @@
         </div>
 
         <div class="col-md-7 ps-md-4">
+            @{
+                int leaveDaysAllowed = 5; // Default rule
+                if (!string.IsNullOrEmpty(Model.DynamicRuleMessage))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(Model.DynamicRuleMessage, @"\d+");
+                    if (match.Success) { leaveDaysAllowed = int.Parse(match.Value); }
+                }
+                string leaveMinDate = DateTime.Now.AddDays(-leaveDaysAllowed).ToString("yyyy-MM-dd");
+            }
             <div class="row">
                 <div class="col-6 mb-3">
                     <label for="LeaveTypeId" class="form-label">Leave Type</label>
-                    @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, new { @class = "form-select", @placeholder = "Leave Types", @id = "LeaveTypeId" })
+                    @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, new { @class = "form-select", @id = "LeaveTypeId" })
                 </div>
                 <div class="mt-2 col-6 mb-1 d-flex align-items-center" id="checkboxWrapper">
                     @Html.CheckBoxFor(m => m.EmergencyLeave, new { @class = "form-check-input me-1", id = "checkbox" })
                     <label for="checkbox" class="form-check-label">Emergency Leave</label>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-6">
                     <label for="LeaveFrom" class="form-label">From</label>
                     @Html.TextBoxFor(m => m.LeaveFrom, new {
-                        @class = "form-control", @type = "date", @id = "LeaveFrom",
-                        @Value = Model.LeaveFrom.ToString("yyyy-MM-dd"), @onkeydown = "return false;"
+                        @class = "form-control",
+                        @type = "date",
+                        @id = "LeaveFrom",
+                        @Value = Model.LeaveFrom.ToString("yyyy-MM-dd"),
+                        @min = leaveMinDate,
+                        @onkeydown = "return false;"
                     })
                 </div>
                 <div class="col-6">
                     <label for="LeaveTo" class="form-label">To</label>
                     @Html.TextBoxFor(m => m.LeaveTo, new {
-                        @class = "form-control", @type = "date", @id = "LeaveTo",
-                        @Value = Model.LeaveTo.ToString("yyyy-MM-dd"), @onkeydown = "return false;"
+                        @class = "form-control",
+                        @type = "date",
+                        @id = "LeaveTo",
+                        @Value = Model.LeaveTo.ToString("yyyy-MM-dd"),
+                        @min = leaveMinDate,
+                        @onkeydown = "return false;"
                     })
                 </div>
             </div>
@@ -131,107 +183,159 @@
     </div>
 }
 
-<script>
-    $(document).ready(function () {
-        function getWorkingDaysAgo(startDate, daysBack) {
-            var date = new Date(startDate);
-            var count = 0;
-            while (count < daysBack) {
-                date.setDate(date.getDate() - 1);
-                var day = date.getDay();
-                if (day !== 0 && day !== 6) count++;
-            }
-            return date;
+<style>
+    .pulse-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+        .pulse-container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 193, 7, 0.4);
+            border-radius: 50%;
+            animation: pulse-animation 2s infinite;
         }
 
+    @@keyframes pulse-animation {
+        0% {
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+
+        70% {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+    }
+
+    [aria-expanded="true"] .transition-icon {
+        transform: rotate(180deg);
+    }
+
+    .transition-icon {
+        transition: all 0.3s ease;
+    }
+
+    .instruction-box:hover {
+        filter: brightness(0.98);
+        transition: 0.2s;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd !important;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+    function getWorkingDaysAgo(startDate, daysBack) {
+        var date = new Date(startDate);
+        var count = 0;
+        while (count < daysBack) {
+            date.setDate(date.getDate() - 1);
+            var day = date.getDay();
+            if (day !== 0 && day !== 6) count++;
+        }
+        return date;
+    }
+
         function setDateRules() {
-            var leaveType = $("#LeaveTypeId").val();
+            var requestType = $("#CurrentRequestType").val();
             var fromInput = $("#LeaveFrom");
             var toInput = $("#LeaveTo");
             var isEmergency = $("#checkbox").is(":checked");
-
-            if (leaveType == "2") {
-                $("#checkboxWrapper").removeClass("hidden");
-            } else {
-                $("#checkboxWrapper").addClass("hidden");
-                $("#checkbox").prop("checked", false);
-            }
-
             var today = new Date();
             var todayStr = today.toISOString().split('T')[0];
 
-            if (leaveType == "2") {  //  Vacation Leave
+            var ruleText = $("#rule-container").text();
+            var daysMatch = ruleText.match(/(\d+)/);
+            var allowedDays = daysMatch ? parseInt(daysMatch[0]) : 5;
+
+            if (requestType === "VL") {
+                $("#checkboxWrapper").removeClass("d-none");
                 if (isEmergency) {
-                    // Emergency: bypass 3 ays rule
                     fromInput.attr("min", todayStr).removeAttr("max");
                     toInput.attr("min", todayStr).removeAttr("max");
                 } else {
-                    // Normal VL: enforce 3 days rule
                     var minDate = new Date();
-                    minDate.setDate(today.getDate() + 3);
+                    minDate.setDate(today.getDate() + allowedDays);
                     var minStr = minDate.toISOString().split('T')[0];
-
                     fromInput.attr("min", minStr).removeAttr("max");
                     toInput.attr("min", todayStr).removeAttr("max");
-
-                    if (fromInput.val() && fromInput.val() < minStr) fromInput.val(minStr);
-                    if (toInput.val() && toInput.val() < todayStr) toInput.val(todayStr);
                 }
-            }
-            else if (leaveType == "1") {  //  Sick Leave
-                var minDate = getWorkingDaysAgo(today, 5);
+            } else {
+                $("#checkboxWrapper").addClass("d-none");
+                $("#checkbox").prop("checked", false);
+                var minDate = getWorkingDaysAgo(today, allowedDays);
                 var minStr = minDate.toISOString().split('T')[0];
-
                 fromInput.attr("min", minStr).removeAttr("max");
                 toInput.attr("min", minStr).removeAttr("max");
-
-                if (fromInput.val() && fromInput.val() < minStr) fromInput.val(minStr);
-                if (toInput.val() && toInput.val() < minStr) toInput.val(minStr);
-            }
-            else {
-                fromInput.removeAttr("min").removeAttr("max");
-                toInput.removeAttr("min").removeAttr("max");
             }
         }
 
-        setDateRules();
+    function updateInstructionVisibility() {
+        var leaveType = $("#LeaveTypeId").val();
+        $(".rule-group").addClass("d-none");
 
-        $("#LeaveTypeId").on("change", setDateRules);
+        if (leaveType == "1") {
+            $("#rule-sl").removeClass("d-none");
+        } else if (leaveType == "2") {
+            $("#rule-vl").removeClass("d-none");
+        } else {
+            $("#rule-generic").removeClass("d-none");
+        }
+    }
 
-        $("#checkbox").on("change", setDateRules);
+$("#LeaveTypeId").on("change", function () {
+    var selectedText = $(this).find("option:selected").text().trim();
 
-        $("#LeaveFrom").on("change", function () {
-            var fromDate = $(this).val();
-            var toInput = $("#LeaveTo");
-            
-            toInput.val(fromDate);
-            toInput.attr("min", fromDate);
-            
-            toInput.trigger("change");
-            
-            setDateRules();
-        });
+    $.get('@Url.Action("GetDynamicRulesData", "Leave")', { leaveTypeName: selectedText }, function (data) {
+        if (selectedText === "Maternity Leave" || selectedText === "Paternity Leave") {
+            var customHtml = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + selectedText + ' must be filed within 10 days.</p>';
+            $('#rule-container').html(customHtml);
+        } else if (data.Message === "Follow default rule.") {
+            var defaultHtml = '<ul class="list-unstyled mb-0 small">' +
+                '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File at least 3 working days in advance.</span></li>' +
+                '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to bypass the 3-day rule.</span></li>' +
+                '</ul>';
+            $('#rule-container').html(defaultHtml);
+        } else {
+            var html = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + data.Message + '</p>';
+            $('#rule-container').html(html);
+        }
 
-        function updateInstructionVisibility() {
-            var leaveType = $("#LeaveTypeId").val();
+        $("#CurrentRequestType").val(data.RequestType);
 
-            $(".rule-group").addClass("d-none");
-            
-            if (leaveType == "1") {
-                $("#rule-sl").removeClass("d-none");
-            } else if (leaveType == "2") {
-                $("#rule-vl").removeClass("d-none");
-            } else {
-                $("#rule-generic").removeClass("d-none");
-            }
+        if (selectedText === "Vacation Leave") {
+            $("#CurrentRequestType").val("VL");
         }
 
         updateInstructionVisibility();
-        
-        $("#LeaveTypeId").on("change", updateInstructionVisibility);
-
+        setDateRules();
     });
+});
+        
+    $("#checkbox").on("change", setDateRules);
 
-
-
+    $("#LeaveFrom").on("change", function () {
+        var fromDate = $(this).val();
+        var toInput = $("#LeaveTo");
+        toInput.val(fromDate);
+        toInput.attr("min", fromDate);
+        setDateRules();
+    });
+        
+    setDateRules();
+    updateInstructionVisibility();
+});
 </script>
