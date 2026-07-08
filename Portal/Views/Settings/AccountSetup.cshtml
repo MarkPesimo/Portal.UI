@@ -1,82 +1,122 @@
 ﻿@model APWModel.ViewModel.Global.Account.Portal_AccountSetup_Model
-@*@model APWModel.ViewModel.Global.Account.Portal_ChangePasswordModel*@
 
-@section  Scripts
-{
+@section Scripts {
     <script src="~/Scripts/Settings/Settings.js"></script>
 }
 
+<style>
+    .widget {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+    }
 
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .field-validation-error {
+        font-size: 0.8rem;
+        color: #dc3545;
+        display: block;
+        margin-top: 0.25rem;
+    }
+
+    .helper-text {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.3rem;
+    }
+</style>
 
 <section class="main">
     <div class="main-title py-3">
         <div class="container-fluid">
-            <div class="row justify-content-between align-items-center">
-                <div class="col-lg-auto text-center text-lg-start mb-4 mb-lg-0">
-                    <h1 class="h4 mb-4 mb-lg-0">Account Settings</h1>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
-                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Settings")">Settings</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Account Setup</li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
+            <h1 class="h4">Account Settings</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Settings")">Settings</a></li>
+                    <li class="breadcrumb-item active">Account Setup</li>
+                </ol>
+            </nav>
         </div>
     </div>
 
     <div class="main-content py-3">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-xl-4">
-
-                </div>
-
-                <div class="col-12 col-xl-4">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-5 col-xl-4">
                     <div class="widget">
-                        <h1 class="text-center text-black h1 mb-4">
-                            Account Setup
-                        </h1>
+                        <h2 class="text-center h4 mb-4">Account Setup</h2>
 
                         @using (Html.BeginForm())
                         {
                             @Html.HiddenFor(model => model.EmpId)
-                            @Html.ValidationSummary(true, "", new { @class = "text-danger form-control-sm font-weight-bold" })
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger p-2 small" })
 
-                            <div class="row">
-                                @Html.ValidationMessageFor(model => model.Username, null, new { @class = "form-control-sm zips-label", @style = "color:red" })
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid fa-user"></i>
-                                    </span>
-                                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Username" })
+                                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Enter your username" })
                                 </div>
+                                @Html.ValidationMessageFor(model => model.Username)
                             </div>
 
-                            <div class="row">
-                                @Html.ValidationMessageFor(model => model.EmailAddress, null, new { @class = "form-control-sm zips-label", @style = "color:red" })
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid fa-envelope"></i>
-                                    </span>
-                                    @Html.TextBoxFor(m => m.EmailAddress, new { @class = "form-control", @placeholder = "Email Address" })
+                                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                    @Html.TextBoxFor(m => m.EmailAddress, new {
+                                        @class = "form-control",
+                                        @id = "emailInput",
+                                        @placeholder = "jdelacruz@gmail.com; jdelacruz@yahoo.com"
+                                    })
                                 </div>
+                                <div class="helper-text">
+                                    <i class="fa-solid fa-circle-info"></i> Use <strong>";"</strong> for multiple emails.
+                                    <em>e.g., jdelacruz@gmail.com; jdelacruz@yahoo.com</em>
+                                </div>
+                                <div id="emailError" class="text-danger small" style="display:none;">
+                                    Invalid characters detected (/ or \). Please remove them.
+                                </div>
+                                @Html.ValidationMessageFor(model => model.EmailAddress)
                             </div>
 
-                            <div class="pt-1 mt-4 mb-2 justify-content-center">
-                                <button type="submit" class="btn btn-primary w-100" id="update-settings-button">
-                                    <i class="bi bi-check-circle"></i> Update
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="bi bi-check-circle me-1"></i> Update Settings
                                 </button>
                             </div>
                         }
                     </div>
                 </div>
-
-                <div class="col-12 col-xl-4">
-
-                </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        var emailInput = document.getElementById('emailInput').value;
+        var errorDiv = document.getElementById('emailError');
+        
+        if (/[/\\-]/.test(emailInput)) {
+            e.preventDefault();
+            errorDiv.textContent = "Invalid characters detected (/ , \\ or -). Please remove them.";
+            errorDiv.style.display = 'block';
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    });
+</script>

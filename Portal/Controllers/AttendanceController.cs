@@ -340,11 +340,14 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddPostCorrection(DateTime _datelog)
         {
+            RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "Attd Correction");
+
             Correction_model _model = new Correction_model
             {
                 DateLog = _datelog,
                 EmpId = _loginuserid,
-                UserId = 112
+                UserId = 112,
+                DynamicRuleMessage = _rule?.Message
             };
 
             DefaultShift _defaultshift = _attendancerepository.GetDefaultShift();
@@ -403,12 +406,15 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddCorrection()
         {
+            RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "Attd Correction");
+
             Correction_model _model = new Correction_model
             {
                 EmpId = _loginuserid,
-                UserId = 112
+                UserId = 112,
+                DynamicRuleMessage = _rule?.Message
             };
-
+            
             DefaultShift _defaultshift = _attendancerepository.GetDefaultShift();
             if (_defaultshift != null)
             {
@@ -437,18 +443,28 @@ namespace Portal.Controllers
                 {
                     return Json(new { Result = "ERROR", Message = "The timeout you entered is earlier than the time in. Please enter a valid time out.", ElementName = "TimeInDate" });
                 }
-
-                DateTime _datetodate = DateTime.Now;
-                double _noofdays = (_datetodate - DateTime.Parse(_model.TimeInDate.ToString())).TotalDays;
-                if (_noofdays > 2)
+                
+                RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "Attd Correction");
+                
+                int daysAllowed = 2;
+                if (_rule != null && !string.IsNullOrEmpty(_rule.Message))
                 {
-                    return Json(new { Result = "ERROR", Message = "You cannot submit an Attendance correction request for work performed more than two days ago.", ElementName = "TimeInDate" });
+                    var match = System.Text.RegularExpressions.Regex.Match(_rule.Message, @"(\d+)");
+                    if (match.Success)
+                    {
+                        daysAllowed = int.Parse(match.Groups[1].Value);
+                    }
                 }
 
+                double _noofdays = (DateTime.Now - _model.TimeInDate.Date).TotalDays;
+                if (_noofdays > daysAllowed)
+                {
+                    return Json(new { Result = "ERROR", Message = "You cannot submit an Attendance correction request: " + (_rule?.Message ?? "Request exceeded allowed filing period."), ElementName = "TimeInDate" });
+                }
+                
                 if (ModelState.IsValid)
                 {
                     int _id = _attendancerepository.ManageAttendanceCorrection(_model, 0);
-
                     _model.Id = _id;
                     _id = _attendancerepository.ManageAttendanceCorrection(_model, 3);
 
@@ -775,7 +791,26 @@ namespace Portal.Controllers
                 throw;
             }
         }
-        
+
+        [HttpGet]
+        public JsonResult GetEmployeeDTR(int empId, string fromDate, string toDate)
+        {
+            try
+            {
+                DateTime dtFrom = DateTime.Parse(fromDate);
+                DateTime dtTo = DateTime.Parse(toDate);
+
+                var model = _attendancerepository.GetEmployeeDTRByEmpDate(empId, dtFrom, dtTo);
+
+                return Json(model, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                return Json(new { message = "Error loading DTR: " + ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
         [HttpGet]
         public ActionResult _AddDTR()
         {
@@ -857,7 +892,7 @@ namespace Portal.Controllers
 
                     if (_id == 0)
                     {
-                        return Json(new { Result = "ERROR", DTRId = 0,  Message = "An error occured, please contact system administrator." });
+                        return Json(new { Result = "ERROR", DTRId = 0,  Message = "Kindly double check if the DTR is already existing or there are no logs detected in the DTR." });
                     }
                     else
                     {

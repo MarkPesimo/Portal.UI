@@ -12,7 +12,58 @@
     @Html.HiddenFor(m => m.FileExtension)
 
 
-    @Html.Partial("~/Views/Shared/_atdcorrection_instruction.cshtml")
+    @*@Html.Partial("~/Views/Shared/_atdcorrection_instruction.cshtml")*@
+
+    <div class="instruction-box shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-info-subtle border-start border-5 border-info"
+             data-bs-toggle="collapse"
+             href="#correctionInstructionsCollapse"
+             role="button"
+             aria-expanded="false"
+             aria-controls="correctionInstructionsCollapse"
+             style="cursor: pointer;">
+            <div class="d-flex align-items-center">
+                <div class="pulse-container me-3">
+                    <i class="fa-solid fa-circle-info fs-4 text-info"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">Attendance Correction Rules</h6>
+                    <small class="text-muted d-block d-md-none">Tap to view requirements</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <span class="badge rounded-pill bg-info text-white mb-1 d-none d-md-inline-block">Policy</span>
+                <i class="fa-solid fa-chevron-down text-dark ms-2 transition-icon"></i>
+            </div>
+        </div>
+
+        <div class="collapse" id="correctionInstructionsCollapse">
+            <div class="p-3 bg-white">
+                <ul class="list-unstyled mb-0 small">
+
+                    @if (string.IsNullOrEmpty(Model.DynamicRuleMessage) ||
+                         Model.DynamicRuleMessage == "No Client Detected" ||
+                         Model.DynamicRuleMessage == "Follow default rule.")
+                    {
+                        <li class="mb-2 d-flex">
+                            <i class="fa-solid fa-clock text-danger me-2 mt-1"></i>
+                            <span><strong>Filing Deadline:</strong> Attendance correction must be filed within 48 hours (2 days) after the actual attendance date.</span>
+                        </li>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.DynamicRuleMessage) &&
+                          Model.DynamicRuleMessage != "No Client Detected" &&
+                          Model.DynamicRuleMessage != "Follow default rule.")
+                    {
+                        <li class="mb-2 d-flex">
+                            <i class="fa-solid fa-triangle-exclamation text-warning me-2 mt-1"></i>
+                            <span><strong>Filing Rule:</strong> @Model.DynamicRuleMessage</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
 
 
     <div class="row" id="div-validation" style="display: none;">
@@ -86,25 +137,43 @@
     </div>
 }
 
-<script type="text/javascript">
+    <script type="text/javascript">
     (function () {
-        function initDateSync() {
+        function initCorrectionLogic() {
             var timeInDateInput = document.getElementById("TimeInDate");
             var timeOutDateInput = document.getElementById("TimeOutDate");
             var dateLogInput = document.getElementById("DateLog");
+            
+            var ruleMessage = "@(Model.DynamicRuleMessage ?? "")";
+            var daysAllowed = 2; // Default
 
+            if (ruleMessage.toLowerCase().includes("day")) {
+                var match = ruleMessage.match(/(\d+)/);
+                if (match) daysAllowed = parseInt(match[0]);
+            }
+            
+            var minDate = new Date();
+            minDate.setDate(minDate.getDate() - daysAllowed);
+            var minDateString = minDate.toISOString().split('T')[0];
+            
+            if (timeInDateInput) timeInDateInput.setAttribute("min", minDateString);
+            if (timeOutDateInput) timeOutDateInput.setAttribute("min", minDateString);
+            
+            var dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(function(input) {
+                input.addEventListener('keydown', function(e) {
+                    e.preventDefault(); 
+                });
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault(); 
+                });
+            });
+            
             if (timeInDateInput) {
                 var syncDates = function () {
                     var selectedValue = timeInDateInput.value;
-
-                    // Sync to Time Out Date
-                    if (timeOutDateInput) {
-                        timeOutDateInput.value = selectedValue;
-                    }
-                    // Sync to Date Log
-                    if (dateLogInput) {
-                        dateLogInput.value = selectedValue;
-                    }
+                    if (timeOutDateInput) timeOutDateInput.value = selectedValue;
+                    if (dateLogInput) dateLogInput.value = selectedValue;
                 };
 
                 timeInDateInput.addEventListener("input", syncDates);
@@ -113,9 +182,9 @@
         }
 
         if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", initDateSync);
+            document.addEventListener("DOMContentLoaded", initCorrectionLogic);
         } else {
-            initDateSync();
+            initCorrectionLogic();
         }
     })();
-</script>
+    </script>

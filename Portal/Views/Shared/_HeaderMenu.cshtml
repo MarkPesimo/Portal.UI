@@ -30,47 +30,50 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
 
-            <div class="offcanvas-body align-items-center" id="nav-header">
+            <div class="offcanvas-body align-items-center navbar-compact-desktop" id="nav-header">
                 <ul class="navbar-nav navbar-nav-left justify-content-start flex-grow-1 pe-lg-3 ps-lg-2 mb-3 mb-lg-0 pb-3 pb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" id="nav-Home" aria-current="page" href="@Url.Action("Index", "Home")">Home</a>
+                        <a class="nav-link active text-nowrap" id="nav-Home" aria-current="page" href="@Url.Action("Index", "Home")">Home</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).PayrollMenuVisibility)>
-                        <a class="nav-link " id="nav-Payroll" href="@Url.Action("Index", "Payroll")">Payroll</a>
+                        <a class="nav-link text-nowrap" id="nav-Payroll" href="@Url.Action("Index", "Payroll")">Payroll</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).OvertimeMenuVisibility)>
-                        <a class="nav-link " id="nav-Overtime" href="@Url.Action("Index", "Overtime")">Overtime</a>
+                        <a class="nav-link text-nowrap" id="nav-Overtime" href="@Url.Action("Index", "Overtime")">Overtime</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).LeaveMenuVisibility)>
-                        <a class="nav-link " id="nav-Leave" href="@Url.Action("Index", "Leave")">Leave</a>
+                        <a class="nav-link text-nowrap" id="nav-Leave" href="@Url.Action("Index", "Leave")">Leave</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).AttendanceMenuVisibility)>
-                        <a class="nav-link " id="nav-Attendance" href="@Url.Action("Index", "Attendance")">Attendance</a>
+                        <a class="nav-link text-nowrap" id="nav-Attendance" href="@Url.Action("Index", "Attendance")">Attendance</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).DocumentMenuVisibility)>
-                        <a class="nav-link " id="nav-Document" href="@Url.Action("Index", "Document")">Documents</a>
+                        <a class="nav-link text-nowrap" id="nav-Document" href="@Url.Action("Index", "Document")">Documents</a>
                     </li>
                     <li class="nav-item" @((User as ContextLoginUser_model).HelpdeskMenuVisibility)>
-                        <a class="nav-link " id="nav-Helpdesk" href="@Url.Action("Index", "Helpdesk")">Helpdesk</a>
+                        <a class="nav-link text-nowrap" id="nav-Helpdesk" href="@Url.Action("Index", "Helpdesk")">Helpdesk</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " id="nav-Help" href="@Url.Action("Index", "Help")">Quick Guide</a>
+                        <a class="nav-link text-nowrap" id="nav-Help" href="@Url.Action("Index", "Help")">Quick Guide</a>
                     </li>
                 </ul>
 
                 <ul class="navbar-nav justify-content-end flex-grow-1">
                     <li class="nav-item mt-1" @((User as ContextLoginUser_model).AttendanceMenuVisibility)>
                         <div class="d-flex align-items-center clock-actions-wrapper">
-                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0 shadow-sm" id="my-shift" current-date="" disabled>
+                            <button class="btn btn-sm me-2 shadow-sm rounded-pill px-3 text-nowrap" id="my-shift" current-date="" disabled
+                                    style="background-color: #f8f9fa; border: 1px solid #e2e8f0; color: #495057; font-size: 0.75rem;">
                                 <i class="fa-solid fa-calendar-day me-1"></i> Shift: Loading...
                             </button>
 
-                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0 clock-btn clock-in" id="clock-in-button" data-clockin-value="" type="submit">
-                                <i class="fa-solid fa-door-open me-1"></i> Clock In
+                            <button class="btn btn-sm me-2 btn-clock-in py-2 px-3 fw-bold rounded-pill shadow-sm clock-btn text-nowrap"
+                                    id="clock-in-button" data-clockin-value="" type="submit">
+                                <i class="fa-regular fa-clock me-1"></i> Clock In
                             </button>
 
-                            <button class="btn btn-sm me-2 btn-outline-light my-2 my-sm-0 clock-btn clock-out" id="clock-out-button" data-clockout-value="" type="submit">
-                                <i class="fa-solid fa-right-from-bracket me-1"></i> Clock Out
+                            <button class="btn btn-sm me-2 btn-clock-out py-2 px-3 fw-bold rounded-pill shadow-sm clock-btn text-nowrap"
+                                    id="clock-out-button" data-clockout-value="" type="submit">
+                                <i class="fa-regular fa-clock me-1"></i> Clock Out
                             </button>
                         </div>
                     </li>
@@ -134,8 +137,44 @@
     </li>
 }
 
-<style>
+    <style>
+    .btn-clock-in {
+        background: linear-gradient(145deg, #b30000, #800000);
+        color: white !important;
+        border: none;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
 
+        .btn-clock-in:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 8px rgba(128, 0, 0, 0.3);
+        }
+
+        .btn-clock-in:active {
+            transform: scale(0.96);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+    .btn-clock-out {
+        background: #f8f9fa;
+        color: #495057 !important;
+        border: 1px solid #ced4da;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+        .btn-clock-out:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .btn-clock-out:active {
+            transform: scale(0.96);
+            background-color: #dee2e6;
+        }
     .notification-pulse i {
         animation: ring 4s .7s ease-in-out infinite;
         transform-origin: 50% 4px;
@@ -176,4 +215,36 @@
             box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
         }
     }
-</style>
+
+@@media (max-width: 1024px) {
+    .clock-actions-wrapper .btn {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.70rem !important;
+    }
+    .clock-actions-wrapper i {
+        margin-right: 2px !important;
+    }
+}
+
+        .clock-btn, #my-shift {
+            white-space: nowrap;
+        }
+
+    @@media (min-width: 992px) and (max-width: 1199px) {
+    .navbar-compact-desktop .nav-link {
+        font-size: 0.85rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .navbar-compact-desktop .clock-actions-wrapper .btn {
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.65rem !important;
+    }
+
+    .navbar-compact-desktop .navbar-nav .nav-item {
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+    }
+}
+    </style>

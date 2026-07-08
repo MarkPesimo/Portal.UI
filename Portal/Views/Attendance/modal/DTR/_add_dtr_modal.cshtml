@@ -1,23 +1,44 @@
-﻿<div class="modal fade " id="add_dtr_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+﻿<div class="modal fade" id="add_dtr_modal" tabindex="-1" aria-labelledby="jobOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered dtr-modal-dialog">
         <div class="modal-content">
             <div class="modal-header Zips-modal-header">
                 <h1 class="modal-title fs-5" id="jobOrderLabel">File DTR</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <div class="modal-body">                
-
+            <div class="modal-body">
             </div>
-
-            <div class="modal-footer">
+            @*<div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="submit_DTR">
                     <i class="fa-regular fa-circle-check"></i> Save & Post
                 </button>
-            </div>
+            </div>*@
         </div>
     </div>
 </div>
+<style>
+    .dtr-modal-dialog {
+        max-width: 95vw;
+        width: 95vw;
+    }
 
+        .dtr-modal-dialog .modal-content {
+            height: 92vh;
+            border-radius: 16px;
+            overflow: hidden; 
+            border: none;
+        }
 
+        .dtr-modal-dialog .modal-body {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
 
+        .dtr-modal-dialog .modal-header {
+            border-radius: 16px 16px 0 0;
+        }
+
+        .dtr-modal-dialog .modal-footer {
+            border-radius: 0 0 16px 16px;
+        }
+</style>

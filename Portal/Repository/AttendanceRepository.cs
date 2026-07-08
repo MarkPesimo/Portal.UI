@@ -623,5 +623,34 @@ namespace Portal.Repository
                 throw;
             }
         }
+
+        public DTRPostDetailResult GetEmployeeDTRByEmpDate(int empId, DateTime fromDate, DateTime toDate)
+        {
+            try
+            {
+                DTRPostDetailResult result = new DTRPostDetailResult();
+
+                string endpoint = string.Format(
+                    "Attendance/GetPostDTRByEmpDate?empId={0}&fromDate={1}&toDate={2}",
+                    empId,
+                    fromDate.ToString("yyyy-MM-dd"),
+                    toDate.ToString("yyyy-MM-dd")
+                );
+
+                HttpResponseMessage response = _globalRepository.GenerateGetRequest(endpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var value = response.Content.ReadAsStringAsync().Result;
+                    result = JsonConvert.DeserializeObject<DTRPostDetailResult>(value);
+                }
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

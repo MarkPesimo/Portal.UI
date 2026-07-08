@@ -1,124 +1,193 @@
 ﻿@model APWModel.ViewModel.Portal.DTR_model.DTRmodel
 
 <style>
+    #dtrContainer {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
     input[type="month"].month-only::-webkit-datetime-edit-year-field {
         display: none;
     }
-
     input[type="month"].month-only::-moz-datetime-edit-year-field {
         display: none;
     }
+
+    #dtrContainer table {
+        width: 100%;
+        min-width: 1000px;
+    }
+
+    #dtrContainer .card table {
+        min-width: 500px;
+    }
+
+    #dtrContainer th, #dtrContainer td {
+        white-space: nowrap;
+        padding: 5px 8px !important;
+    }
+
+    .dtr-filter-bar {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+    }
+
+    .dtr-filter-bar .form-label {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+
+    .dtr-date-divider {
+        margin-bottom: 8px;
+    }
+
+    .dtr-guidelines {
+        background: #fff8e6;
+        border: 1px solid #ffe69c;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+    }
+
+    .dtr-guidelines h6 {
+        color: #664d03;
+    }
+
+    .dtr-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 250px;
+        text-align: center;
+        color: #6c757d;
+        padding: 20px 16px;
+    }
+
+    .dtr-empty-state img {
+        max-width: 220px;
+        width: 60%;
+        margin-bottom: 16px;
+        opacity: 0.9;
+    }
+
+    .dtr-empty-state p {
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    @@media (max-width: 767px) {
+        .dtr-empty-state {
+            min-height: 180px;
+        }
+        .dtr-empty-state img {
+            max-width: 140px;
+        }
+        .dtr-empty-state p {
+            font-size: 0.85rem;
+            padding: 0 8px;
+        }
+    }
+
+    .dtr-partial-footer {
+        flex-shrink: 0; 
+    }
 </style>
 
-@using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "dtr-Form", id = "dtr-Form" }))
-{
-    @Html.HiddenFor(m => m.Id)
-    @Html.HiddenFor(m => m.EmpId)
-    @Html.HiddenFor(m => m.UserId)
-    @Html.HiddenFor(m => m.Mode)
-    @Html.HiddenFor(m => m.DateCreated)
-    @Html.HiddenFor(m => m.Remarks)
+<div class="d-flex flex-column h-100">
 
-    <div class="row" id="div-validation" style="display: none;">
-        <div class="col-lg-12 mb-3">
-            <label id="error-message-label" class="form-label text-danger"></label>
-        </div>
+    <div class="dtr-guidelines">
+        <h6 class="fw-bold mb-1">Important Review Guidelines</h6>
+        <ul class="mb-0 small ps-3">
+            <li>
+                <strong>Approval Status:</strong> Ensure all Attendance Corrections, OT, and Leaves are marked as
+                <span class="badge rounded-pill bg-success">Approved</span>.
+                Items marked as <span class="badge rounded-pill bg-warning text-dark">Posted</span>
+                are pending review and <strong>will not be counted</strong> in this submission.
+            </li>
+            <li class="mt-1">
+                <strong>Late/Undertime Alert:</strong> Double-check entries with <span class="text-danger fw-bold">Red Font</span> in the Time In/Out columns. This indicates a late or undertime record that may require a correction to avoid salary deductions.
+            </li>
+            <li class="mt-1">
+                <strong>Found a Discrepancy?</strong> If you notice any incorrect entry or need something added or corrected, <strong>do not proceed</strong> with creating the DTR. Please coordinate with your account supervisor first before filing.
+            </li>
+            <li class="mt-1">
+                <strong>Date Restriction:</strong> If a date has already been submitted or included in another DTR, the system <strong>will not proceed</strong> with creating a new DTR for that date.
+            </li>
+        </ul>
     </div>
 
-    <div class="row mt-2">
-        <div class="col-12 mb-3 position-relative">
-            <label class="form-label">Cutoff</label>
-            @Html.DropDownListFor(m => m.CutOff,
-                new SelectList(new[]
-                {
-                    new { Value = "1ST CUTOFF", Text = "1ST CUT OFF" },
-                    new { Value = "2ND CUTOFF", Text = "2ND CUT OFF" }
-                }, "Value", "Text", Model.CutOff),
-                new { @class = "form-select", id = "Cutoff", name = "Cutoff" })
-        </div>
-    </div>
+    <div class="dtr-filter-bar">
+        @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "dtr-Form", id = "dtr-Form" }))
+        {
+            @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.EmpId)
+            @Html.HiddenFor(m => m.UserId)
+            @Html.HiddenFor(m => m.Mode)
+            @Html.HiddenFor(m => m.DateCreated)
+            @Html.HiddenFor(m => m.Remarks)
 
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label class="form-label">Month</label>
-            @Html.TextBoxFor(m => m.Month, new {
-                @class = "form-control month-only",
-                type = "month",
-                id = "Month",
-                name = "Month"
-            })
-        </div>
+            <div class="row" id="div-validation" style="display: none;">
+                <div class="col-12 mb-2">
+                    <label id="error-message-label" class="form-label text-danger mb-0"></label>
+                </div>
+            </div>
 
+            <div class="row g-3 align-items-end">
+                <div class="col-4 col-md-2">
+                    <label class="form-label">Cutoff</label>
+                    @Html.DropDownListFor(m => m.CutOff,
+                        new SelectList(new[] {
+                            new { Value = "1ST CUTOFF", Text = "1ST CUT OFF" },
+                            new { Value = "2ND CUTOFF", Text = "2ND CUT OFF" }
+                        }, "Value", "Text", Model.CutOff),
+                        new { @class = "form-select form-select-sm", id = "Cutoff" })
+                </div>
 
-        <div class="col-6 mb-3">
-            <label class="form-label">Year</label>
-            @Html.DropDownListFor(m => m.Year,
-                new SelectList(
-                    Enumerable.Range(DateTime.Now.Year - 5, 11)
-                              .Select(y => new { Value = y.ToString(), Text = y.ToString() }),
-                    "Value", "Text", Model.Year ?? DateTime.Now.Year.ToString()
-                ),
-                new { @class = "form-select", id = "Year", name = "Year" })
-        </div>
+                <div class="col-4 col-md-2">
+                    <label class="form-label">Month</label>
+                    @Html.TextBoxFor(m => m.Month, new { @class = "form-control form-control-sm month-only", type = "month", id = "Month" })
+                </div>
 
-    </div>
-    <hr />
-    <div class="row">
-        <div class="col-12 mb-2">
-            <p class="text-muted fst-italic " style="font-size: 0.9rem;">
-                *You can adjust the date range if the cutoff period is shortened or different.
-            </p>
-        </div>
+                <div class="col-4 col-md-2">
+                    <label class="form-label">Year</label>
+                    @Html.DropDownListFor(m => m.Year,
+                        new SelectList(Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new { Value = y.ToString(), Text = y.ToString() }), "Value", "Text", Model.Year ?? DateTime.Now.Year.ToString()),
+                        new { @class = "form-select form-select-sm", id = "Year" })
+                </div>
 
-        <div class="col-6 mb-3">
-            <label class="form-label">Date From</label>
-            @Html.TextBox("DateFrom",
-                Model.DateFrom != DateTime.MinValue ? Model.DateFrom.ToString("yyyy-MM-dd") : "",
-                new {
-                    @class = "form-control fw-bold",
-                    type = "date",
-                    id = "DateFrom",
-                    name = "DateFrom"
-                })
-        </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Date From</label>
+                    @Html.TextBox("DateFrom", Model.DateFrom != DateTime.MinValue ? Model.DateFrom.ToString("yyyy-MM-dd") : "", new { @class = "form-control form-control-sm fw-bold", type = "date", id = "DateFrom" })
+                </div>
 
-        <div class="col-6 mb-3">
-            <label class="form-label">Date To</label>
-            @Html.TextBox("Dateto",
-                Model.Dateto != DateTime.MinValue ? Model.Dateto.ToString("yyyy-MM-dd") : "",
-                new {
-                    @class = "form-control fw-bold",
-                    type = "date",
-                    id = "DateTo",
-                    name = "DateTo"
-                })
-        </div>
-    </div>
+                <div class="col-auto d-none d-md-flex align-items-center px-0 dtr-date-divider">
+                    <i class="fa-solid fa-arrow-right-long text-muted"></i>
+                </div>
 
-
-}
-
-<!--
-<script>
-    $("#Cutoff, #Month, #Year").change(function () {
-        var cutoff = $("#Cutoff").val();
-        var year = $("#Year").val();
-        var monthInput = $("#Month").val();
-        var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
-
-        if (cutoff && month > 0 && year) {
-            $.getJSON('/Attendance/GetClientCutoffDate',
-                { cutoff: cutoff, month: month, year: year },
-                function (data) {
-                    if (data.success) {
-                        $("#DateFrom").val(data.dateFrom);
-                        $("#DateTo").val(data.dateTo);
-                    } else {
-                        alert("Error: " + data.message);
-                    }
-                });
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Date To</label>
+                    @Html.TextBox("Dateto", Model.Dateto != DateTime.MinValue ? Model.Dateto.ToString("yyyy-MM-dd") : "", new { @class = "form-control form-control-sm fw-bold", type = "date", id = "DateTo" })
+                </div>
+            </div>
         }
-    });
+    </div>
 
-</script>
-    -->
+    <label class="form-label fw-bold text-primary mb-1">DTR Preview</label>
+    <div id="dtrContainer">
+        <div class="dtr-empty-state" id="dtrEmptyState">
+            <img src="@Url.Content("~/Content/animation/selectdtr.gif")" alt="Select DTR" />
+            <p>Select a <strong>Cutoff</strong>, <strong>Month</strong>, and <strong>Date range</strong> above, then choose an employee to preview their DTR.</p>
+        </div>
+    </div>
+
+ 
+</div>

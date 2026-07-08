@@ -105,6 +105,8 @@ namespace Portal.Controllers
         {
             if (!_globalrepository.HasClientAccess(_client_id, "FILE LEAVE")) { return Json(new { Result = "ACCESS DENIED" }, JsonRequestBehavior.AllowGet); }
 
+            string defaultLeaveType = "SL";
+
             LeaveModel _model = new LeaveModel
             {
                 LeaveFrom = _datelog,
@@ -114,7 +116,19 @@ namespace Portal.Controllers
                 Mode = 0,
             };
 
-            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
+            var ruleResult = _attendancerepository.GetDynamicRules(_client_id, defaultLeaveType);
+            _model.DynamicRuleMessage = ruleResult?.Message;
+
+
+            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
+             .Select(t => new SelectListItem
+             {
+                 Text = t.LeaveType,
+                 Value = t.Id.ToString(),
+                 Selected = (t.LeaveType == defaultLeaveType)
+             }).ToList();
+
+            //ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
             return PartialView("~/Views/Attendance/Partial/Leave/_post_leave_detail.cshtml", _model);
         }
 

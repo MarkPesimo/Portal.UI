@@ -581,7 +581,7 @@
     $('#add_post_overtime_modal').on('click', '#submit_post_overtime', function (e) {
         ShowLoading('SHOW');
         $.ajax({
-            url: '/Overtime/_AddPostOvertime',
+            url: '/Overtime/_ManageOvertime',
             type: "POST",
             data: $('#post-overtime-Form').serialize(),
             dataType: 'json',
@@ -638,7 +638,7 @@
     $('#add_post_correction_modal').on('click', '#submit_post_correction', function (e) {
         ShowLoading('SHOW');
         $.ajax({
-            url: '/Attendance/_AddPostCorrection',
+            url: '/Attendance/_AddCorrection',
             type: "POST",
             data: $('#post-attendance-correction-Form').serialize(),
             dataType: 'json',
@@ -670,7 +670,6 @@
 
     $('#clockinout-table').on('click', '.file-leave', function () {
         var DateLog = $(this).attr("DateLog");
-
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",
@@ -679,28 +678,29 @@
             contentType: "application/json; charset=utf-8",
             dataType: "html",
             success: function (response) {
-
                 if (isJsonString(response)) {
                     ShowAccessDenied("Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator.");
                     return;
                 }
-
                 ShowLoading('HIDE');
                 $('#add_post_leave_modal').find(".modal-body").innerHTML = '';
                 $('#add_post_leave_modal').find(".modal-body").html(response);
                 $("#add_post_leave_modal").modal('show');
 
+                var _modal = '#add_post_leave_modal';
                 var _form = '#post-leave-Form';
-                document.querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
-                document.querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
 
-                document.querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
-                document.querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
-
-                document.querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
-                document.querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
-
+                GetLeaveShiftOnSelectedDate(_modal, _form);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", function () {
+                    GetLeaveShiftOnSelectedDate(_modal, _form);
+                });
+                document.querySelector(_modal).querySelector(_form).querySelector("#IsHalfday").addEventListener("change", CheckIsHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").addEventListener("change", CheckIsNotHalfdayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstHalf").addEventListener("change", ToggleFirstHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#SecondHalf").addEventListener("change", ToggleSecondHalfAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#FirstDay_SecondHalf").addEventListener("change", ToggleNotSameDayAdd);
+                document.querySelector(_modal).querySelector(_form).querySelector("#LastDay_FirstHalf").addEventListener("change", ToggleNotSameDayAdd);
                 ComputeLeaveDays();
             },
             failure: function (response) { LogError(response); },
@@ -739,6 +739,97 @@
         });
     });
 
+    $(document).on('change', '#LeaveFrom', function () {
+        var urlPath = '/Leave/GetFiledLeave';
+        var leaveDate = $(this).val();
+
+        if (leaveDate) {
+            $.ajax({
+                url: urlPath,
+                type: 'GET',
+                data: { leaveDate: leaveDate },
+                success: function (res) {
+                    var $container = $('#existing-leave-container');
+                    var $list = $('#existing-leave-list');
+
+                    if (res.success && res.data && res.data.length > 0) {
+                        $list.empty();
+
+                        $.each(res.data, function (i, item) {
+                            var from = item.LeaveFromStr;
+                            var to = item.LeaveToStr;
+                            var reason = item.Reason ? item.Reason : "No reason provided";
+
+                            $list.append('<li><strong>' + from + ' to ' + to + '</strong> — ' + reason + '</li>');
+                        });
+
+                        $container.slideDown();
+                    } else {
+                        $container.slideUp();
+                    }
+                },
+                error: function (err) {
+                    console.error("AJAX Error details:", err);
+                }
+            });
+        }
+    });
+
+    $('#add_post_leave_modal').on('change', '#LeaveFrom', function () {
+        var fromDate = $(this).val();
+        $('#LeaveTo').val(fromDate);
+
+        ComputeLeaveDays();
+    });
+
+    $('#add_post_leave_modal').on('change', '#LeaveTo', function () {
+        ComputeLeaveDays();
+    });
+
+    function ComputeLeaveDays() {
+        var $form = $('#post-leave-Form');
+        var leaveFrom = $form.find("#LeaveFrom").val();
+        var leaveTo = $form.find("#LeaveTo").val();
+
+        //console.log("Sending to API - From:", leaveFrom, "To:", leaveTo);
+
+        var isFirstDayHalf = $form.find('#FirstHalf').is(':checked');
+        var isLastDayHalf = $form.find('#SecondHalf').is(':checked');
+
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    $form.find('#LeaveDays').val(data.NoOfDays);
+                }
+            });
+    }
+
+    function GetLeaveShiftOnSelectedDate(modal, form) {
+        var _modal = modal || '#add_post_leave_modal';
+        var _form = form || '#post-leave-Form';
+
+        var DateLog = $(_modal).find(_form).find("#LeaveFrom").val();
+
+        fetch(`/Overtime/GetShift?_datelog=${DateLog}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    $(_modal).find('#leave-shift-in').val(data.ShiftIn);
+                    $(_modal).find('#leave-shift-out').val(data.ShiftOut);
+                }
+            });
+
+        fetch(`/Overtime/_GetSelectedDateValue?_datelog=${DateLog}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    $(_modal).find('#leave-day-type').val(data.DayType);
+                }
+            });
+    }
 
 });
 

@@ -88,6 +88,8 @@ namespace Portal.Controllers
         [HttpGet]
         public ActionResult _AddPostOvertime(DateTime _datelog)
         {
+            RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "OT");
+
             OvertimeModel _model = new OvertimeModel
             {
                 OTFrom = _datelog,
@@ -96,7 +98,8 @@ namespace Portal.Controllers
                 UserId = 112,
                 ClientId = _client_id,
                 Mode = 0,
-                ContinuousOt = _overtimerepository.SetIfContinuousOT(_datelog)
+                ContinuousOt = _overtimerepository.SetIfContinuousOT(_datelog),
+                DynamicRuleMessage = _rule?.Message
             };
 
             return PartialView("~/Views/Attendance/Partial/Overtime/_post_overtime_detail.cshtml", _model);
@@ -325,27 +328,30 @@ namespace Portal.Controllers
                     {
                         return Json(new { Result = "ERROR", Message = "The date of Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
                     }
-                    
+
                     double _noofdays = (DateTime.Now.Date - _model.OTFrom.Date).TotalDays;
                     if (_noofdays > otDaysAllowed)
                     {
                         return Json(new { Result = "ERROR", Message = $"You cannot submit an overtime request for work performed more than {otDaysAllowed} days ago.", ElementName = "OTFrom" });
                     }
-
                     DateTime _from = DateTime.Parse(_model.OTFrom.ToShortDateString() + " " + _model.OTFromTime.ToShortTimeString());
                     DateTime _to = DateTime.Parse(_model.OTTo.ToShortDateString() + " " + _model.OTToTime.ToShortTimeString());
-
                     if (_from > _to)
                     {
                         return Json(new { Result = "ERROR", Message = "The Overtime [from] cannot be ahead to the date of Overtime [to].", ElementName = "OTFrom" });
                     }
 
-                    if (ComputeOTHours(_from, _to) <= 0)
+                    double _otMinutes = ComputeOTHours(_from, _to);
+                    if (_otMinutes <= 0)
                     {
                         return Json(new { Result = "ERROR", Message = "The value of Overtime [from] must be greater than the value of Overtime [to].", ElementName = "OTFrom" });
                     }
+                    if (_otMinutes > 15 * 60)
+                    {
+                        return Json(new { Result = "ERROR", Message = "Overtime filing cannot exceed 15 hours in a single request.", ElementName = "OTFrom" });
+                    }
                 }
-                
+
                 if (ModelState.IsValid)
                 {
                     string _gen_result = "";

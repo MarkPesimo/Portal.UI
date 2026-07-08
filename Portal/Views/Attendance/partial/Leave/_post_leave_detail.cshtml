@@ -1,9 +1,13 @@
 ﻿@model APWModel.ViewModel.Portal.Leave_model.LeaveModel
 
+<style>
+    .hidden {
+        display: none !important;
+    }
+</style>
 
 @using (Html.BeginForm("Add", "Leave", FormMethod.Post, new { enctype = "multipart/form-data", name = "post-leave-Form", id = "post-leave-Form" }))
 {
-
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.EmpId)
     @Html.HiddenFor(m => m.DateFiled)
@@ -12,9 +16,53 @@
     @Html.HiddenFor(m => m.Remarks)
     @Html.HiddenFor(m => m.Mode)
     @Html.HiddenFor(m => m.Message)
-
     @Html.HiddenFor(m => m.HasAttachement)
     @Html.HiddenFor(m => m.FileExtension)
+    @Html.Hidden("CurrentRequestType", "SL")
+
+    <div class="row mb-2" id="existing-leave-container" style="display:none;">
+        <div class="col-12">
+            <div class="alert alert-warning py-2 px-3 mb-2 shadow-sm border-start border-4 border-warning">
+                <p class="mb-1 small fw-bold text-uppercase">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> Already Filed for this date:
+                </p>
+                <ul id="existing-leave-list" class="mb-0 small ps-3"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="instruction-box shadow-sm mb-4 border-0 rounded-3 overflow-hidden">
+        <div class="d-flex align-items-center justify-content-between p-3 bg-info-subtle border-start border-5 border-info"
+             data-bs-toggle="collapse" href="#post-leaveInstructionsCollapse" role="button" aria-expanded="true" aria-controls="post-leaveInstructionsCollapse" style="cursor: pointer;">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-circle-info fs-4 text-info me-3"></i>
+                <h6 class="fw-bold mb-0 text-dark">Leave Filing Policy</h6>
+            </div>
+            <i class="fa-solid fa-chevron-down text-dark transition-icon"></i>
+        </div>
+        <div class="collapse show" id="post-leaveInstructionsCollapse">
+            <div class="p-3 bg-white border-top">
+                <div id="rule-container">
+                    @if (Model.DynamicRuleMessage == "Follow default rule.")
+                    {
+                        <ul class="list-unstyled mb-0 small">
+                            <li class="d-flex"><i class="fa-solid fa-stethoscope text-danger me-2"></i> <span><strong>Sick Leave:</strong> File within the last 5 working days.</span></li>
+                        </ul>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.DynamicRuleMessage))
+                    {
+                        <p class="small text-muted mb-0">
+                            <i class="fa-solid fa-circle-info text-info me-2"></i> @Model.DynamicRuleMessage
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-0">Select a leave type to view specific requirements.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row" id="div-validation" style="display: none;">
         <div class="col mb-3">
@@ -22,90 +70,270 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label for="" class="form-label">Leave Type</label>
-            @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, "Please Select", new { @class = "form-select", @placeholder = "Leave Types" })
-        </div>
+    <div class="row mt-2">
+        <div class="col-md-5 pe-md-4 border-end">
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Shift Schedule</label>
+                <div class="row g-1">
+                    <div class="col-6">
+                        <input class="text-center form-control form-control-sm bg-light text-primary fw-bold p-1"
+                               style="font-size: 0.75rem;" id="leave-shift-in" name="leave-shift-in" readonly placeholder="In" />
+                    </div>
+                    <div class="col-6">
+                        <input class="text-center form-control form-control-sm bg-light text-primary fw-bold p-1"
+                               style="font-size: 0.75rem;" id="leave-shift-out" name="leave-shift-out" readonly placeholder="Out" />
+                    </div>
+                </div>
+            </div>
 
-
-    </div>
-
-    <div class="row">
-        <div class="col-6">
-            <label for="" class="form-label">From</label>
-            @Html.TextBoxFor(m => m.LeaveFrom, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveFrom.ToString("yyyy-MM-dd") })
-        </div>
-
-        <div class="col-6">
-            <label for="" class="form-label">To</label>
-            @Html.TextBoxFor(m => m.LeaveTo, new { @class = "form-control  ", @placeholder = "mm/dd/yyyy", @type = "date", @Value = Model.LeaveTo.ToString("yyyy-MM-dd") })
-        </div>
-    </div>
-
-    <div class="row mt-4" id="div-sameday-halfday">
-        <div class="col-4">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input", @name = @Model.IsHalfday, @value = @Model.IsHalfday })
-                <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Selected Date Remarks</label>
+                <input class="text-center form-control bg-light text-primary fw-bold" id="leave-day-type" name="leave-day-type" readonly placeholder="" />
             </div>
         </div>
 
-        <div class="col-8 d-none" id="div-sameday-halfday-details">
+        <div class="col-md-7 ps-md-4">
+            @{
+                int leaveDaysAllowed = 5; // Default rule
+                if (!string.IsNullOrEmpty(Model.DynamicRuleMessage))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(Model.DynamicRuleMessage, @"\d+");
+                    if (match.Success) { leaveDaysAllowed = int.Parse(match.Value); }
+                }
+                string leaveMinDate = DateTime.Now.AddDays(-leaveDaysAllowed).ToString("yyyy-MM-dd");
+            }
             <div class="row">
-                <div class="col">
-                    <div class="form-check form-switch mt-2">
-                        @Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input", @name = @Model.FirstHalf, @value = @Model.FirstHalf })
-                        <label class="form-check-label" for="flexSwitchCheckChecked">First Half</label>
-                    </div>
+                <div class="col-6 mb-3">
+                    <label for="LeaveTypeId" class="form-label">Leave Type</label>
+                    @Html.DropDownListFor(m => m.LeaveTypeId, (IEnumerable<SelectListItem>)ViewBag._LeaveTypes, "Please Select", new { @class = "form-select" })
                 </div>
-
-                <div class="col">
-                    <div class="form-check form-switch mt-2">
-                        @Html.CheckBoxFor(m => m.SecondHalf, new { @class = "form-check-input", @name = @Model.SecondHalf, @value = @Model.SecondHalf })
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Second Half</label>
-                    </div>
+                <div class="mt-2 col-6 mb-1 d-flex align-items-center" id="checkboxWrapper">
+                    @Html.CheckBoxFor(m => m.EmergencyLeave, new { @class = "form-check-input me-1", id = "checkbox" })
+                    <label for="checkbox" class="form-check-label">Emergency Leave</label>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="row mt-4 d-none" id="div-not-sameday-halfday">
-        <div class="col-6">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.FirstDay_SecondHalf, new { @class = "form-check-input", @name = @Model.FirstDay_SecondHalf, @value = @Model.FirstDay_SecondHalf })
-                <label class="form-check-label" for="flexSwitchCheckChecked">First day, Second half</label>
+            <div class="row">
+                <div class="col-6">
+                    <label for="LeaveFrom" class="form-label">From</label>
+                    @Html.TextBoxFor(m => m.LeaveFrom, new {
+                        @class = "form-control",
+                        @type = "date",
+                        @Value = Model.LeaveFrom.ToString("yyyy-MM-dd"),
+                        @min = leaveMinDate,
+                        @onkeydown = "return false;"
+                    })
+                </div>
+                <div class="col-6">
+                    <label for="LeaveTo" class="form-label">To</label>
+                    @Html.TextBoxFor(m => m.LeaveTo, new {
+                        @class = "form-control",
+                        @type = "date",
+                        @Value = Model.LeaveTo.ToString("yyyy-MM-dd"),
+                        @min = leaveMinDate,
+                        @onkeydown = "return false;"
+                    })
+                </div>
             </div>
-        </div>
 
-        <div class="col-6">
-            <div class="form-check form-switch mt-2">
-                @Html.CheckBoxFor(m => m.LastDay_FirstHalf, new { @class = "form-check-input", @name = @Model.LastDay_FirstHalf, @value = @Model.LastDay_FirstHalf })
-                <label class="form-check-label" for="flexSwitchCheckChecked">Last day, First Half</label>
+            <div class="row mt-4" id="div-sameday-halfday">
+                <div class="col-4">
+                    <div class="form-check form-switch mt-2">
+                        @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input" })
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+                    </div>
+                </div>
+                <div class="col-8 d-none" id="div-sameday-halfday-details">
+                    <div class="row">
+                        <div class="col"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.FirstHalf, new { @class = "form-check-input" })<label class="form-check-label">First Half</label></div></div>
+                        <div class="col"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.SecondHalf, new { @class = "form-check-input" })<label class="form-check-label">Second Half</label></div></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col-3 mb-3">
-            <label for="" class="form-label">No. of Days</label>
-            @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", @placeholder = "No. of Days", @readonly = "true" })
-        </div>
-    </div>
+            <div class="row mt-4 d-none" id="div-not-sameday-halfday">
+                <div class="col-6"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.FirstDay_SecondHalf, new { @class = "form-check-input" })<label class="form-check-label">First day, Second half</label></div></div>
+                <div class="col-6"><div class="form-check form-switch mt-2">@Html.CheckBoxFor(m => m.LastDay_FirstHalf, new { @class = "form-check-input" })<label class="form-check-label">Last day, First Half</label></div></div>
+            </div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <label for="" class="form-label">Reason</label>
-            @Html.TextAreaFor(m => m.Reason, 4, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
-        </div>
-    </div>
+            <div class="row mt-4">
+                <div class="col-4 mb-3">
+                    <label class="form-label">No. of Days</label>
+                    @Html.TextBoxFor(m => m.LeaveDays, new { @class = "text-center form-control text-primary font-weight-bold", style = "background-color: #e9ecef;", @readonly = "true" })
+                </div>
+            </div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <input class="form-control" type="file" name="Leave_Post_Attachment" id="Leave_Post_Attachment">
+            <div class="row mt-2">
+                <div class="col">
+                    <label class="form-label">Reason</label>
+                    @Html.TextAreaFor(m => m.Reason, 2, 40, new { @class = "form-control", @placeholder = "Enter your reason here" })
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col">
+                    <label class="form-label">Attachment (Optional)</label>
+                    <input class="form-control" type="file" name="Leave_Post_Attachment" id="Leave_Post_Attachment">
+                </div>
+            </div>
         </div>
     </div>
 }
 
+<style>
+    .pulse-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
 
+        .pulse-container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 193, 7, 0.4);
+            border-radius: 50%;
+            animation: pulse-animation 2s infinite;
+        }
 
+    @@keyframes pulse-animation {
+        0% {
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+
+        70% {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+    }
+
+    [aria-expanded="true"] .transition-icon {
+        transform: rotate(180deg);
+    }
+
+    .transition-icon {
+        transition: all 0.3s ease;
+    }
+
+    .instruction-box:hover {
+        filter: brightness(0.98);
+        transition: 0.2s;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff3cd !important;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        var $form = $("#post-leave-Form");
+
+        function getWorkingDaysAgo(startDate, daysBack) {
+            var date = new Date(startDate);
+            var count = 0;
+            while (count < daysBack) {
+                date.setDate(date.getDate() - 1);
+                var day = date.getDay();
+                if (day !== 0 && day !== 6) count++;
+            }
+            return date;
+        }
+
+        function setDateRules() {
+            var requestType = $form.find("#CurrentRequestType").val();
+            var fromInput = $form.find("#LeaveFrom");
+            var toInput = $form.find("#LeaveTo");
+            var isEmergency = $form.find("#checkbox").is(":checked");
+            var today = new Date();
+            var todayStr = today.toISOString().split('T')[0];
+
+            var ruleText = $form.find("#rule-container").text();
+            var daysMatch = ruleText.match(/(\d+)/);
+            var allowedDays = daysMatch ? parseInt(daysMatch[0]) : 5;
+
+            if (requestType === "VL") {
+                $form.find("#checkboxWrapper").removeClass("d-none");
+                if (isEmergency) {
+                    fromInput.attr("min", todayStr).removeAttr("max");
+                    toInput.attr("min", todayStr).removeAttr("max");
+                } else {
+                    var minDate = new Date();
+                    minDate.setDate(today.getDate() + allowedDays);
+                    var minStr = minDate.toISOString().split('T')[0];
+                    fromInput.attr("min", minStr).removeAttr("max");
+                    toInput.attr("min", todayStr).removeAttr("max");
+                }
+            } else {
+                $form.find("#checkboxWrapper").addClass("d-none");
+                $form.find("#checkbox").prop("checked", false);
+                var minDate = getWorkingDaysAgo(today, allowedDays);
+                var minStr = minDate.toISOString().split('T')[0];
+                fromInput.attr("min", minStr).removeAttr("max");
+                toInput.attr("min", minStr).removeAttr("max");
+            }
+        }
+
+        function updateInstructionVisibility() {
+            var leaveType = $form.find("#LeaveTypeId").val();
+            $form.find(".rule-group").addClass("d-none");
+
+            if (leaveType == "1") {
+                $form.find("#rule-sl").removeClass("d-none");
+            } else if (leaveType == "2") {
+                $form.find("#rule-vl").removeClass("d-none");
+            } else {
+                $form.find("#rule-generic").removeClass("d-none");
+            }
+        }
+
+        $form.find("#LeaveTypeId").on("change", function () {
+            var selectedText = $(this).find("option:selected").text().trim();
+
+            $.get('@Url.Action("GetDynamicRulesData", "Leave")', { leaveTypeName: selectedText }, function (data) {
+                if (selectedText === "Maternity Leave" || selectedText === "Paternity Leave") {
+                    var customHtml = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + selectedText + ' must be filed within 10 days.</p>';
+                    $form.find('#rule-container').html(customHtml);
+                } else if (data.Message === "Follow default rule.") {
+                    var defaultHtml = '<ul class="list-unstyled mb-0 small">' +
+                        '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File at least 3 working days in advance.</span></li>' +
+                        '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to bypass the 3-day rule.</span></li>' +
+                        '</ul>';
+                    $form.find('#rule-container').html(defaultHtml);
+                } else {
+                    var html = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + data.Message + '</p>';
+                    $form.find('#rule-container').html(html);
+                }
+
+                $form.find("#CurrentRequestType").val(data.RequestType);
+
+                if (selectedText === "Vacation Leave") {
+                    $form.find("#CurrentRequestType").val("VL");
+                }
+
+                updateInstructionVisibility();
+                setDateRules();
+            });
+        });
+
+        $form.find("#checkbox").on("change", setDateRules);
+
+        $form.find("#LeaveFrom").on("change", function () {
+            var fromDate = $(this).val();
+            var toInput = $form.find("#LeaveTo");
+            toInput.val(fromDate);
+            toInput.attr("min", fromDate);
+            setDateRules();
+        });
+
+        setDateRules();
+        updateInstructionVisibility();
+    });
+</script>
