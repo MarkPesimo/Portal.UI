@@ -743,6 +743,36 @@
             .catch(error => console.error("Request failed:", error));
     }
 
+    function ComputeLeaveDaysNotSameDayAPI() {
+        var _modal = '#add_leave_modal';
+        var _form = '#leave-Form';
+
+        var leaveFrom = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveFrom").value;
+        var leaveTo = document.querySelector(_modal).querySelector(_form).querySelector("#LeaveTo").value;
+
+        //var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        //var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        var isFirstDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#FirstDay_SecondHalf').checked;
+        var isLastDayHalf = document.querySelector(_modal).querySelector(_form).querySelector('#LastDay_FirstHalf').checked;
+
+        console.log(isFirstDayHalf)
+        console.log(isLastDayHalf)
+
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.error) {
+                    document.querySelector(_modal).querySelector(_form).querySelector('#LeaveDays').value = data.NoOfDays;
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => console.error("Request failed:", error));
+    }
+
     $("#show_leave_filter_btn").click(function (e) {
         e.preventDefault();
 

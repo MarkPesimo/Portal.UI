@@ -120,6 +120,38 @@
             font-size: 0.7rem;
             text-transform: uppercase;
         }
+
+        .status-hover {
+            display: inline-block;
+            padding: 2px 5px; 
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 4px;
+            cursor: default;
+        }
+
+            .status-hover:hover {
+                transform: scale(1.2);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                background-color: rgba(0,0,0,0.05);
+            }
+            .status-hover i {
+                pointer-events: none;
+            }
+
+        .dtr-legend span {
+            display: inline-flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .dtr-legend i {
+            margin-right: 5px;
+            font-size: 0.85rem;
+        }
+
     }
 </style>
 

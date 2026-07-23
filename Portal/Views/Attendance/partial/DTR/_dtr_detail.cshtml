@@ -105,26 +105,26 @@
 <div class="d-flex flex-column h-100">
 
     <div class="dtr-guidelines">
-        <h6 class="fw-bold mb-1">Important Review Guidelines</h6>
-        <ul class="mb-0 small ps-3">
-            <li>
-                <strong>Approval Status:</strong> Ensure all Attendance Corrections, OT, and Leaves are marked as
-                <span class="badge rounded-pill bg-success">Approved</span>.
-                Items marked as <span class="badge rounded-pill bg-warning text-dark">Posted</span>
-                are pending review and <strong>will not be counted</strong> in this submission.
-            </li>
-            <li class="mt-1">
-                <strong>Late/Undertime Alert:</strong> Double-check entries with <span class="text-danger fw-bold">Red Font</span> in the Time In/Out columns. This indicates a late or undertime record that may require a correction to avoid salary deductions.
-            </li>
-            <li class="mt-1">
-                <strong>Found a Discrepancy?</strong> If you notice any incorrect entry or need something added or corrected, <strong>do not proceed</strong> with creating the DTR. Please coordinate with your account supervisor first before filing.
-            </li>
-            <li class="mt-1">
-                <strong>Date Restriction:</strong> If a date has already been submitted or included in another DTR, the system <strong>will not proceed</strong> with creating a new DTR for that date.
-            </li>
-        </ul>
-    </div>
+        <div class="d-flex justify-content-between align-items-center guidelines-toggle" data-bs-toggle="collapse" data-bs-target="#collapseGuidelines" aria-expanded="false" aria-controls="collapseGuidelines">
+            <h6 class="fw-bold mb-0">Important Review Guidelines</h6>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
 
+        <div class="collapse" id="collapseGuidelines">
+            <ul class="mb-0 small ps-3 mt-2">
+                <li>
+                    <strong>Approval Status:</strong> Ensure you have marked all Attendance Corrections, OT, and Leaves as
+                    <span class="badge rounded-pill bg-success">Approved</span>. Items you have marked as <span class="badge rounded-pill bg-warning text-dark">Posted</span> are still pending review and <strong>will not be counted</strong> in your submission.
+                </li>
+                <li class="mt-1">
+                    <strong>Late/Undertime Alert:</strong> Double-check your entries with <span class="text-danger fw-bold">Red Font</span> in the Time In/Out columns. These indicate late or undertime records that you may need to correct to avoid salary deductions.
+                </li>
+                <li class="mt-1">
+                    <strong>Found a Discrepancy?</strong> If you notice an incorrect entry or need to add or correct information, <strong>do not proceed</strong> with creating your DTR. Please coordinate with your account supervisor first before filing.
+                </li>
+            </ul>
+        </div>
+    </div>
     <div class="dtr-filter-bar">
         @using (Html.BeginForm("_AddCorrection", "Attendance", FormMethod.Post, new { enctype = "multipart/form-data", name = "dtr-Form", id = "dtr-Form" }))
         {
@@ -151,28 +151,23 @@
                         }, "Value", "Text", Model.CutOff),
                         new { @class = "form-select form-select-sm", id = "Cutoff" })
                 </div>
-
                 <div class="col-4 col-md-2">
                     <label class="form-label">Month</label>
                     @Html.TextBoxFor(m => m.Month, new { @class = "form-control form-control-sm month-only", type = "month", id = "Month" })
                 </div>
-
                 <div class="col-4 col-md-2">
                     <label class="form-label">Year</label>
                     @Html.DropDownListFor(m => m.Year,
                         new SelectList(Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new { Value = y.ToString(), Text = y.ToString() }), "Value", "Text", Model.Year ?? DateTime.Now.Year.ToString()),
                         new { @class = "form-select form-select-sm", id = "Year" })
                 </div>
-
                 <div class="col-6 col-md-2">
                     <label class="form-label">Date From</label>
                     @Html.TextBox("DateFrom", Model.DateFrom != DateTime.MinValue ? Model.DateFrom.ToString("yyyy-MM-dd") : "", new { @class = "form-control form-control-sm fw-bold", type = "date", id = "DateFrom" })
                 </div>
-
                 <div class="col-auto d-none d-md-flex align-items-center px-0 dtr-date-divider">
                     <i class="fa-solid fa-arrow-right-long text-muted"></i>
                 </div>
-
                 <div class="col-6 col-md-2">
                     <label class="form-label">Date To</label>
                     @Html.TextBox("Dateto", Model.Dateto != DateTime.MinValue ? Model.Dateto.ToString("yyyy-MM-dd") : "", new { @class = "form-control form-control-sm fw-bold", type = "date", id = "DateTo" })
@@ -180,8 +175,16 @@
             </div>
         }
     </div>
-
-    <label class="form-label fw-bold text-primary mb-1">DTR Preview</label>
+    <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between mb-2">
+        <label class="form-label fw-bold text-primary mb-2 mb-lg-0 fs-5 text-nowrap">DTR Preview</label>
+        <div class="dtr-legend fs-6 d-flex flex-wrap align-items-center gap-2">
+            @*<small class="fw-normal font-italic w-100 d-block d-md-inline w-md-auto">(Hover table icons for details)</small>*@
+            <span><i class="fa-solid fa-circle-half-stroke text-danger"></i> Half Day Absent</span>
+            <span><i class="fa-solid fa-circle-xmark text-danger"></i> Absent</span>
+            <span><i class="fa-solid fa-umbrella-beach text-danger"></i> Leave</span>
+            <span><i class="fa-solid fa-calendar-check text-warning"></i> Rest Day</span>
+        </div>
+    </div>
     <div id="dtrContainer">
         <div class="dtr-empty-state" id="dtrEmptyState">
             <img src="@Url.Content("~/Content/animation/selectdtr.gif")" alt="Select DTR" />
@@ -189,5 +192,4 @@
         </div>
     </div>
 
- 
 </div>

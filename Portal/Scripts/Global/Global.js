@@ -360,7 +360,11 @@
                         if (result.Status == "SUCCESS") {
                             GetClockInClockOut();
                             CheckAttendanceNotification('TIME OUT');
-                        } else {
+                        }
+                        else if (result.Status == "ERROR") {
+                            ShowDangerMessage("Error", result.Message || "Something went wrong while processing your time out. Please contact your account supervisor for assistant.");
+                        }
+                        else {
                             ShowAccessDenied(result.result);
                         }
                     }

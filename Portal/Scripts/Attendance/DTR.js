@@ -157,21 +157,56 @@
             dataType: "html",
             success: function (response) {
                 ShowLoading('HIDE');
-                $('#add_dtr_modal').find(".modal-body").innerHTML = '';
                 $('#add_dtr_modal').find(".modal-body").html(response);
                 $('#add_dtr_modal').modal('show');
 
-                var _modal = '#add_dtr_modal';
-                var _form = '#dtr-Form';
-                document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").addEventListener("change", SetCutOffDate);
-                document.querySelector(_modal).querySelector(_form).querySelector("#Month").addEventListener("change", SetCutOffDate);
-                document.querySelector(_modal).querySelector(_form).querySelector("#Year").addEventListener("change", SetCutOffDate);
-                SetCutOffDate();
+                var modal = document.querySelector('#add_dtr_modal');
+                var form = modal.querySelector('#dtr-Form');
+                form.querySelector("#Cutoff").addEventListener("change", FetchAndSetCutoff);
+                form.querySelector("#Month").addEventListener("change", FetchAndSetCutoff);
+                form.querySelector("#Year").addEventListener("change", FetchAndSetCutoff);
+                
+                form.querySelector("#DateFrom").addEventListener("change", RefreshTableFromManualDates);
+                form.querySelector("#DateTo").addEventListener("change", RefreshTableFromManualDates);
+                
+                FetchAndSetCutoff();
             },
             failure: function (response) { LogError(response); },
             error: function (response) { LogError(response); }
         });
     });
+
+    function FetchAndSetCutoff() {
+        var _modal = '#add_dtr_modal';
+        var form = document.querySelector(_modal).querySelector('#dtr-Form');
+
+        var cutoff = form.querySelector("#Cutoff").value;
+        var year = form.querySelector("#Year").value;
+        var monthInput = form.querySelector("#Month").value;
+        var empId = form.querySelector("#EmpId").value;
+        var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
+
+        if (cutoff && month > 0 && year) {
+            $.getJSON('/Attendance/GetClientCutoffDate',
+                { cutoff: cutoff, month: month, year: year },
+                function (data) {
+                    if (data.success) {
+                        $("#DateFrom").val(data.dateFrom);
+                        $("#DateTo").val(data.dateTo);
+                        
+                        loadEmployeeDTR(empId, data.dateFrom, data.dateTo);
+                    }
+                });
+        }
+    }
+
+    function RefreshTableFromManualDates() {
+        var empId = document.querySelector('#dtr-Form #EmpId').value;
+        var dateFrom = $("#DateFrom").val();
+        var dateTo = $("#DateTo").val();
+
+        loadEmployeeDTR(empId, dateFrom, dateTo);
+    }
 
     //$('#add_dtr_modal').on('click', '#submit_DTR', function (e) {
     //    ManageDTR('#dtr-Form', '#add_dtr_modal', 'DTR successfully created.')
@@ -329,11 +364,13 @@
     function SetCutOffDate() {
         var _modal = '#add_dtr_modal';
         var _form = '#dtr-Form';
+        
+        var form = document.querySelector(_modal).querySelector(_form);
 
-        var cutoff = document.querySelector(_modal).querySelector(_form).querySelector("#Cutoff").value;
-        var year = document.querySelector(_modal).querySelector(_form).querySelector("#Year").value;
-        var monthInput = document.querySelector(_modal).querySelector(_form).querySelector("#Month").value;
-        var empId = document.querySelector(_modal).querySelector(_form).querySelector("#EmpId").value;
+        var cutoff = form.querySelector("#Cutoff").value;
+        var year = form.querySelector("#Year").value;
+        var monthInput = form.querySelector("#Month").value;
+        var empId = form.querySelector("#EmpId").value;
         var month = monthInput ? parseInt(monthInput.split("-")[1]) : 0;
 
         if (cutoff && month > 0 && year) {
@@ -344,7 +381,10 @@
                         $("#DateFrom").val(data.dateFrom);
                         $("#DateTo").val(data.dateTo);
                         
-                        loadEmployeeDTR(empId, data.dateFrom, data.dateTo);
+                        var actualDateFrom = $("#DateFrom").val();
+                        var actualDateTo = $("#DateTo").val();
+                        
+                        loadEmployeeDTR(empId, actualDateFrom, actualDateTo);
                     } else {
                         alert("Error: " + data.message);
                     }
@@ -602,6 +642,24 @@
                 let totalLate = 0;
                 let totalUnder = 0;
 
+                const renderWorkSchedule = (workSchedule) => {
+                    let wsDisplay = (workSchedule || '').trim();
+
+                    if (wsDisplay.includes('0.50 ABSENT')) {
+                        wsDisplay = wsDisplay.replace('0.50 ABSENT', '<i class="fa-solid fa-circle-half-stroke text-danger" title="0.50 ABSENT"></i>');
+                    } else if (wsDisplay.includes('1.00 ABSENT')) {
+                        wsDisplay = wsDisplay.replace('1.00 ABSENT', '<i class="fa-solid fa-circle-xmark text-danger" title="1.00 ABSENT"></i>');
+                    }
+                    else if (wsDisplay.includes('0.50 Day on leave') || wsDisplay.includes('1.00 Day on leave')) {
+                        wsDisplay = wsDisplay.replace(/0.50 Day on leave|1.00 Day on leave/gi, '<i class="fa-solid fa-umbrella-beach text-danger"></i> <span class="fw-bold text-danger">Leave</span>');
+                    }
+                    else if (wsDisplay.includes('Rest Day')) {
+                        wsDisplay = wsDisplay.replace('Rest Day', '<i class="fa-solid fa-calendar-check text-warning"></i> <span class="fw-bold text-warning">Rest Day</span>');
+                    }
+
+                    return '<span class="status-hover d-inline-block">' + wsDisplay + '</span>';
+                };
+
                 html += '<div class="card mb-3 shadow-sm">';
                 html += '<div class="card-header bg-primary text-white py-2"><strong>Attendance</strong></div>';
                 html += '<div class="card-body p-0">';
@@ -625,7 +683,6 @@
                 $.each(data.Attendance, function (i, a) {
                     const isLate = (a.LateColor || '').trim().toUpperCase() === 'RED';
                     const isUndertime = (a.UndertimeColor || '').trim().toUpperCase() === 'RED';
-                    const isAbsent = (a.WorkSchedule || '').trim().toUpperCase() === 'ABSENT';
                     const hasTimeLogs = (a.TimeIn && a.TimeIn.trim() !== '') || (a.TimeOut && a.TimeOut.trim() !== '');
 
                     const hasInLoc = a.TimeInLatitude !== 0 && a.TimeInLongitude !== 0;
@@ -673,7 +730,7 @@
                     html += '<tr class="text-center">' +
                         '<td>' + dtrDisplay + '</td>' +
                         '<td class="text-nowrap">' + (a.DateLog || '') + '</td>' +
-                        '<td class="' + (isAbsent ? 'text-danger fw-bold' : '') + '">' + (a.WorkSchedule || '') + '</td>' +
+                        '<td>' + renderWorkSchedule(a.WorkSchedule) + '</td>' +
                         '<td>' + renderTimeWithMap(a.TimeIn, a.TimeInLatitude, a.TimeInLongitude, (isLate ? 'text-danger fw-bold' : ''), hasInLoc, 'text-success') + '</td>' +
                         '<td>' + renderTimeWithMap(a.TimeOut, a.TimeOutLatitude, a.TimeOutLongitude, (isUndertime ? 'text-danger fw-bold' : ''), hasOutLoc, 'text-danger') + '</td>' +
                         '<td>' + displayWorkHours + '</td>' +

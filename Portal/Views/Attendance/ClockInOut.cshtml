@@ -103,6 +103,7 @@
                     font-weight: 600;
                     border: none !important;
                 }
+
     }
 </style>
 
@@ -125,8 +126,16 @@
                     </nav>
                 </div>
 
-                <div class="col-lg-auto mt-lg-0 mt-3 d-flex d-lg-block">
-                    <button type="button" class="btn btn-sm btn-dark px-3 rounded shadow-sm w-100 w-lg-auto" id="show_clockinout_filter_btn">
+                <div class="col-lg-auto mt-lg-0 mt-3 d-flex align-items-center flex-wrap gap-3">
+                    <div class="dtr-legend fs-6 d-flex flex-wrap gap-2">
+
+                        <span class="px-2 py-1 bg-white border rounded"><i class="fa-solid fa-circle-half-stroke text-danger"></i> Half Day Absent</span>
+                        <span class="px-2 py-1 bg-white border rounded"><i class="fa-solid fa-circle-xmark text-danger"></i> Whole Day Absent</span>
+                        <span class="px-2 py-1 bg-white border rounded"><i class="fa-solid fa-umbrella-beach text-danger"></i> Leave</span>
+                        <span class="px-2 py-1 bg-white border rounded"><i class="fa-solid fa-calendar-check text-warning"></i> Rest Day</span>
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-dark px-3 rounded shadow-sm" id="show_clockinout_filter_btn">
                         <i class="fa-solid fa-sliders me-1"></i> Filter Records
                     </button>
                 </div>

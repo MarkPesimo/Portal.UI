@@ -102,7 +102,28 @@
                     }
                 },
                 {
-                    targets: [1, 2, 3, 4],
+                    targets: 1,
+                    className: "text-center align-middle",
+                    render: function (data) {
+                        if (!data) return "";
+
+                        let wsDisplay = (data || '').trim();
+
+                        if (wsDisplay.includes('0.50 ABSENT')) {
+                            wsDisplay = wsDisplay.replace('0.50 ABSENT', '<i class="fa-solid fa-circle-half-stroke text-danger" title="0.50 ABSENT"></i>');
+                        } else if (wsDisplay.includes('1.00 ABSENT')) {
+                            wsDisplay = wsDisplay.replace('1.00 ABSENT', '<i class="fa-solid fa-circle-xmark text-danger" title="1.00 ABSENT"></i>');
+                        } else if (wsDisplay.includes('0.50 Day on leave') || wsDisplay.includes('1.00 Day on leave')) {
+                            wsDisplay = wsDisplay.replace(/0.50 Day on leave|1.00 Day on leave/gi, '<i class="fa-solid fa-umbrella-beach text-danger"></i> <span class="fw-bold text-danger">Leave</span>');
+                        } else if (wsDisplay.includes('Rest Day')) {
+                            wsDisplay = wsDisplay.replace('Rest Day', '<i class="fa-solid fa-calendar-check text-warning"></i> <span class="fw-bold text-warning">Rest Day</span>');
+                        }
+
+                        return '<span class="badge bg-light text-dark border status-hover d-inline-block">' + wsDisplay + '</span>';
+                    }
+                },
+                {
+                    targets: [2, 3, 4], 
                     className: "text-center align-middle"
                 },
                 {
