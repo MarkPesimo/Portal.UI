@@ -85,7 +85,7 @@ namespace Portal.Repository
             //if (_mode == 4) { _endpoint = "Leave/Unpost"; }
             //if (_mode == 5) { _endpoint = "Leave/Approv"; }
             //if (_mode == 6) { _endpoint = "Leave/Reject"; }
-
+            _model.UserId = 112;
 
             var _content_prop = new Dictionary<string, string>
             {

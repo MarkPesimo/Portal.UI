@@ -418,8 +418,7 @@
         const a = new Date(_leavefrom);
         const b = new Date(_leaveto);
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-
-        // Discard the time and time-zone information.
+        
         const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
         const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
 
@@ -760,70 +759,121 @@
         });
     });
 
-    $(document).on('change', '#LeaveFrom', function () {
-        var urlPath = '/Leave/GetFiledLeave';
-        var leaveDate = $(this).val();
+    //$(document).on('change', '#LeaveFrom', function () {
+    //    var urlPath = '/Leave/GetFiledLeave';
+    //    var leaveDate = $(this).val();
 
-        if (leaveDate) {
-            $.ajax({
-                url: urlPath,
-                type: 'GET',
-                data: { leaveDate: leaveDate },
-                success: function (res) {
-                    var $container = $('#existing-leave-container');
-                    var $list = $('#existing-leave-list');
+    //    if (leaveDate) {
+    //        $.ajax({
+    //            url: urlPath,
+    //            type: 'GET',
+    //            data: { leaveDate: leaveDate },
+    //            success: function (res) {
+    //                var $container = $('#existing-leave-container');
+    //                var $list = $('#existing-leave-list');
 
-                    if (res.success && res.data && res.data.length > 0) {
-                        $list.empty();
+    //                if (res.success && res.data && res.data.length > 0) {
+    //                    $list.empty();
 
-                        $.each(res.data, function (i, item) {
-                            var from = item.LeaveFromStr;
-                            var to = item.LeaveToStr;
-                            var reason = item.Reason ? item.Reason : "No reason provided";
+    //                    $.each(res.data, function (i, item) {
+    //                        var from = item.LeaveFromStr;
+    //                        var to = item.LeaveToStr;
+    //                        var reason = item.Reason ? item.Reason : "No reason provided";
 
-                            $list.append('<li><strong>' + from + ' to ' + to + '</strong> — ' + reason + '</li>');
-                        });
+    //                        $list.append('<li><strong>' + from + ' to ' + to + '</strong> — ' + reason + '</li>');
+    //                    });
 
-                        $container.slideDown();
-                    } else {
-                        $container.slideUp();
-                    }
-                },
-                error: function (err) {
-                    console.error("AJAX Error details:", err);
-                }
-            });
+    //                    $container.slideDown();
+    //                } else {
+    //                    $container.slideUp();
+    //                }
+    //            },
+    //            error: function (err) {
+    //                console.error("AJAX Error details:", err);
+    //            }
+    //        });
+    //    }
+    //});
+    
+    var computeLeaveController = null;
+    
+    $('#add_post_leave_modal').on('change', '#LeaveFrom, #LeaveTo', function (e) {
+        var $form = $('#post-leave-Form');
+        var $fromInput = $form.find('#LeaveFrom');
+        var $toInput = $form.find('#LeaveTo');
+
+        var leaveFrom = $fromInput.val();
+        var leaveTo = $toInput.val();
+        
+        if (e.target.id === 'LeaveFrom') {
+            leaveTo = leaveFrom;
+            $toInput.val(leaveFrom);
         }
-    });
 
-    $('#add_post_leave_modal').on('change', '#LeaveFrom', function () {
-        var fromDate = $(this).val();
-        $('#LeaveTo').val(fromDate);
+        $toInput.attr('min', leaveFrom);
+        
+        UpdateHalfDayVisibility(leaveFrom, leaveTo);
 
         ComputeLeaveDays();
     });
-
-    $('#add_post_leave_modal').on('change', '#LeaveTo', function () {
+    
+    $('#add_post_leave_modal').on('change', '#FirstHalf, #SecondHalf', function () {
         ComputeLeaveDays();
     });
+
+    function UpdateHalfDayVisibility(leaveFrom, leaveTo) {
+        if (!leaveFrom || !leaveTo) return;
+
+        var $sameDaySection = $('#div-sameday-halfday');
+        var $notSameDaySection = $('#div-not-sameday-halfday');
+
+        if (leaveFrom === leaveTo) {
+            $sameDaySection.removeClass('d-none hidden').css('display', '');
+            $notSameDaySection.addClass('d-none').css('display', 'none');
+        } else {
+            $sameDaySection.addClass('d-none').css('display', 'none');
+            $notSameDaySection.removeClass('d-none hidden').css('display', '');
+        }
+    }
 
     function ComputeLeaveDays() {
         var $form = $('#post-leave-Form');
         var leaveFrom = $form.find("#LeaveFrom").val();
         var leaveTo = $form.find("#LeaveTo").val();
 
-        //console.log("Sending to API - From:", leaveFrom, "To:", leaveTo);
+        if (!leaveFrom || !leaveTo) {
+            $form.find('#LeaveDays').val('');
+            return;
+        }
+        
+        if (new Date(leaveTo) < new Date(leaveFrom)) {
+            leaveTo = leaveFrom;
+            $form.find("#LeaveTo").val(leaveFrom);
+        }
 
         var isFirstDayHalf = $form.find('#FirstHalf').is(':checked');
         var isLastDayHalf = $form.find('#SecondHalf').is(':checked');
+        
+        if (computeLeaveController) {
+            computeLeaveController.abort();
+        }
+        computeLeaveController = new AbortController();
 
-        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${encodeURIComponent(leaveFrom)}&d2=${encodeURIComponent(leaveTo)}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
 
-        fetch(url, { method: 'GET' })
+        fetch(url, {
+            method: 'GET',
+            signal: computeLeaveController.signal 
+        })
             .then(response => response.json())
             .then(data => {
                 if (data && !data.error) {
                     $form.find('#LeaveDays').val(data.NoOfDays);
+                }
+            })
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error("Error computing leave days:", err);
                 }
             });
     }

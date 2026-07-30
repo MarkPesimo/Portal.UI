@@ -843,7 +843,7 @@
                 html += '<div class="card mt-3 mb-2 border-primary">' +
                     '<div class="card-body py-3 text-center">' +
                     '<img src="/Content/ItalizedSignature.png" alt="E-Signature" style="max-height:180px; width:100%; object-fit:contain;" />' +
-                    '<div class="small text-muted mt-1 mb-3">*Actual format of the e-signature.</div>' +
+                    '<div class="small mt-1 mb-3"><span class="bg-warning-subtle text-warning-emphasis px-2 py-1 rounded fw-bold">* Sample e-signature format only</span></div>' +
                     '<hr class="my-2" />' +
                     '<small class="text-muted d-block">' +
                     '<i class="fa-solid fa-circle-info text-primary"></i> ' +

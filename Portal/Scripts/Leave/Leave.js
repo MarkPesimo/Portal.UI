@@ -7,21 +7,24 @@
         
         ShowLoading('HIDE');
         LoadDefault();
-        GetLeaveBalance(1);
-        GetLeaveBalance(2);
-        GetLeaveBalance(4);
-        GetLeaveBalance(5);
+
+        //GetLeaveBalance(1);
+        //GetLeaveBalance(2);
+        //GetLeaveBalance(4);
+        //GetLeaveBalance(5);
+        var leaveTypeIds = [1, 2, 4, 5, 6];
+        leaveTypeIds.forEach(function (id) {
+            GetLeaveBalance(id);
+        });
+
+
     });
 
     function LoadDefault() {
         var date = new Date();
-
-        var curr_date = date.getDate();
-        var curr_month = date.getMonth() + 1; //Months are zero based
         var curr_year = date.getFullYear();
-
         BindTable(0, curr_year + "-01-01", curr_year + "-12-31");
-    };
+    }
 
     function GetLeaveBalance(leavetypeid) {
         ShowLoading('SHOW');
@@ -31,27 +34,87 @@
             data: { '_leavetypeid': leavetypeid },
             success: function (response) {
                 ShowLoading('HIDE');
-                var p = (leavetypeid == 1) ? "sl" : (leavetypeid == 2) ? "vl" : (leavetypeid == 4) ? "ml" : "pl";
 
-                if (response && response.result) {
-                    var res = response.result;
-                    $('#card-type-' + leavetypeid).removeClass('d-none');
-                    document.getElementById('label-' + p + '-balance').innerHTML = 'Balance : <strong class="text-leave-green">' + res.Balance + '</strong>';
-                    document.getElementById('label-' + p + '-earned').innerHTML = 'Earned : <strong>' + res.Earned + '</strong>';
-                    document.getElementById('label-' + p + '-used').innerHTML = 'Used : <strong>' + res.Used + '</strong>';
-                    document.getElementById('label-' + p + '-entitled').innerHTML = 'Entitled : <strong>' + res.EntitledLeave + '</strong>';
-                    document.getElementById('label-' + p + '-valid-until').innerHTML = 'Valid Until : <strong class="text-leave-green">' + res.ValidUntil + '</strong>';
-                    document.getElementById('label-' + p + '-earned-at').innerHTML = 'Credits earned at : <strong>' + res.EarnedAt + '</strong>';
-                } else {
-                    $('#card-type-' + leavetypeid).addClass('d-none');
+                $('#card-type-' + leavetypeid).remove();
+
+                var res = response && response.result;
+                if (res && res.LeaveTypeId == leavetypeid) {
+                    $('#leaveSummaryContainer').append(BuildLeaveCard(leavetypeid));
+
+                    document.getElementById('label-' + leavetypeid + '-balance').innerHTML = 'Balance : <strong class="text-leave-green fw-bold">' + res.Balance + '</strong>';
+
+                    document.getElementById('label-' + leavetypeid + '-earned').innerHTML = 'Earned : <strong class="text-dark fw-bold">' + res.Earned + '</strong>';
+
+                    document.getElementById('label-' + leavetypeid + '-used').innerHTML = 'Used : <strong class="text-dark fw-bold">' + res.Used + '</strong>';
+
+                    document.getElementById('label-' + leavetypeid + '-entitled').innerHTML = 'Entitled : <strong class="text-dark fw-bold">' + res.EntitledLeave + '</strong>';
+
+                    document.getElementById('label-' + leavetypeid + '-valid-until').innerHTML = 'Valid Until : <strong class="text-leave-green fw-bold">' + res.ValidUntil + '</strong>';
+
+                    document.getElementById('label-' + leavetypeid + '-earned-at').innerHTML = 'Credits earned at : <strong class="text-dark fw-bold">' + res.EarnedAt + '</strong>';
                 }
             },
             error: function () {
                 ShowLoading('HIDE');
-                $('#card-type-' + leavetypeid).addClass('d-none');
+                $('#card-type-' + leavetypeid).remove();
             }
         });
     }
+
+    function BuildLeaveCard(leavetypeid) {
+        var cfg = leaveTypeConfig[leavetypeid] || {
+            label: 'Leave Type ' + leavetypeid,
+            icon: 'fa-calendar-days',
+            bg: 'bg-light-secondary',
+            color: 'text-secondary'
+        };
+
+        var iconHtml = cfg.extraIcon
+            ? '<i class="fa-solid ' + cfg.icon + '"></i>'
+            + '<i class="fa-solid ' + cfg.extraIcon + '" style="position:absolute;font-size:0.55em;bottom:2px;right:2px;"></i>'
+            : '<i class="fa-solid ' + cfg.icon + '"></i>';
+
+        return '' +
+            '<div class="col-lg-3" id="card-type-' + leavetypeid + '">' +
+            '  <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-3">' +
+            '    <div class="card-body p-3">' +
+            '      <div class="d-flex align-items-center justify-content-between leave-card-header">' +
+            '        <div class="d-flex align-items-center">' +
+            '          <div class="p-2 rounded-circle ' + cfg.bg + ' ' + cfg.color + ' me-2 position-relative" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">' +
+            '            ' + iconHtml +
+            '          </div>' +
+            '          <h6 class="mb-0 fw-bold">' + cfg.label + '</h6>' +
+            '        </div>' +
+            '        <i class="fa-solid fa-chevron-down chevron-icon text-muted"></i>' +
+            '      </div>' +
+            '      <div class="leave-card-body">' +
+            '        <div class="row mt-3">' +
+            '          <div class="col-6">' +
+            '            <div class="small text-muted mb-1" id="label-' + leavetypeid + '-balance"></div>' +
+            '            <div class="small text-muted mb-1" id="label-' + leavetypeid + '-earned"></div>' +
+            '          </div>' +
+            '          <div class="col-6">' +
+            '            <div class="small text-muted mb-1" id="label-' + leavetypeid + '-used"></div>' +
+            '            <div class="small text-muted mb-1" id="label-' + leavetypeid + '-entitled"></div>' +
+            '          </div>' +
+            '        </div>' +
+            '        <div class="border-top pt-2 mt-2 small text-muted">' +
+            '          <div id="label-' + leavetypeid + '-valid-until"></div>' +
+            '          <div id="label-' + leavetypeid + '-earned-at"></div>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>';
+    }
+
+    var leaveTypeConfig = {
+        1: { label: 'Sick Leave', icon: 'fa-house-chimney-medical', bg: 'bg-light-primary', color: 'text-primary' },
+        2: { label: 'Vacation Leave', icon: 'fa-plane-departure', bg: 'bg-light-info', color: 'text-info' },
+        4: { label: 'Maternity', icon: 'fa-baby', bg: 'bg-light-danger', color: 'text-danger' },
+        5: { label: 'Paternity', icon: 'fa-person', extraIcon: 'fa-child', bg: 'bg-light-warning', color: 'text-warning' },
+        6: { label: 'Birthday Leave', icon: 'fa-cake-candles', bg: 'bg-light-success', color: 'text-success' }
+    };
 
     var leaveCardsExpanded = false;
 
@@ -1173,13 +1236,35 @@
             }
         });
     });
+    
+    var computeLeaveControllerAPI = null;
+    var currentFiledLeaveXHR = null;
+    
+    function UpdateHalfDayVisibility(leaveFrom, leaveTo) {
+        if (!leaveFrom || !leaveTo) return;
 
+        var $sameDaySection = $('#div-sameday-halfday');
+        var $notSameDaySection = $('#div-not-sameday-halfday');
+
+        if (leaveFrom === leaveTo) {
+            $sameDaySection.removeClass('d-none hidden').css('display', '');
+            $notSameDaySection.addClass('d-none').css('display', 'none');
+        } else {
+            $sameDaySection.addClass('d-none').css('display', 'none');
+            $notSameDaySection.removeClass('d-none hidden').css('display', '');
+        }
+    }
+    
     $(document).on('change', '#LeaveFrom', function () {
         var urlPath = '/Leave/GetFiledLeave';
         var leaveDate = $(this).val();
 
         if (leaveDate) {
-            $.ajax({
+            if (currentFiledLeaveXHR && currentFiledLeaveXHR.readyState !== 4) {
+                currentFiledLeaveXHR.abort();
+            }
+
+            currentFiledLeaveXHR = $.ajax({
                 url: urlPath,
                 type: 'GET',
                 data: { leaveDate: leaveDate },
@@ -1204,44 +1289,96 @@
                     }
                 },
                 error: function (err) {
-                    console.error("AJAX Error details:", err);
+                    if (err.statusText !== 'abort') {
+                        console.error("AJAX Error details:", err);
+                    }
                 }
             });
         }
     });
+    
+    $('#add_leave_modal').on('change', '#LeaveFrom, #LeaveTo', function (e) {
+        var $form = $('#leave-Form');
+        var $fromInput = $form.find('#LeaveFrom');
+        var $toInput = $form.find('#LeaveTo');
 
-    $('#add_leave_modal').on('change', '#LeaveFrom', function () {
-        var fromDate = $(this).val();
+        var leaveFrom = $fromInput.val();
+        var leaveTo = $toInput.val();
         
-        $('#LeaveTo').val(fromDate);
+        if (e.target.id === 'LeaveFrom') {
+            leaveTo = leaveFrom;
+            $toInput.val(leaveFrom);
+        }
+        
+        $toInput.attr('min', leaveFrom);
+        
+        UpdateHalfDayVisibility(leaveFrom, leaveTo);
         
         ComputeLeaveDaysAPI();
     });
     
-    $('#add_leave_modal').on('change', '#LeaveTo', function () {
+    $('#add_leave_modal').on('change', '#FirstHalf, #SecondHalf, #FirstDay_SecondHalf, #LastDay_FirstHalf, #IsHalfday', function () {
         ComputeLeaveDaysAPI();
     });
-
+    
     function ComputeLeaveDaysAPI() {
         var $form = $('#leave-Form');
         var leaveFrom = $form.find("#LeaveFrom").val();
         var leaveTo = $form.find("#LeaveTo").val();
+
+        if (!leaveFrom || !leaveTo) {
+            $form.find('#LeaveDays').val('');
+            return;
+        }
         
-        console.log("Sending to API - From:", leaveFrom, "To:", leaveTo);
+        if (new Date(leaveTo) < new Date(leaveFrom)) {
+            leaveTo = leaveFrom;
+            $form.find("#LeaveTo").val(leaveFrom);
+        }
 
-        var isFirstDayHalf = $form.find('#FirstHalf').is(':checked');
-        var isLastDayHalf = $form.find('#SecondHalf').is(':checked');
+        var isSameDay = (leaveFrom === leaveTo);
+        var isFirstDayHalf = false;
+        var isLastDayHalf = false;
 
-        var url = `/Leave/GetComputedFiledLeaveDays?d1=${leaveFrom}&d2=${leaveTo}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+        if (isSameDay) {
+            if ($form.find('#IsHalfday').is(':checked')) {
+                isFirstDayHalf = $form.find('#FirstHalf').is(':checked');
+                isLastDayHalf = $form.find('#SecondHalf').is(':checked');
+            }
+        } else {
+            isFirstDayHalf = $form.find('#FirstDay_SecondHalf').is(':checked');
+            isLastDayHalf = $form.find('#LastDay_FirstHalf').is(':checked');
+        }
+        
+        if (computeLeaveControllerAPI) {
+            computeLeaveControllerAPI.abort();
+        }
+        computeLeaveControllerAPI = new AbortController();
 
-        fetch(url, { method: 'GET' })
+        var url = `/Leave/GetComputedFiledLeaveDays?d1=${encodeURIComponent(leaveFrom)}&d2=${encodeURIComponent(leaveTo)}&isFirstDayHalf=${isFirstDayHalf}&isLastDayHalf=${isLastDayHalf}`;
+
+        fetch(url, {
+            method: 'GET',
+            signal: computeLeaveControllerAPI.signal
+        })
             .then(response => response.json())
             .then(data => {
                 if (data && !data.error) {
                     $form.find('#LeaveDays').val(data.NoOfDays);
                 }
+            })
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error("Error computing leave days:", err);
+                }
             });
     }
+    
+    $(document).ready(function () {
+        var leaveFrom = $('#leave-Form #LeaveFrom').val();
+        var leaveTo = $('#leave-Form #LeaveTo').val();
+        UpdateHalfDayVisibility(leaveFrom, leaveTo);
+    });
 
     function GetLeaveShiftOnSelectedDate(modal, form) {
         var _modal = modal || '#add_leave_modal';
