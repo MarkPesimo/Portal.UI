@@ -74,10 +74,22 @@
 
                     @if (!string.IsNullOrEmpty(Model.DynamicRuleMessage) && Model.DynamicRuleMessage != "No Client Detected" && Model.DynamicRuleMessage != "Follow default rule.")
                     {
+                        var ruleParts = Model.DynamicRuleMessage.Split(new[] { " Minimum overtime is " }, StringSplitOptions.None);
+                        string filingRule = ruleParts[0];
+                        string minOtRule = ruleParts.Length > 1 ? "Minimum overtime is " + ruleParts[1] : string.Empty;
+
                         <li class="mb-2 d-flex">
                             <i class="fa-solid fa-triangle-exclamation text-warning me-2 mt-1"></i>
-                            <span><strong>Filing Rule:</strong> @Model.DynamicRuleMessage</span>
+                            <span><strong>Filing Rule:</strong> @filingRule</span>
                         </li>
+
+                        if (!string.IsNullOrEmpty(minOtRule))
+                        {
+                            <li class="mb-2 d-flex">
+                                <i class="fa-solid fa-stopwatch text-info me-2 mt-1"></i>
+                                <span><strong>Duration Rule:</strong> @minOtRule</span>
+                            </li>
+                        }
                     }
                 </ul>
             </div>

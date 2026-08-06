@@ -70,6 +70,33 @@ namespace Portal.Repository
             catch (Exception) { return false; }
         }
 
+        public ValidateOtTimeResult ValidateOtTime(int clientId, string otStart, string otEnd)
+        {
+            try
+            {
+                ValidateOtTimeResult _obj = null;
+
+                string safeStart = otStart != null ? otStart : string.Empty;
+                string safeEnd = otEnd != null ? otEnd : string.Empty;
+
+                string _endpoint = "Overtime/ValidateOtTime/" + clientId.ToString() +
+                                   "?otStart=" + Uri.EscapeDataString(safeStart) +
+                                   "&otEnd=" + Uri.EscapeDataString(safeEnd);
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result;
+                    _obj = JsonConvert.DeserializeObject<ValidateOtTimeResult>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         public SelectedOvertimeDateValue GetSelectedDateValue(DateTime _datelog)
         {

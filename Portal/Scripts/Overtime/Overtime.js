@@ -344,7 +344,63 @@
             .catch(error => console.error("Request failed:", error));
     }
 
+    var isOtTimeValid = true;
+
+    function performOtValidation() {
+        var otFromDate = $('#OTFrom').val();
+        var otFromTime = $('#OTFromTime').val();
+        var otToDate = $('#OTTo').val();
+        var otToTime = $('#OTToTime').val();
+
+        if (otFromDate && otFromTime && otToDate && otToTime) {
+            var otStart = otFromDate + ' ' + otFromTime;
+            var otEnd = otToDate + ' ' + otToTime;
+
+            $.ajax({
+                url: '/Overtime/ValidateOtTime',
+                type: 'GET',
+                data: { otStart: otStart, otEnd: otEnd },
+                dataType: 'json',
+                success: function (response) {
+                    if (!response.isValid) {
+                        isOtTimeValid = false;
+                        $('#error-message-label').text(response.message);
+                        $('#div-validation').slideDown();
+                        $('#submit-overtime-button').prop('disabled', true);
+                    } else {
+                        isOtTimeValid = true;
+                        $('#div-validation').slideUp();
+                        $('#error-message-label').text('');
+                        $('#submit-overtime-button').prop('disabled', false);
+
+                        if (response.otHours) {
+                            $('#OTHours').val(response.otHours);
+                        }
+                    }
+                },
+                error: function () {
+                    isOtTimeValid = false;
+                    $('#error-message-label').text('Unable to validate overtime schedule. Please try again.');
+                    $('#div-validation').slideDown();
+                    $('#submit-overtime-button').prop('disabled', true);
+                }
+            });
+        }
+    }
+    
+    $(document).on('change', '#OTFrom, #OTFromTime, #OTTo, #OTToTime', function () {
+        performOtValidation();
+    });
+    
     $('#add_overtime_modal').on('click', '#submit-overtime-button', function (e) {
+        e.preventDefault();
+        
+        if (!isOtTimeValid) {
+            $('#error-message-label').text('Selected overtime schedule is invalid. Please adjust the hours.');
+            $('#div-validation').slideDown();
+            return false;
+        }
+
         ShowLoading('SHOW');
         $.ajax({
             url: '/Overtime/_ManageOvertime',
@@ -352,15 +408,16 @@
             data: $('#overtime-Form').serialize(),
             dataType: 'json',
             success: function (result) {
-                if (result.Result == "ERROR") { ValidationError(result); }
-                else {
+                if (result.Result == "ERROR") {
+                    ValidationError(result);
+                } else {
                     $("#add_overtime_modal").modal('hide');
 
-                    $file = $("#Overtime_Attachment");
+                    var $file = $("#Overtime_Attachment");
                     var $filepath = $.trim($file.val());
 
                     if ($filepath != "") {
-                        OvertimeAttachment(result.OvertimeId, 'Overtime successfully created.')
+                        OvertimeAttachment(result.OvertimeId, 'Overtime successfully created.');
                         return;
                     }
 
