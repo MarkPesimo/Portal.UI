@@ -354,7 +354,6 @@ namespace Portal.Repository
             catch (Exception) { throw; }
         }
 
-
         public int ManageDTR(DTRmodel _model)
         {
             int _id = 0;
@@ -595,6 +594,29 @@ namespace Portal.Repository
                 return _obj;
             }
             catch (Exception) { throw; }
+        }
+
+        public CheckDtrPortalResultModel CheckDtrPortal(int empId, string dateFrom, string dateTo)
+        {
+            try
+            {
+                CheckDtrPortalResultModel _obj = new CheckDtrPortalResultModel();
+                string _endpoint = $"Attendance/CheckDtrPortal?empId={empId}&dateFrom={dateFrom}&dateTo={dateTo}";
+
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<CheckDtrPortalResultModel>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public RuleResult_model ValidateFiledRequest(int clientId, string requestType, DateTime startDate, DateTime endDate, string feature)

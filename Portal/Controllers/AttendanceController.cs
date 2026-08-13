@@ -811,6 +811,7 @@ namespace Portal.Controllers
             }
 
         }
+
         [HttpGet]
         public ActionResult _AddDTR()
         {
@@ -1290,6 +1291,28 @@ namespace Portal.Controllers
             catch (Exception ex)
             {
                 return Json(new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult CheckDtrPortal(string dateFrom, string dateTo)
+        {
+            try
+            {
+                CheckDtrPortalResultModel result = _attendancerepository.CheckDtrPortal(_loginuserid, dateFrom, dateTo);
+
+                if (result != null)
+                {
+                    return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No validation data found." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
     }

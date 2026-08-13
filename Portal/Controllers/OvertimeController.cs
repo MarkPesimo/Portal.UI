@@ -216,6 +216,7 @@ namespace Portal.Controllers
 
             return PartialView("~/Views/Overtime/Partial/_overtime_detail.cshtml", _model);
         }
+
         [HttpGet]
         public JsonResult ValidateOtTime(string otStart, string otEnd)
         {
@@ -227,12 +228,16 @@ namespace Portal.Controllers
                 {
                     return Json(new { isValid = false, message = "The selected overtime duration does not meet the minimum required threshold." }, JsonRequestBehavior.AllowGet);
                 }
+                
+                string formattedStart = result.CorrectedOtStart?.ToString("yyyy-MM-dd hh:mm tt");
+                string formattedEnd = result.CorrectedOtEnd?.ToString("yyyy-MM-dd hh:mm tt");    
+                
 
                 return Json(new
                 {
                     isValid = true,
-                    correctedStart = result.CorrectedOtStart,
-                    correctedEnd = result.CorrectedOtEnd,
+                    correctedStart = formattedStart,
+                    correctedEnd = formattedEnd,
                     otHours = result.OtHours
                 }, JsonRequestBehavior.AllowGet);
             }

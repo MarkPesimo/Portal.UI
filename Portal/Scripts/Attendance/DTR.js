@@ -268,15 +268,148 @@
     });
 
     $('#add_dtr_modal').on('click', '#post_dtr', function (e) {
-        
-        ManageDTR_Mode3('#dtr-Form', '#add_dtr_modal', 'DTR successfully Posted.', null,
-            function (result) {
-                
-                ManageDTR_Mode3('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.',
-                    { Mode: 3, Id: result.DTRId }
-                );
+        e.preventDefault();
+
+        const dateFrom = $('#DateFrom').val();
+        const dateTo = $('#DateTo').val();
+
+        if (!dateFrom || !dateTo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Date Range',
+                text: 'Please select both Date From and Date To before proceeding.'
+            });
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.ajax({
+            url: '/Attendance/CheckDtrPortal',
+            type: 'GET',
+            data: {
+                dateFrom: dateFrom,
+                dateTo: dateTo
+            },
+            dataType: 'json',
+            success: function (response) {
+                $btn.prop('disabled', false);
+
+                if (response && response.success) {
+                    const data = response.data;
+                    const invalidRecords = [];
+                    
+                    const parseJsonDate = (jsonDate) => {
+                        if (!jsonDate) return 'N/A';
+                        
+                        if (typeof jsonDate === 'string' && jsonDate.indexOf('/Date(') !== -1) {
+                            const milli = parseInt(jsonDate.replace(/\/Date\((.*?)\)\//, '$1'), 10);
+                            return new Date(milli).toLocaleDateString();
+                        }
+                        
+                        const parsedDate = new Date(jsonDate);
+                        if (!isNaN(parsedDate.getTime())) {
+                            return parsedDate.toLocaleDateString();
+                        }
+
+                        return jsonDate;
+                    };
+                    
+                    const collectErrors = (remarksList, category) => {
+                        if (Array.isArray(remarksList)) {
+                            remarksList.forEach(item => {
+                                const isInvalid = item.IsValid === false ||
+                                    item.is_valid === false ||
+                                    item.is_valid === 0 ||
+                                    item.IsValid === 0;
+
+                                if (isInvalid) {
+                                    const rawDate = item.DateLog !== undefined ? item.DateLog : (item.date_log !== undefined ? item.date_log : item.DATELOG);
+                                    const formattedDate = parseJsonDate(rawDate);
+                                    const remarkText = item.Remarks || item.remarks || 'No details provided';
+
+                                    invalidRecords.push({
+                                        category: category,
+                                        date: formattedDate,
+                                        remarks: remarkText
+                                    });
+                                }
+                            });
+                        }
+                    };
+                    
+                    collectErrors(data.AttendanceRemarks, 'Attendance');
+                    collectErrors(data.OvertimeRemarks, 'Overtime');
+                    collectErrors(data.LeaveRemarks, 'Leave');
+                    
+                    if (invalidRecords.length > 0) {
+                        const tableRows = invalidRecords.map(rec => `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">${rec.date}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${rec.category}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${rec.remarks}</td>
+                        </tr>
+                    `).join('');
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Records Found',
+                            width: '600px',
+                            html: `
+                            <p style="text-align: left; margin-bottom: 10px;">Posting cannot proceed due to the following invalid records:</p>
+                            <div style="max-height: 220px; overflow-y: auto; border: 1px solid #ccc;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th style="padding: 8px; border: 1px solid #ddd; width: 25%;">Date Log</th>
+                                            <th style="padding: 8px; border: 1px solid #ddd; width: 20%;">Category</th>
+                                            <th style="padding: 8px; border: 1px solid #ddd; width: 55%;">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${tableRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #dc3545; text-align: left; font-size: 13px; color: #555;">
+                                <strong>Note:</strong> Kindly coordinate with your account supervisor or approver to correct or approve the detected invalid logs.
+                            </div>
+                        `,
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    executeManageDTRMode3();
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        text: response.message || 'An error occurred during DTR validation.'
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                $btn.prop('disabled', false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'System Error',
+                    text: 'An error occurred while verifying DTR details.'
+                });
             }
-        );
+        });
+
+        function executeManageDTRMode3() {
+            ManageDTR_Mode3('#dtr-Form', '#add_dtr_modal', 'DTR successfully Posted.', null,
+                function (result) {
+                    ManageDTR_Mode3('#post-dtr-Form', '#post_dtr_modal', 'DTR successfully Posted.',
+                        { Mode: 3, Id: result.DTRId }
+                    );
+                }
+            );
+        }
     });
 
     $('#dtr-table').on('click', '.print-dtr', function () {
