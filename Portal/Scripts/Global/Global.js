@@ -85,12 +85,18 @@
     
 
     $(document).on('click', '#clock-in-button, #clock-in-button-mob', function () {
+
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
         var _clockin_btn = document.getElementById('clock-in-button').getAttribute("data-clockin-value");
 
         if (_clockin_btn != '') {
-            ShowDangerMessage('The system has detected that you have already clocked in. Please verify your time entry.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Already Clocked In',
+                text: 'The system has detected that you have already clocked in. Please verify your time entry.',
+                confirmButtonText: 'OK'
+            });
             return;
         }
 
@@ -114,7 +120,12 @@
                                 GetClockInClockOut();
                                 CheckAttendanceNotification('TIME IN');
                             } else {
-                                ShowAccessDenied(result.result);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Clock-In Denied',
+                                    html: result.result, // Changed 'text' to 'html' to enable HTML formatting
+                                    confirmButtonText: 'OK'
+                                });
                             }
                         }
                     });
@@ -136,7 +147,14 @@
                                 GetClockInClockOut();
                                 CheckAttendanceNotification('TIME IN');
                             }
-                            else { ShowAccessDenied(result.result); }
+                            else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Clock-In Denied',
+                                    html: result.result, // Changed 'text' to 'html'
+                                    confirmButtonText: 'OK'
+                                });
+                            }
                         }
                     });
                 });
@@ -158,7 +176,14 @@
                         GetClockInClockOut();
                         CheckAttendanceNotification('TIME IN');
                     }
-                    else { ShowAccessDenied(result.result); }
+                    else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Clock-In Denied',
+                            html: result.result, // Changed 'text' to 'html'
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 }
             });
         }
@@ -254,9 +279,11 @@
     $(document).on('click', '#clock-out-button, #clock-out-button-mob', function () {
         var AttendanceId = $(this).attr("attendance_id");
         var ShiftId = $(this).attr("shift_id");
+        var testLatitude = 14.556299329267413;
+        var testLongitude = 121.0339708696376;
 
         ShowLoading('SHOW');
-        
+
         if (AttendanceId == 0) {
             $.ajax({
                 type: "GET",
@@ -273,12 +300,12 @@
                         if (response.WithPrevious == true) {
                             $("#div-label-with-previous-clockin").removeClass("d-none");
                             $("#div-with-previous-clockin").removeClass("d-none");
-                            
+
                             $('#label-date-log').text(response.result.DateLog);
                             $('#label-shift-description').text(response.result.ShiftDescription);
                             $('#label-clock-in').text(response.result.ClockIn);
                             $('#label-clock-out').text(response.result.ClockOut || "--:--");
-                            
+
                             $('#clock-out-previous-button')
                                 .attr('attendance_id', response.result.Id)
                                 .attr('shift_id', response.result.ShiftId);
@@ -286,10 +313,15 @@
                         else {
                             $("#div-label-no-clockin-today").removeClass("d-none");
                         }
-                        
+
                         $("#clockin_modal").modal('show');
                     } else {
-                        ShowAccessDenied(response.result);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Access Denied',
+                            text: response.result,
+                            confirmButtonText: 'OK'
+                        });
                     }
                 },
                 failure: function (response) { LogError(response); },
@@ -306,8 +338,10 @@
                             data: {
                                 '_id': AttendanceId,
                                 '_shiftid': ShiftId,
-                                '_latitude': position.coords.latitude,
-                                '_longitude': position.coords.longitude
+                                //'_latitude': position.coords.latitude,
+                                //'_longitude': position.coords.longitude
+                                '_latitude': testLatitude,
+                                '_longitude': testLongitude
                             },
                             dataType: 'json',
                             success: function (result) {
@@ -316,7 +350,12 @@
                                     GetClockInClockOut();
                                     CheckAttendanceNotification('TIME OUT');
                                 } else {
-                                    ShowAccessDenied(result.result);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Clock-Out Denied',
+                                        text: result.result,
+                                        confirmButtonText: 'OK'
+                                    });
                                 }
                             }
                         });
@@ -338,7 +377,12 @@
                                     GetClockInClockOut();
                                     CheckAttendanceNotification('TIME OUT');
                                 } else {
-                                    ShowAccessDenied(result.result);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Clock-Out Denied',
+                                        text: result.result,
+                                        confirmButtonText: 'OK'
+                                    });
                                 }
                             }
                         });
@@ -362,10 +406,20 @@
                             CheckAttendanceNotification('TIME OUT');
                         }
                         else if (result.Status == "ERROR") {
-                            ShowDangerMessage("Error", result.Message || "Something went wrong while processing your time out. Please contact your account supervisor for assistant.");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: result.Message || "Something went wrong while processing your time out. Please contact your account supervisor for assistance.",
+                                confirmButtonText: 'OK'
+                            });
                         }
                         else {
-                            ShowAccessDenied(result.result);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Clock-Out Denied',
+                                text: result.result,
+                                confirmButtonText: 'OK'
+                            });
                         }
                     }
                 });

@@ -46,7 +46,8 @@
                     @if (Model.DynamicRuleMessage == "Follow default rule.")
                     {
                         <ul class="list-unstyled mb-0 small">
-                            <li class="d-flex"><i class="fa-solid fa-stethoscope text-danger me-2"></i> <span><strong>Sick Leave:</strong> File within the last 5 working days.</span></li>
+                            <li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File up to 5 working days late or for future dates.</span></li>
+                            <li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to file starting from today.</span></li>
                         </ul>
                     }
                     else if (!string.IsNullOrEmpty(Model.DynamicRuleMessage))
@@ -100,7 +101,19 @@
                     var match = System.Text.RegularExpressions.Regex.Match(Model.DynamicRuleMessage, @"\d+");
                     if (match.Success) { leaveDaysAllowed = int.Parse(match.Value); }
                 }
-                string leaveMinDate = DateTime.Now.AddDays(-leaveDaysAllowed).ToString("yyyy-MM-dd");
+
+                // Calculate 5 working days ago in C# for initial render
+                DateTime calculatedMinDate = DateTime.Now;
+                int addedWorkingDays = 0;
+                while (addedWorkingDays < leaveDaysAllowed)
+                {
+                    calculatedMinDate = calculatedMinDate.AddDays(-1);
+                    if (calculatedMinDate.DayOfWeek != DayOfWeek.Saturday && calculatedMinDate.DayOfWeek != DayOfWeek.Sunday)
+                    {
+                        addedWorkingDays++;
+                    }
+                }
+                string leaveMinDate = calculatedMinDate.ToString("yyyy-MM-dd");
             }
             <div class="row">
                 <div class="col-6 mb-3">
@@ -139,7 +152,7 @@
                 <div class="col-4">
                     <div class="form-check form-switch mt-2">
                         @Html.CheckBoxFor(m => m.IsHalfday, new { @class = "form-check-input" })
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Half day</label>
+                        <label class="form-check-label" for="IsHalfday">Half day</label>
                     </div>
                 </div>
                 <div class="col-8 d-none" id="div-sameday-halfday-details">
@@ -235,7 +248,7 @@
 <script>
     $(document).ready(function () {
         var $form = $("#post-leave-Form");
-
+        
         function getWorkingDaysAgo(startDate, daysBack) {
             var date = new Date(startDate);
             var count = 0;
@@ -245,6 +258,77 @@
                 if (day !== 0 && day !== 6) count++;
             }
             return date;
+        }
+
+        function updateHalfDayUI() {
+            var fromVal = $form.find("#LeaveFrom").val();
+            var toVal = $form.find("#LeaveTo").val();
+
+            if (!fromVal || !toVal) return;
+
+            var isSameDay = (fromVal === toVal);
+
+            if (isSameDay) {
+                $form.find("#div-sameday-halfday").removeClass("d-none");
+                $form.find("#div-not-sameday-halfday").addClass("d-none");
+                
+                $form.find("#FirstDay_SecondHalf, #LastDay_FirstHalf").prop("checked", false);
+                
+                if ($form.find("#IsHalfday").is(":checked")) {
+                    $form.find("#div-sameday-halfday-details").removeClass("d-none");
+                } else {
+                    $form.find("#div-sameday-halfday-details").addClass("d-none");
+                    $form.find("#FirstHalf, #SecondHalf").prop("checked", false);
+                }
+            } else {
+                $form.find("#div-sameday-halfday").addClass("d-none");
+                $form.find("#div-not-sameday-halfday").removeClass("d-none");
+                
+                $form.find("#IsHalfday, #FirstHalf, #SecondHalf").prop("checked", false);
+                $form.find("#div-sameday-halfday-details").addClass("d-none");
+            }
+        }
+        
+        function calculateLeaveDays() {
+            var fromVal = $form.find("#LeaveFrom").val();
+            var toVal = $form.find("#LeaveTo").val();
+
+            if (!fromVal || !toVal) {
+                $form.find("#LeaveDays").val("0");
+                return;
+            }
+
+            var d1 = new Date(fromVal);
+            var d2 = new Date(toVal);
+
+            if (d1 > d2) {
+                $form.find("#LeaveDays").val("0");
+                return;
+            }
+
+            var isSameDay = (fromVal === toVal);
+
+            if (isSameDay) {
+                var isHalfDay = $form.find("#IsHalfday").is(":checked");
+                if (isHalfDay) {
+                    $form.find("#LeaveDays").val("0.5");
+                } else {
+                    $form.find("#LeaveDays").val("1");
+                }
+            } else {
+                var timeDiff = Math.abs(d2.getTime() - d1.getTime());
+                var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+
+                var totalDays = diffDays;
+
+                var firstDayHalf = $form.find("#FirstDay_SecondHalf").is(":checked");
+                var lastDayHalf = $form.find("#LastDay_FirstHalf").is(":checked");
+
+                if (firstDayHalf) totalDays -= 0.5;
+                if (lastDayHalf) totalDays -= 0.5;
+
+                $form.find("#LeaveDays").val(totalDays > 0 ? totalDays : "0");
+            }
         }
 
         function setDateRules() {
@@ -265,20 +349,25 @@
                     fromInput.attr("min", todayStr).removeAttr("max");
                     toInput.attr("min", todayStr).removeAttr("max");
                 } else {
-                    var minDate = new Date();
-                    minDate.setDate(today.getDate() + allowedDays);
-                    var minStr = minDate.toISOString().split('T')[0];
+                    var minPastDate = getWorkingDaysAgo(today, allowedDays);
+                    var minStr = minPastDate.toISOString().split('T')[0];
+
                     fromInput.attr("min", minStr).removeAttr("max");
-                    toInput.attr("min", todayStr).removeAttr("max");
+                    toInput.attr("min", minStr).removeAttr("max");
                 }
             } else {
                 $form.find("#checkboxWrapper").addClass("d-none");
                 $form.find("#checkbox").prop("checked", false);
-                var minDate = getWorkingDaysAgo(today, allowedDays);
-                var minStr = minDate.toISOString().split('T')[0];
+
+                var minPastDate = getWorkingDaysAgo(today, allowedDays);
+                var minStr = minPastDate.toISOString().split('T')[0];
+
                 fromInput.attr("min", minStr).removeAttr("max");
                 toInput.attr("min", minStr).removeAttr("max");
             }
+
+            updateHalfDayUI();
+            calculateLeaveDays();
         }
 
         function updateInstructionVisibility() {
@@ -293,7 +382,7 @@
                 $form.find("#rule-generic").removeClass("d-none");
             }
         }
-
+        
         $form.find("#LeaveTypeId").on("change", function () {
             var selectedText = $(this).find("option:selected").text().trim();
 
@@ -303,8 +392,8 @@
                     $form.find('#rule-container').html(customHtml);
                 } else if (data.Message === "Follow default rule.") {
                     var defaultHtml = '<ul class="list-unstyled mb-0 small">' +
-                        '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File at least 3 working days in advance.</span></li>' +
-                        '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to bypass the 3-day rule.</span></li>' +
+                        '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File up to 5 working days late or for future dates.</span></li>' +
+                        '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to file starting from today.</span></li>' +
                         '</ul>';
                     $form.find('#rule-container').html(defaultHtml);
                 } else {
@@ -324,7 +413,7 @@
         });
 
         $form.find("#checkbox").on("change", setDateRules);
-
+        
         $form.find("#LeaveFrom").on("change", function () {
             var fromDate = $(this).val();
             var toInput = $form.find("#LeaveTo");
@@ -333,7 +422,23 @@
             setDateRules();
         });
 
+        $form.find("#LeaveTo").on("change", function () {
+            updateHalfDayUI();
+            calculateLeaveDays();
+        });
+        
+        $form.find("#IsHalfday").on("change", function () {
+            updateHalfDayUI();
+            calculateLeaveDays();
+        });
+
+        $form.find("#FirstDay_SecondHalf, #LastDay_FirstHalf, #FirstHalf, #SecondHalf").on("change", function () {
+            calculateLeaveDays();
+        });
+        
+        updateHalfDayUI();
         setDateRules();
         updateInstructionVisibility();
+        calculateLeaveDays();
     });
 </script>

@@ -1,0 +1,524 @@
+﻿@{
+    ViewBag.Title = "Meet The Team";
+    var defaultAvatar = Url.Content("~/Content/images/MeetTheTeam/default-avatar.png");
+}
+
+<style>
+    :root {
+        --primary: #334155;
+        --primary-dark: #1e293b;
+        --primary-soft: #f1f5f9;
+        --teams-brand: #475569;
+        --teams-soft: #f8fafc;
+        --bg-surface: #ffffff;
+        --bg-body: #fafafa;
+        --text-main: #0f172a;
+        --text-sub: #64748b;
+        --border-color: #e2e8f0;
+        --radius-lg: 12px;
+        --radius-md: 8px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    .breadcrumb-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-sub);
+        margin-bottom: 20px;
+    }
+
+        .breadcrumb-nav a {
+            color: var(--text-sub);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+            .breadcrumb-nav a:hover {
+                color: var(--text-main);
+            }
+
+        .breadcrumb-nav .separator {
+            font-size: 0.7rem;
+            color: #cbd5e1;
+        }
+
+        .breadcrumb-nav .current {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+    .page-title-wrapper {
+        margin-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+    }
+
+        .page-title-wrapper h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title-wrapper p {
+            color: var(--text-sub);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+    .team-count-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: var(--primary-soft);
+        color: var(--primary-dark);
+        padding: 2px 8px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .team-section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .team-section-title .icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .team-section-title h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .team-section-title p {
+            margin: 0;
+            color: var(--text-sub);
+            font-size: 0.82rem;
+        }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .team-card {
+        background: var(--bg-surface);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+    }
+
+        .team-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: #94a3b8;
+        }
+
+    .card-banner {
+        height: 55px;
+        background: #f1f5f9;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-avatar-wrapper {
+        width: 68px;
+        height: 68px;
+        margin: -34px auto 10px;
+        position: relative;
+        z-index: 2;
+    }
+
+        .card-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--bg-surface);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            background-color: var(--bg-surface);
+            transition: transform 0.3s ease;
+        }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 3px solid var(--bg-surface);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        background-color: #e2e8f0;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .team-card:hover .card-avatar-wrapper img,
+    .team-card:hover .card-avatar-wrapper .avatar-placeholder {
+        transform: scale(1.03);
+    }
+
+    .card-body-content {
+        padding: 0 12px 14px;
+        text-align: center;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .member-name {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0 0 4px;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .role-badge {
+        display: inline-block;
+        background-color: #f8fafc;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 2px 8px;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 4px;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border-color);
+        background-color: #ffffff;
+        color: var(--text-sub);
+    }
+
+        .action-btn:hover {
+            background-color: var(--text-main);
+            color: #ffffff;
+            border-color: var(--text-main);
+        }
+
+    @@media (max-width: 1200px) {
+        .team-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .team-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="main bg-light min-vh-100 py-4">
+    <div class="container-fluid px-lg-5">
+        <nav class="breadcrumb-nav" aria-label="breadcrumb">
+            <a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Home</a>
+            <i class="fas fa-chevron-right separator"></i>
+            <span class="current">Meet The Team</span>
+        </nav>
+
+        <div class="page-title-wrapper">
+            <h1>
+                Meet The Team
+                <span class="team-count-badge">10 Members</span>
+            </h1>
+            <p>Direct contact directory for systems engineering and technical support personnel.</p>
+        </div>
+
+        <div class="team-section-title">
+            <div class="icon-box">
+                <i class="fas fa-code"></i>
+            </div>
+            <div>
+                <h2>Systems &amp; Development Team</h2>
+                <p>Engineering robust, reliable, and scalable software solutions.</p>
+            </div>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Mark Pesimo pic.jpg" alt="Mark Pesimo" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Mark Pesimo">Mark Pesimo</h3>
+                        <span class="role-badge" title="Software Engineer Team Lead">Software Engineer Team Lead</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:mpesimo@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=mpesimo@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Marlene Beltran pic.jpg" alt="Marlene Beltran" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Marlene Beltran">Marlene Beltran</h3>
+                        <span class="role-badge" title="Senior Software Engineer">Senior Software Engineer</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:mbeltran@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=mbeltran@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Charles Odtujan.jpg" alt="Charles Odtujan" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Charles Odtujan">Charles Odtujan</h3>
+                        <span class="role-badge" title="Software Engineer I">Software Engineer I</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:ecvodtujan@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=ecvodtujan@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Nspatac.jpg" alt="Neil Patac" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Neil Patac">Neil Patac</h3>
+                        <span class="role-badge" title="Software Engineer I">Software Engineer I</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:nspatac@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=nspatac@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <div class="avatar-placeholder">KB</div>
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Kenneth Bejar">Kenneth Bejar</h3>
+                        <span class="role-badge" title="Software Developer">Software Developer</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:kabejar@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=kabejar@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-section-title mt-4">
+            <div class="icon-box">
+                <i class="fas fa-headset"></i>
+            </div>
+            <div>
+                <h2>Technical Support Team</h2>
+                <p>Ensuring system stability, infrastructure reliability, and user assistance.</p>
+            </div>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Mighty Cruz.jpg" alt="Mighty Cruz" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Mighty Cruz">Mighty Cruz</h3>
+                        <span class="role-badge" title="ICT Support Supervisor">ICT Support Sup.</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:mmccruz@wardhowell.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=mmccruz@wardhowell.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Raymond Ribaya.jpg" alt="Raymond Ribaya" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Raymond Ribaya">Raymond Ribaya</h3>
+                        <span class="role-badge" title="Systems Administrator">Systems Admin</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:rrribaya@wardhowell.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=rrribaya@wardhowell.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Romero Pepito.jpg" alt="Romero Pepito" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Romero Pepito">Romero Pepito</h3>
+                        <span class="role-badge" title="Senior ICT Tech Support I">Sr. ICT Tech Support I</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:rfrpepito@wardhowell.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=rfrpepito@wardhowell.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/John Carlo Cabutaje.jpg" alt="John Carlo Cabutaje" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="John Carlo Cabutaje">John Carlo Cabutaje</h3>
+                        <span class="role-badge" title="ICT Technical Support I">ICT Tech Support I</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:jccabutaje@asiapeopleworks.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=jccabutaje@asiapeopleworks.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="card-banner"></div>
+                <div class="card-avatar-wrapper">
+                    <img src="~/Content/images/MeetTheTeam/Mc Laurence De Torres De Castro.jpg" alt="Mc Laurence De Torres De Castro" onerror="this.onerror=null;this.src='@defaultAvatar';" />
+                </div>
+                <div class="card-body-content">
+                    <div>
+                        <h3 class="member-name" title="Mc Laurence De Torres De Castro">Mc Laurence De Castro</h3>
+                        <span class="role-badge" title="ICT Technical Support I">ICT Tech Support I</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="mailto:mcldecastro@asiaselect.com.ph" class="action-btn" title="Send Email">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="msteams:/l/chat/0/0?users=mcldecastro@asiaselect.com.ph" class="action-btn" title="Chat on MS Teams">
+                            <i class="fab fa-microsoft"></i> Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

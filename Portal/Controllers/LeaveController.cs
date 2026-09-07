@@ -120,15 +120,24 @@ namespace Portal.Controllers
             _model.DynamicRuleMessage = ruleResult?.Message;
 
 
-            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
-             .Select(t => new SelectListItem
-             {
-                 Text = t.LeaveType,
-                 Value = t.Id.ToString(),
-                 Selected = (t.LeaveType == defaultLeaveType)
-             }).ToList();
+            //ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
+            // .Select(t => new SelectListItem
+            // {
+            //     Text = t.LeaveType,
+            //     Value = t.Id.ToString(),
+            //     Selected = (t.LeaveType == defaultLeaveType)
+            // }).ToList();
 
             //ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes().Select(t => new SelectListItem { Text = t.LeaveType, Value = t.Id.ToString() }).ToList();
+
+            ViewBag._LeaveTypes = _globalrepository.GetAvaliableLeaveTypes(_loginuserid)
+                .Select(t => new SelectListItem
+                {
+                    Text = t.LeaveType,
+                    Value = t.Id.ToString(),
+                    Selected = (t.LeaveType == defaultLeaveType)
+                }).ToList();
+
             return PartialView("~/Views/Attendance/Partial/Leave/_post_leave_detail.cshtml", _model);
         }
 
@@ -230,7 +239,15 @@ namespace Portal.Controllers
             var ruleResult = _attendancerepository.GetDynamicRules(_client_id, defaultLeaveType);
             _model.DynamicRuleMessage = ruleResult?.Message;
 
-            ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
+            //ViewBag._LeaveTypes = _globalrepository.GetLeaveTypes()
+            //    .Select(t => new SelectListItem
+            //    {
+            //        Text = t.LeaveType,
+            //        Value = t.Id.ToString(),
+            //        Selected = (t.LeaveType == defaultLeaveType)
+            //    }).ToList();
+
+            ViewBag._LeaveTypes = _globalrepository.GetAvaliableLeaveTypes(_loginuserid)
                 .Select(t => new SelectListItem
                 {
                     Text = t.LeaveType,

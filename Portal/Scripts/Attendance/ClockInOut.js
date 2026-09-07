@@ -689,6 +689,7 @@
     });
 
     $('#clockinout-table').on('click', '.file-leave', function () {
+        
         var DateLog = $(this).attr("DateLog");
         ShowLoading('SHOW');
         $.ajax({
@@ -759,6 +760,130 @@
         });
     });
 
+    $(document).on('change', '#OTFrom, #OTFromTime, #OTTo, #OTToTime', function () {
+        performOtValidation();
+    });
+
+    function performOtValidation() {
+        var otFromDate = $('#OTFrom').val();
+        var otFromTime = $('#OTFromTime').val();
+        var otToDate = $('#OTTo').val();
+        var otToTime = $('#OTToTime').val();
+
+        if (otFromDate && otFromTime && otToDate && otToTime) {
+            var otStart = otFromDate + ' ' + otFromTime;
+            var otEnd = otToDate + ' ' + otToTime;
+
+            $.ajax({
+                url: '/Overtime/ValidateOtTime',
+                type: 'GET',
+                data: { otStart: otStart, otEnd: otEnd },
+                dataType: 'json',
+                success: function (response) {
+                    if (!response.isValid) {
+                        isOtTimeValid = false;
+                        $('#error-message-label').text(response.message);
+                        $('#div-validation').slideDown();
+                        $('#submit_post_overtime').prop('disabled', true); 
+
+                        $('#div-validation .p-2')
+                            .removeClass('border-info text-info')
+                            .addClass('border-danger text-danger');
+                    } else {
+                        function parseToTimestamp(dtStr) {
+                            if (!dtStr) return NaN;
+                            var parts = dtStr.trim().split(' ');
+                            if (parts.length === 3) {
+                                var dateSep = parts[0].includes('-') ? '-' : '/';
+                                var dateParts = parts[0].split(dateSep);
+                                var timeParts = parts[1].split(':');
+                                var ampm = parts[2].toUpperCase();
+
+                                var year = dateSep === '-' ? parseInt(dateParts[0], 10) : parseInt(dateParts[2], 10);
+                                var month = (dateSep === '-' ? parseInt(dateParts[1], 10) : parseInt(dateParts[0], 10)) - 1;
+                                var day = dateSep === '-' ? parseInt(dateParts[2], 10) : parseInt(dateParts[1], 10);
+
+                                var hours = parseInt(timeParts[0], 10);
+                                var minutes = parseInt(timeParts[1], 10);
+
+                                if (ampm === 'PM' && hours < 12) hours += 12;
+                                if (ampm === 'AM' && hours === 12) hours = 0;
+
+                                return new Date(year, month, day, hours, minutes, 0, 0).getTime();
+                            }
+                            return new Date(dtStr.replace(/-/g, '/')).getTime();
+                        }
+
+                        function formatToMMDDYYYY(dtStr) {
+                            if (!dtStr) return '';
+                            var parts = dtStr.trim().split(' ');
+                            if (parts.length < 2) return dtStr;
+
+                            var dateParts = parts[0].split('-');
+                            if (dateParts.length === 3) {
+                                var year = dateParts[0];
+                                var month = dateParts[1];
+                                var day = dateParts[2];
+                                var timePart = parts.slice(1).join(' ');
+                                return month + '/' + day + '/' + year + ' ' + timePart;
+                            }
+                            return dtStr;
+                        }
+
+                        var userStartTs = parseToTimestamp(otStart);
+                        var userEndTs = parseToTimestamp(otEnd);
+                        var correctedStartTs = parseToTimestamp(response.correctedStart);
+                        var correctedEndTs = parseToTimestamp(response.correctedEnd);
+
+                        var isCorrected = (!isNaN(userStartTs) && !isNaN(correctedStartTs) && userStartTs === correctedStartTs) &&
+                            (!isNaN(userEndTs) && !isNaN(correctedEndTs) && userEndTs === correctedEndTs);
+
+                        if (!isCorrected) {
+                            isOtTimeValid = false;
+
+                            var formattedStartMMDDYYYY = formatToMMDDYYYY(response.correctedStart);
+                            var formattedEndMMDDYYYY = formatToMMDDYYYY(response.correctedEnd);
+
+                            var timeHighlightStyle = "color: #0d6efd; font-weight: 700;";
+
+                            var message = "Please correct your filing to match the minimum allowed overtime details:"
+                                + "<br><div class='mt-1'>"
+                                + "OT Start: <span style='" + timeHighlightStyle + "'>" + formattedStartMMDDYYYY + " - </span> "
+                                + "OT End: <span style='" + timeHighlightStyle + "'>" + formattedEndMMDDYYYY + "</span>"
+                                + "</div>";
+
+                            $('#error-message-label').html(message);
+                            $('#div-validation').slideDown();
+                            $('#submit_post_overtime').prop('disabled', true); 
+
+                            $('#div-validation .p-2')
+                                .removeClass('border-danger text-danger')
+                                .addClass('border-info text-info');
+                        } else {
+                            isOtTimeValid = true;
+                            $('#div-validation').slideUp();
+                            $('#error-message-label').html('');
+                            $('#submit_post_overtime').prop('disabled', false);
+
+                            if (response.otHours) {
+                                $('#OTHours').val(response.otHours);
+                            }
+                        }
+                    }
+                },
+                error: function () {
+                    isOtTimeValid = false;
+                    $('#error-message-label').text('Unable to validate overtime schedule. Please try again.');
+                    $('#div-validation').slideDown();
+                    $('#submit_post_overtime').prop('disabled', true); 
+
+                    $('#div-validation .p-2')
+                        .removeClass('border-info text-info')
+                        .addClass('border-danger text-danger');
+                }
+            });
+        }
+    }
     //$(document).on('change', '#LeaveFrom', function () {
     //    var urlPath = '/Leave/GetFiledLeave';
     //    var leaveDate = $(this).val();

@@ -373,6 +373,25 @@ namespace Portal.Repository
             }
         }
 
- 
+        public IEnumerable<FixedDropdown_model.LeaveTypeList> GetAvaliableLeaveTypes(int _loguserid)
+        {
+            try
+            {
+                List<FixedDropdown_model.LeaveTypeList> _obj = new List<FixedDropdown_model.LeaveTypeList>();
+                string _endpoint = "Leave/GetEmployeeAvailableLeaveTypes/" + _loguserid.ToString();
+                HttpResponseMessage _response = GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<List<FixedDropdown_model.LeaveTypeList>>(_value);
+                }
+                return _obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }

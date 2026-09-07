@@ -86,7 +86,7 @@ namespace Portal.Controllers
         }
 
         [HttpGet]
-        public ActionResult _AddPostOvertime(DateTime _datelog)
+        public ActionResult _AddPostOvertime(DateTime _datelog) //Clock in and Out TAB
         {
             RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "OT");
 
@@ -200,7 +200,7 @@ namespace Portal.Controllers
         }
 
         [HttpGet]
-        public ActionResult _AddOvertime()
+        public ActionResult _AddOvertime() // OT TAB
         {
             RuleResult_model _rule = _attendancerepository.GetDynamicRules(_client_id, "OT");
 

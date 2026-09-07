@@ -24,6 +24,7 @@ namespace Portal.Controllers
         private GlobalRepository _globalrepository { get; set; }
         private AccountRepository _accountrepository { get; set; }
         private AttendanceRepository _attendancerepository { get; set; }
+        private string _meettheteam_index = "~/Views/About/MeetTheTeam_Index.cshtml";
 
         public AccountController()
         {
@@ -69,6 +70,13 @@ namespace Portal.Controllers
                 throw;
             }
         }
+
+        public ActionResult MeetTheTeam()
+        {
+
+            return View(_meettheteam_index);
+        }
+
 
         [HttpPost]
         public ActionResult GetLocation()

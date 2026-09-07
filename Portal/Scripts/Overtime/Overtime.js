@@ -216,7 +216,6 @@
 
     $("#file_overtime_btn").click(function (e) {
         e.preventDefault();
-
         ShowLoading('SHOW');
         $.ajax({
             type: "GET",

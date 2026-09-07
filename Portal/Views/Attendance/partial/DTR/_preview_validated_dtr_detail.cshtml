@@ -1,0 +1,183 @@
+﻿@model string
+@{
+    string _filename = Model + ".pdf";
+    string _relativePath = "~/DTRAttachments/DTRFormsGenerated/Approved/" + Model + "/" + _filename;
+    string _filePath = Server.MapPath(_relativePath);
+    bool _fileExists = System.IO.File.Exists(_filePath);
+    string _fileUrl = _fileExists ? Url.Content(_relativePath) : null;
+    string _lastModified = _fileExists ? System.IO.File.GetLastWriteTime(_filePath).ToString("MMM dd, yyyy h:mm tt") : null;
+    string _gifUrl = Url.Content("~/Content/animation/process.gif");
+}
+<style>
+    .dtr-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .dtr-pdf-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .dtr-pdf-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .dtr-pdf-frame-holder {
+        position: relative;
+        width: 100%;
+        height: 75vh; 
+        min-height: 500px;
+        border: 1px solid #dee2e6;
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background: #fff;
+    }
+
+        .dtr-pdf-frame-holder iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+    .dtr-pdf-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        transition: opacity 0.2s ease;
+    }
+
+    .dtr-pdf-fallback {
+        display: none;
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .loading-box {
+        text-align: center;
+        border: 2px dashed #ccc;
+        padding: 50px 30px;
+        border-radius: 8px;
+        background: #f9f9f9;
+        color: #555;
+        max-width: 500px;
+    }
+
+        .loading-box .status-pill {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+    .dtr-anim-gif {
+        display: block;
+        margin: 0 auto 10px;
+    }
+
+    .loading-box .dtr-anim-gif {
+        width: 120px;
+        height: 120px;
+    }
+
+    .dtr-pdf-loading .dtr-anim-gif {
+        width: 70px;
+        height: 70px;
+    }
+
+    @@media (min-width: 1200px) {
+    #preview_dtr_modal .modal-xl {
+        max-width: 95%;
+    }
+}
+</style>
+
+<div class="dtr-container">
+    @if (_fileExists)
+    {
+        <div class="dtr-pdf-wrapper">
+            <div class="dtr-pdf-toolbar">
+                <span>
+                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>
+                    @_filename
+                    <span class="text-muted ms-2">Generated @_lastModified</span>
+                </span>
+                <span>
+                    <a href="@_fileUrl" target="_blank" class="btn btn-sm btn-outline-secondary border-0" title="Open in new tab">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                    <a href="@_fileUrl" download="@_filename" class="btn btn-sm btn-outline-primary border-0" title="Download PDF">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </span>
+            </div>
+            <div class="dtr-pdf-frame-holder" id="dtrPdfHolder">
+                <div class="dtr-pdf-loading" id="dtrPdfSpinner">
+                    <img src="@_gifUrl" alt="Loading" class="dtr-anim-gif" />
+                    <small class="text-muted">Loading document...</small>
+                </div>
+                <iframe id="dtrPdfFrame"
+                        src="@_fileUrl"
+                        title="@_filename"
+                        onload="document.getElementById('dtrPdfSpinner').style.display='none';"></iframe>
+                <div class="dtr-pdf-fallback" id="dtrPdfFallback">
+                    <i class="bi bi-file-earmark-pdf display-4 text-danger d-block mb-2"></i>
+                    <p class="text-muted mb-2">Your browser can't preview this PDF inline.</p>
+                    <a href="@_fileUrl" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Open PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                var frame = document.getElementById('dtrPdfFrame');
+                var spinner = document.getElementById('dtrPdfSpinner');
+                var fallback = document.getElementById('dtrPdfFallback');
+                var loaded = false;
+
+                frame.addEventListener('load', function () { loaded = true; });
+
+                setTimeout(function () {
+                    if (!loaded) {
+                        spinner.style.display = 'none';
+                        frame.style.display = 'none';
+                        fallback.style.display = 'block';
+                    }
+                }, 4000);
+            })();
+        </script>
+    }
+    else
+    {
+        <div class="loading-box">
+            <img src="@_gifUrl" alt="Processing" class="dtr-anim-gif" />
+            <h4>Pending DTR Generation</h4>
+            <p>The Daily Time Report (DTR) is currently being generated. Please try again in a few minutes. Thank you.</p>
+            @*<span class="status-pill"><i class="bi bi-clock-history me-1"></i>Awaiting approval</span>*@
+        </div>
+    }
+</div>

@@ -238,6 +238,44 @@ namespace Portal.Repository
             catch (Exception) { throw; }
         }
 
+        public BranchModel GetBranchDetail(int _id)
+        {
+            try
+            {
+                BranchModel _obj = new BranchModel();
+
+                string _endpoint = "Attendance/GetBranchDetail/" + _id.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<BranchModel>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
+        public ClientPortalRuleModel GetClientPortalRuleDetail(int _clientId)
+        {
+            try
+            {
+                ClientPortalRuleModel _obj = new ClientPortalRuleModel();
+
+                string _endpoint = "Attendance/GetClientPortalRuleDetail/" + _clientId.ToString();
+                HttpResponseMessage _response = _globalRepository.GenerateGetRequest(_endpoint);
+                if (_response.IsSuccessStatusCode)
+                {
+                    var _value = _response.Content.ReadAsStringAsync().Result.ToString();
+                    _obj = JsonConvert.DeserializeObject<ClientPortalRuleModel>(_value);
+                }
+
+                return _obj;
+            }
+            catch (Exception) { throw; }
+        }
+
         public int ManageAttendanceCorrection(Correction_model _model, int _mode)
             {
             int _id = 0;

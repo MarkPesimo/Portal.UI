@@ -44,7 +44,7 @@
                 <ul class="list-unstyled mb-0 small">
                     <li class="mb-2 d-flex">
                         <i class="fa-solid fa-check text-success me-2 mt-1"></i>
-                        <span><strong>Continuous Overtime:</strong> Enable for "Straight Duty". Otherwise, 1-hour is deducted after 4hrs OT.</span>
+                        <span><strong>No break overtime:</strong> Enable for "Straight Duty". Otherwise, 1-hour is deducted after 4hrs OT.</span>
                     </li>
                     <li class="mb-2 d-flex">
                         <i class="fa-solid fa-calendar-check text-primary me-2 mt-1"></i>
@@ -65,10 +65,22 @@
 
                     @if (!string.IsNullOrEmpty(Model.DynamicRuleMessage) && Model.DynamicRuleMessage != "No Client Detected" && Model.DynamicRuleMessage != "Follow default rule.")
                     {
+                        var ruleParts = Model.DynamicRuleMessage.Split(new[] { " Minimum overtime is " }, StringSplitOptions.None);
+                        string filingRule = ruleParts[0];
+                        string minOtRule = ruleParts.Length > 1 ? "Minimum overtime is " + ruleParts[1] : string.Empty;
+
                         <li class="mb-2 d-flex">
                             <i class="fa-solid fa-triangle-exclamation text-warning me-2 mt-1"></i>
-                            <span><strong>Filing Rule:</strong> @Model.DynamicRuleMessage</span>
+                            <span><strong>Filing Rule:</strong> @filingRule</span>
                         </li>
+
+                        if (!string.IsNullOrEmpty(minOtRule))
+                        {
+                            <li class="mb-2 d-flex">
+                                <i class="fa-solid fa-stopwatch text-info me-2 mt-1"></i>
+                                <span><strong>Duration Rule:</strong> @minOtRule</span>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
@@ -110,7 +122,7 @@
                 <div class="form-check form-switch card p-3 border-0 shadow-sm bg-light">
                     <div class="ms-4">
                         @Html.CheckBoxFor(m => m.ContinuousOt, new { @class = "form-check-input", @id = "ContinuousOt" })
-                        <label class="form-check-label fw-bold" for="ContinuousOt">Continuous Overtime</label>
+                        <label class="form-check-label fw-bold" for="ContinuousOt">No break overtime</label>
                         <p class="text-muted mb-0" style="font-size: 0.70rem; line-height: 1.2;">Enable for straight duties to prevent automatic break deduction.</p>
                     </div>
                 </div>

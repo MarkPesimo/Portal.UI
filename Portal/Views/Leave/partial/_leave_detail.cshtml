@@ -238,16 +238,16 @@
 
 <script>
     $(document).ready(function () {
-    function getWorkingDaysAgo(startDate, daysBack) {
-        var date = new Date(startDate);
-        var count = 0;
-        while (count < daysBack) {
-            date.setDate(date.getDate() - 1);
-            var day = date.getDay();
-            if (day !== 0 && day !== 6) count++;
+        function getWorkingDaysAgo(startDate, daysBack) {
+            var date = new Date(startDate);
+            var count = 0;
+            while (count < daysBack) {
+                date.setDate(date.getDate() - 1);
+                var day = date.getDay();
+                if (day !== 0 && day !== 6) count++; 
+            }
+            return date;
         }
-        return date;
-    }
 
         function setDateRules() {
             var requestType = $("#CurrentRequestType").val();
@@ -256,86 +256,89 @@
             var isEmergency = $("#checkbox").is(":checked");
             var today = new Date();
             var todayStr = today.toISOString().split('T')[0];
-
+            
             var ruleText = $("#rule-container").text();
             var daysMatch = ruleText.match(/(\d+)/);
             var allowedDays = daysMatch ? parseInt(daysMatch[0]) : 5;
 
             if (requestType === "VL") {
                 $("#checkboxWrapper").removeClass("d-none");
+
                 if (isEmergency) {
                     fromInput.attr("min", todayStr).removeAttr("max");
                     toInput.attr("min", todayStr).removeAttr("max");
                 } else {
-                    var minDate = new Date();
-                    minDate.setDate(today.getDate() + allowedDays);
-                    var minStr = minDate.toISOString().split('T')[0];
+                    var minPastDate = getWorkingDaysAgo(today, allowedDays);
+                    var minStr = minPastDate.toISOString().split('T')[0];
+
                     fromInput.attr("min", minStr).removeAttr("max");
-                    toInput.attr("min", todayStr).removeAttr("max");
+                    toInput.attr("min", minStr).removeAttr("max");
                 }
             } else {
                 $("#checkboxWrapper").addClass("d-none");
                 $("#checkbox").prop("checked", false);
-                var minDate = getWorkingDaysAgo(today, allowedDays);
-                var minStr = minDate.toISOString().split('T')[0];
+
+                var minPastDate = getWorkingDaysAgo(today, allowedDays);
+                var minStr = minPastDate.toISOString().split('T')[0];
+
                 fromInput.attr("min", minStr).removeAttr("max");
                 toInput.attr("min", minStr).removeAttr("max");
             }
         }
 
-    function updateInstructionVisibility() {
-        var leaveType = $("#LeaveTypeId").val();
-        $(".rule-group").addClass("d-none");
+        function updateInstructionVisibility() {
+            var leaveType = $("#LeaveTypeId").val();
+            $(".rule-group").addClass("d-none");
 
-        if (leaveType == "1") {
-            $("#rule-sl").removeClass("d-none");
-        } else if (leaveType == "2") {
-            $("#rule-vl").removeClass("d-none");
-        } else {
-            $("#rule-generic").removeClass("d-none");
-        }
-    }
-
-$("#LeaveTypeId").on("change", function () {
-    var selectedText = $(this).find("option:selected").text().trim();
-
-    $.get('@Url.Action("GetDynamicRulesData", "Leave")', { leaveTypeName: selectedText }, function (data) {
-        if (selectedText === "Maternity Leave" || selectedText === "Paternity Leave") {
-            var customHtml = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + selectedText + ' must be filed within 10 days.</p>';
-            $('#rule-container').html(customHtml);
-        } else if (data.Message === "Follow default rule.") {
-            var defaultHtml = '<ul class="list-unstyled mb-0 small">' +
-                '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File at least 3 working days in advance.</span></li>' +
-                '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to bypass the 3-day rule.</span></li>' +
-                '</ul>';
-            $('#rule-container').html(defaultHtml);
-        } else {
-            var html = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + data.Message + '</p>';
-            $('#rule-container').html(html);
+            if (leaveType == "1") {
+                $("#rule-sl").removeClass("d-none");
+            } else if (leaveType == "2") {
+                $("#rule-vl").removeClass("d-none");
+            } else {
+                $("#rule-generic").removeClass("d-none");
+            }
         }
 
-        $("#CurrentRequestType").val(data.RequestType);
+        $("#LeaveTypeId").on("change", function () {
+            var selectedText = $(this).find("option:selected").text().trim();
 
-        if (selectedText === "Vacation Leave") {
-            $("#CurrentRequestType").val("VL");
-        }
+            $.get('@Url.Action("GetDynamicRulesData", "Leave")', { leaveTypeName: selectedText }, function (data) {
+                if (selectedText === "Maternity Leave" || selectedText === "Paternity Leave") {
+                    var customHtml = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + selectedText + ' must be filed within 10 days.</p>';
+                    $('#rule-container').html(customHtml);
+                } else if (data.Message === "Follow default rule.") {
+                    var defaultHtml = '<ul class="list-unstyled mb-0 small">' +
+                        '<li class="mb-2 d-flex"><i class="fa-solid fa-calendar-days text-primary me-2"></i> <span><strong>Standard VL:</strong> File up to 5 working days late or for future dates.</span></li>' +
+                        '<li class="d-flex"><i class="fa-solid fa-bolt text-warning me-2"></i> <span><strong>Emergency VL:</strong> Check "Emergency" to file starting from today.</span></li>' +
+                        '</ul>';
+                    $('#rule-container').html(defaultHtml);
+                } else {
+                    var html = '<p class="small text-muted mb-0"><i class="fa-solid fa-circle-info text-info me-2"></i>' + data.Message + '</p>';
+                    $('#rule-container').html(html);
+                }
 
+                $("#CurrentRequestType").val(data.RequestType);
+
+                if (selectedText === "Vacation Leave") {
+                    $("#CurrentRequestType").val("VL");
+                }
+
+                updateInstructionVisibility();
+                setDateRules();
+            });
+        });
+
+        $("#checkbox").on("change", setDateRules);
+
+        $("#LeaveFrom").on("change", function () {
+            var fromDate = $(this).val();
+            var toInput = $("#LeaveTo");
+            toInput.val(fromDate);
+            toInput.attr("min", fromDate);
+            setDateRules();
+        });
+
+        setDateRules();
         updateInstructionVisibility();
-        setDateRules();
     });
-});
-        
-    $("#checkbox").on("change", setDateRules);
-
-    $("#LeaveFrom").on("change", function () {
-        var fromDate = $(this).val();
-        var toInput = $("#LeaveTo");
-        toInput.val(fromDate);
-        toInput.attr("min", fromDate);
-        setDateRules();
-    });
-        
-    setDateRules();
-    updateInstructionVisibility();
-});
 </script>
