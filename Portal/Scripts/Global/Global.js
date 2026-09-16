@@ -82,8 +82,7 @@
     //    }
     //});
 
-    
-
+   
     $(document).on('click', '#clock-in-button, #clock-in-button-mob', function () {
 
         var AttendanceId = $(this).attr("attendance_id");
@@ -151,7 +150,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Clock-In Denied',
-                                    html: result.result, // Changed 'text' to 'html'
+                                    html: result.result, 
                                     confirmButtonText: 'OK'
                                 });
                             }
@@ -319,7 +318,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Access Denied',
-                            text: response.result,
+                            html: response.result,
                             confirmButtonText: 'OK'
                         });
                     }
@@ -353,7 +352,7 @@
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Clock-Out Denied',
-                                        text: result.result,
+                                        html: result.result,
                                         confirmButtonText: 'OK'
                                     });
                                 }
@@ -380,7 +379,7 @@
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Clock-Out Denied',
-                                        text: result.result,
+                                        html: result.result,
                                         confirmButtonText: 'OK'
                                     });
                                 }
@@ -405,11 +404,11 @@
                             GetClockInClockOut();
                             CheckAttendanceNotification('TIME OUT');
                         }
-                        else if (result.Status == "ERROR") {
+                        else if (result.Status == "ERROR" || result.Status == "FAILED") {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: result.Message || "Something went wrong while processing your time out. Please contact your account supervisor for assistance.",
+                                text: result.msg || result.Message || "Something went wrong while processing your time out. Please contact your account supervisor for assistance.",
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -417,7 +416,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Clock-Out Denied',
-                                text: result.result,
+                                html: result.result,
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -426,7 +425,6 @@
             }
         }
     });
-
 
     //=================================BEGIN TOASTER====================================
     const toasterSuccessBtn = document.getElementById("toasterSuccessBtn");

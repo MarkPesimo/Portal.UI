@@ -324,37 +324,66 @@ namespace Portal.Controllers
                 {
                     return Json(new { Status = "DENIED", result = "Sorry, This feature is not supported by your assigned client. Please contact your friendly neighborhood System Administrator." }, JsonRequestBehavior.AllowGet);
                 }
-                
-                BranchModel branch = _attendancerepository.GetBranchDetail(_branch_id);
-                
-                if (branch != null
-                    && branch.AllowedRadiusMeter.HasValue
-                    && branch.AllowedRadiusMeter.Value > 0
-                    && branch.RegionLatitude.HasValue
-                    && branch.RegionLongitude.HasValue)
+
+                ClientPortalRuleModel clientRule = _attendancerepository.GetClientPortalRuleDetail(_client_id);
+
+                double userLat, userLon;
+                bool isValidLat = double.TryParse(_latitude, out userLat);
+                bool isValidLon = double.TryParse(_longitude, out userLon);
+
+                bool isBlankAllowed = clientRule != null && clientRule.AllowedBlankAttendance;
+
+                if (!isBlankAllowed)
                 {
-                    double userLat, userLon;
-                    bool isValidLat = double.TryParse(_latitude, out userLat);
-                    bool isValidLon = double.TryParse(_longitude, out userLon);
-                    
                     if (!isValidLat || !isValidLon || (userLat == 0 && userLon == 0))
-                    {
-                        return Json(new { Status = "DENIED", result = "Location access is required to clock out. Please enable GPS/location services." }, JsonRequestBehavior.AllowGet);
-                    }
-
-                    double branchLat = Convert.ToDouble(branch.RegionLatitude.Value);
-                    double branchLon = Convert.ToDouble(branch.RegionLongitude.Value);
-                    int allowedRadius = branch.AllowedRadiusMeter.Value;
-
-                    double distanceInMeters = CalculateDistanceInMeters(userLat, userLon, branchLat, branchLon);
-
-                    if (distanceInMeters > allowedRadius)
                     {
                         return Json(new
                         {
                             Status = "DENIED",
-                            result = "Unable to clock out. Please ensure you are within the allowed premises and try again."
+                            result = "<div style='text-align: left; margin-top: 10px; font-size: 14px;'>" +
+                                     "<p><b>Location access is required to clock out.</b></p>" +
+                                     "<p style='margin-top: 8px;'><b>Desktop:</b></p>" +
+                                     "<ol style='padding-left: 20px; margin-top: 4px;'>" +
+                                     "<li>Click the <b>'Location blocked'</b> icon next to the URL in your address bar.</li>" +
+                                     "<li>Select <b>'Always allow'</b> (or click <b>Reset permission</b>).</li>" +
+                                     "<li>Refresh the page and try again.</li>" +
+                                     "</ol>" +
+                                     "<p style='margin-top: 8px;'><b>Mobile:</b></p>" +
+                                     "<ol style='padding-left: 20px; margin-top: 4px;'>" +
+                                     "<li>Tap the <b>Settings</b> icon (or lock icon) next to the website address.</li>" +
+                                     "<li>Tap <b>Permissions</b> > <b>Location</b> and select <b>Allow</b>.</li>" +
+                                     "<li>If prompted by your phone, turn on device <b>Location/GPS</b> in your phone settings.</li>" +
+                                     "<li>Refresh the page and try again.</li>" +
+                                     "</ol>" +
+                                     "</div>"
                         }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+
+                if (clientRule != null && clientRule.ImplementProximityAttendance && isValidLat && isValidLon && (userLat != 0 || userLon != 0))
+                {
+                    BranchModel branch = _attendancerepository.GetBranchDetail(_branch_id);
+
+                    if (branch != null
+                        && branch.AllowedRadiusMeter.HasValue
+                        && branch.AllowedRadiusMeter.Value > 0
+                        && branch.RegionLatitude.HasValue
+                        && branch.RegionLongitude.HasValue)
+                    {
+                        double branchLat = Convert.ToDouble(branch.RegionLatitude.Value);
+                        double branchLon = Convert.ToDouble(branch.RegionLongitude.Value);
+                        int allowedRadius = branch.AllowedRadiusMeter.Value;
+
+                        double distanceInMeters = CalculateDistanceInMeters(userLat, userLon, branchLat, branchLon);
+
+                        if (distanceInMeters > allowedRadius)
+                        {
+                            return Json(new
+                            {
+                                Status = "DENIED",
+                                result = "Unable to clock out. Please ensure you are within the allowed premises and try again."
+                            }, JsonRequestBehavior.AllowGet);
+                        }
                     }
                 }
 
@@ -394,7 +423,7 @@ namespace Portal.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Status = "ERROR", result = false, msg = ex.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new { Status = "FAILED", result = false, msg = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
